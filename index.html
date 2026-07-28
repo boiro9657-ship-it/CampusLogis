@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CampusLogis | Trouvez votre logement étudiant</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<nav class="navbar">
+
+    <a href="#" class="logo">
+
+        <!-- Remplace plus tard par ton logo -->
+        <img src="images/logo.png.jpeg" alt="CampusLogis">
+
+    </a>
+
+    <ul class="nav-links">
+
+        <li><a href="index.html">Accueil</a></li>
+
+        <li><a href="rechercher.html">Rechercher</a></li>
+
+        <li><a href="apropos.html">À propos</a></li>
+
+        <li><a href="contacte.html">Contact</a></li>
+
+        <li><a href="assets/favoris.html">Favoris</a> </li>
+
+         <li>
+
+
+            <a href="dashboard-proprietaire.html">
+                Tableau de bord
+            </a>
+        </li>
+
+        <li>
+            <a href="publier-logement.html">
+                Publier un logement
+            </a>
+        </li>
+
+    </ul>
+
+    <div class="menu-toggle">
+
+    <i class="fas fa-bars"></i>
+
+    </div>
+
+
+    <div class="nav-buttons">
+
+        <a href="inscription.html" class="btn-login">
+
+            S'inscrire
+        </a>
+
+        <a href="connexion.html" class="btn-login">
+            Se connecter
+        </a>
+    
+
+    </div>
+
+</nav>
+
+
+</header>
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-left">
+
+            <span class="badge">
+                🏠 Plateforme N°1 de logements étudiants
+            </span>
+
+            <h1>
+                Trouvez votre logement étudiant
+                <span>en toute simplicité.</span>
+            </h1>
+
+            <p>
+
+                CampusLogis vous aide à trouver rapidement
+                des chambres, studios et appartements
+                proches de votre université.
+
+            </p>
+
+            <div class="search-box">
+
+                <input
+                type="text"
+                placeholder="📍 Ville">
+
+                <select>
+
+                    <option>Type</option>
+
+                    <option>Chambre</option>
+
+                    <option>Studio</option>
+
+                    <option>Appartement</option>
+
+                </select>
+
+                <input
+                type="number"
+                placeholder="Budget">
+
+                <button>
+
+                    Rechercher
+
+                </button>
+
+            </div>
+
+            <div class="stats">
+
+                <div>
+
+                    <h3>12K+</h3>
+
+                    <span>Étudiants</span>
+
+                </div>
+
+                <div>
+
+                    <h3>2500+</h3>
+
+                    <span>Logements</span>
+
+                </div>
+
+                <div>
+
+                    <h3>300+</h3>
+
+                    <span>Propriétaires</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-right">
+
+            <img
+            src="images/hero.png"
+            alt="CampusLogis">
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===========================
+     LOGEMENTS POPULAIRES
+=========================== -->
+
+<section class="featured">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>Nos logements</span>
+
+            <h2>Logements populaires</h2>
+
+            <p>
+                Découvrez une sélection de logements vérifiés,
+                proches des universités et adaptés à votre budget.
+            </p>
+
+        </div>
+
+
+        <div class="cards">
+
+            <!-- Carte 1 -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="images/logement6.jpg.png" alt="Logement">
+
+                    <span class="badge-card">
+                        Disponible
+                    </span>
+
+        BOUTON FAVORI
+                ========================== 
+
+                <!--
+                    data-id permet d'identifier
+                    chaque logement de façon unique.
+                -->
+                <button
+                    class="favorite"
+                    data-id="1">
+
+                    ❤
+
+                </button>
+
+                </div>
+
+
+                <div class="card-content">
+
+                    <h3>Studio Moderne</h3>
+
+                    <p class="price">
+
+                        95 000 FCFA / mois
+
+                    </p>
+
+                    <p class="location">
+
+                        📍 Dakar - Point E
+
+                    </p>
+
+
+                    <div class="infos">
+
+                        <span>🛏 1 Chambre</span>
+
+                        <span>📶 Wi-Fi</span>
+
+                        <span>🚿 Douche</span>
+
+                    </div>
+
+
+                    <div class="bottom-card">
+
+                        <span>
+
+                            ⭐ 4.9
+
+                        </span>
+
+                        <a href="details-logement.html">
+
+                            Voir les détails →
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Duplique cette carte pour en avoir 6 -->
+        </div>
+
+        <div class="cards">
+
+            <!-- Carte 1 -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="images/logement1.jpg.jpg" alt="Logement">
+
+                    <span class="badge-card">
+                        Disponible
+                    </span>
+
+                                    <!-- Logement 1 -->
+                <button
+                class="favorite"
+                data-id="1">
+
+                ❤
+
+                </button>
+
+                </div>
+
+
+                <div class="card-content">
+
+                    <h3>Studio Moderne</h3>
+
+                    <p class="price">
+
+                        95 000 FCFA / mois
+
+                    </p>
+
+                    <p class="location">
+
+                        📍 Dakar - Point E
+
+                    </p>
+
+
+                    <div class="infos">
+
+                        <span>🛏 1 Chambre</span>
+
+                        <span>📶 Wi-Fi</span>
+
+                        <span>🚿 Douche</span>
+
+                    </div>
+
+
+                    <div class="bottom-card">
+
+                        <span>
+
+                            ⭐ 4.9
+
+                        </span>
+
+                        <a href="details-logement.html">
+
+                            Voir les détails →
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Duplique cette carte pour en avoir 6 -->
+        </div>
+
+        <div class="cards">
+
+            <!-- Carte 1 -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="images/logement2.jpg.png" alt="Logement">
+
+                    <span class="badge-card">
+                        Disponible
+                    </span>
+
+                                    <!-- Logement 2 -->
+                <button
+                class="favorite"
+                data-id="2">
+
+                ❤
+
+                </button>
+                </div>
+
+
+                <div class="card-content">
+
+                    <h3>Studio Moderne</h3>
+
+                    <p class="price">
+
+                        95 000 FCFA / mois
+
+                    </p>
+
+                    <p class="location">
+
+                        📍 Dakar - Point E
+
+                    </p>
+
+
+                    <div class="infos">
+
+                        <span>🛏 1 Chambre</span>
+
+                        <span>📶 Wi-Fi</span>
+
+                        <span>🚿 Douche</span>
+
+                    </div>
+
+
+                    <div class="bottom-card">
+
+                        <span>
+
+                            ⭐ 4.9
+
+                        </span>
+
+                        <a href="details-logement.html">
+
+                            Voir les détails →
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Duplique cette carte pour en avoir 6 -->
+        </div>
+
+        <div class="cards">
+
+            <!-- Carte 1 -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="images/logement3.jpg.png" alt="Logement">
+
+                    <span class="badge-card">
+                        Disponible
+                    </span>
+
+                    <!-- Logement 3 -->
+                    <button
+                    class="favorite"
+                    data-id="3">
+
+                    ❤
+
+                    </button>  
+
+                </div>
+
+
+                <div class="card-content">
+
+                    <h3>Studio Moderne</h3>
+
+                    <p class="price">
+
+                        95 000 FCFA / mois
+
+                    </p>
+
+                    <p class="location">
+
+                        📍 Dakar - Point E
+
+                    </p>
+
+
+                    <div class="infos">
+
+                        <span>🛏 1 Chambre</span>
+
+                        <span>📶 Wi-Fi</span>
+
+                        <span>🚿 Douche</span>
+
+                    </div>
+
+
+                    <div class="bottom-card">
+
+                        <span>
+
+                            ⭐ 4.9
+
+                        </span>
+
+                        <a href="details-logement.html">
+
+                            Voir les détails →
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Duplique cette carte pour en avoir 6 -->
+        </div>
+
+        <div class="cards">
+
+            <!-- Carte 1 -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="images/logement4.jpg.png" alt="Logement">
+
+                    <span class="badge-card">
+                        Disponible
+                    </span>
+
+                    <!-- Logement 4 -->
+                    <button
+                    class="favorite"
+                    data-id="4">
+
+                    ❤
+
+                    </button>
+
+                </div>
+
+
+                <div class="card-content">
+
+                    <h3>Studio Moderne</h3>
+
+                    <p class="price">
+
+                        95 000 FCFA / mois
+
+                    </p>
+
+                    <p class="location">
+
+                        📍 Dakar - Point E
+
+                    </p>
+
+
+                    <div class="infos">
+
+                        <span>🛏 1 Chambre</span>
+
+                        <span>📶 Wi-Fi</span>
+
+                        <span>🚿 Douche</span>
+
+                    </div>
+
+
+                    <div class="bottom-card">
+
+                        <span>
+
+                            ⭐ 4.9
+
+                        </span>
+
+                        <a href="details-logement.html">
+
+                            Voir les détails →
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Duplique cette carte pour en avoir 6 -->
+        </div>
+
+        <div class="cards">
+
+            <!-- Carte 1 -->
+
+            <div class="card">
+
+                <div class="card-image">
+
+                    <img src="images/logement5.jpg.png" alt="Logement">
+
+                    <span class="badge-card">
+                        Disponible
+                    </span>
+
+                    <!-- Logement 5 -->
+                    <button
+                    class="favorite"
+                    data-id="5">
+
+                    ❤
+
+                    </button>
+                </div>
+
+
+                <div class="card-content">
+
+                    <h3>Studio Moderne</h3>
+
+                    <p class="price">
+
+                        95 000 FCFA / mois
+
+                    </p>
+
+                    <p class="location">
+
+                        📍 Dakar - Point E
+
+                    </p>
+
+
+                    <div class="infos">
+
+                        <span>🛏 1 Chambre</span>
+
+                        <span>📶 Wi-Fi</span>
+
+                        <span>🚿 Douche</span>
+
+                    </div>
+
+
+                    <div class="bottom-card">
+
+                        <span>
+
+                            ⭐ 4.9
+
+                        </span>
+
+                        <a href="details-logement.html">
+
+                            Voir les détails →
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Duplique cette carte pour en avoir 6 -->
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===========================
+     COMMENT ÇA MARCHE
+=========================== -->
+
+<section class="how-it-works">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>Simple et rapide</span>
+
+            <h2>Comment ça marche ?</h2>
+
+            <p>
+                Trouver un logement n'a jamais été aussi simple avec CampusLogis.
+            </p>
+
+        </div>
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-icon">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+
+                <h3>Recherchez</h3>
+
+                <p>
+                    Choisissez votre ville, votre budget et le type de logement souhaité.
+                </p>
+
+            </div>
+
+            <div class="step">
+
+                <div class="step-icon">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+
+                <h3>Comparez</h3>
+
+                <p>
+                    Consultez les annonces vérifiées et comparez les meilleurs logements.
+                </p>
+
+            </div>
+
+            <div class="step">
+
+                <div class="step-icon">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+
+                <h3>Réservez</h3>
+
+                <p>
+                    Réservez votre logement en toute sécurité et préparez votre installation.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===========================
+     POURQUOI CHOISIR CAMPUSLOGIS
+=========================== -->
+
+<section class="why-us">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>Nos avantages</span>
+
+            <h2>Pourquoi choisir CampusLogis ?</h2>
+
+            <p>
+                Une plateforme pensée spécialement pour les étudiants et les propriétaires,
+                avec des fonctionnalités modernes, simples et sécurisées.
+            </p>
+
+        </div>
+
+        <div class="why-grid">
+
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <h3>Annonces vérifiées</h3>
+
+                <p>
+                    Chaque annonce est contrôlée avant publication pour garantir sa fiabilité.
+                </p>
+            </div>
+
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+
+                <h3>Paiement sécurisé</h3>
+
+                <p>
+                    Réservez votre logement en toute confiance grâce aux paiements sécurisés.
+                </p>
+            </div>
+
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fa-solid fa-school"></i>
+                </div>
+
+                <h3>Près des universités</h3>
+
+                <p>
+                    Trouvez rapidement un logement proche de votre établissement.
+                </p>
+            </div>
+
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+
+                <h3>Support 7j/7</h3>
+
+                <p>
+                    Notre équipe vous accompagne avant et après votre réservation.
+                </p>
+            </div>
+
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <h3>Avis des étudiants</h3>
+
+                <p>
+                    Consultez les notes et commentaires laissés par les autres étudiants.
+                </p>
+            </div>
+
+            <div class="why-card">
+                <div class="why-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+
+                <h3>Assistant IA</h3>
+
+                <p>
+                    Une intelligence artificielle vous aide à trouver le logement idéal.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===========================
+     STATISTIQUES
+=========================== -->
+
+<section class="stats-section">
+
+    <div class="container">
+
+        <div class="stats-grid">
+
+            <div class="stat-box">
+                <i class="fa-solid fa-user-graduate"></i>
+                <h2 class="counter" data-target="12500">0</h2>
+                <p>Étudiants</p>
+            </div>
+
+            <div class="stat-box">
+                <i class="fa-solid fa-house"></i>
+                <h2 class="counter" data-target="2800">0</h2>
+                <p>Logements</p>
+            </div>
+
+            <div class="stat-box">
+                <i class="fa-solid fa-building-user"></i>
+                <h2 class="counter" data-target="350">0</h2>
+                <p>Propriétaires</p>
+            </div>
+
+            <div class="stat-box">
+                <i class="fa-solid fa-location-dot"></i>
+                <h2 class="counter" data-target="14">0</h2>
+                <p>Villes</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===========================
+     TEMOIGNAGES
+=========================== -->
+
+<section class="testimonials">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>Témoignages</span>
+
+            <h2>Ils nous font confiance</h2>
+
+            <p>
+                Découvrez ce que pensent les étudiants qui ont trouvé leur logement grâce à CampusLogis.
+            </p>
+
+        </div>
+
+        <div class="testimonial-grid">
+
+            <div class="testimonial-card">
+
+                <img src="images/avatar3.jpg.jpg" alt="Étudiant">
+
+                <h3>Fatou Ndiaye</h3>
+
+                <span>Étudiante à l'UCAD</span>
+
+                <div class="stars">
+                    ⭐⭐⭐⭐⭐
+                </div>
+
+                <p>
+                    Grâce à CampusLogis, j'ai trouvé un studio en moins de 48 heures. Le processus était simple et rapide.
+                </p>
+
+            </div>
+
+            <div class="testimonial-card">
+
+                <img src="images/avatar2.jpg.jpg" alt="Étudiant">
+
+                <h3>Mamadou Diallo</h3>
+
+                <span>Étudiant à l'ISI</span>
+
+                <div class="stars">
+                    ⭐⭐⭐⭐⭐
+                </div>
+
+                <p>
+                    Les annonces sont fiables et j'ai pu contacter directement le propriétaire.
+                </p>
+
+            </div>
+
+            <div class="testimonial-card">
+
+                <img src="images/avatar1.jpg.jpg" alt="Étudiant">
+
+                <h3>Awa Fall</h3>
+
+                <span>Étudiante à l'UGB</span>
+
+                <div class="stars">
+                    ⭐⭐⭐⭐⭐
+                </div>
+
+                <p>
+                    Je recommande CampusLogis à tous les étudiants qui recherchent un logement au Sénégal.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!--==============================
+        FAQ
+===============================-->
+
+<section class="faq">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>FAQ</span>
+
+            <h2>Questions Fréquentes</h2>
+
+            <p>
+                Retrouvez les réponses aux questions les plus posées.
+            </p>
+
+        </div>
+
+        <div class="faq-container">
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Comment réserver un logement ?
+                    <span>+</span>
+                </button>
+
+                <div class="faq-answer">
+                    <p>
+                        Recherchez un logement, consultez les détails puis cliquez sur
+                        "Réserver".
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Les annonces sont-elles vérifiées ?
+                    <span>+</span>
+                </button>
+
+                <div class="faq-answer">
+                    <p>
+                        Oui. Toutes les annonces sont vérifiées avant leur publication.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Puis-je publier gratuitement ?
+                    <span>+</span>
+                </button>
+
+                <div class="faq-answer">
+                    <p>
+                        Oui, les propriétaires peuvent publier gratuitement leur première annonce.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Quels moyens de paiement acceptez-vous ?
+                    <span>+</span>
+                </button>
+
+                <div class="faq-answer">
+                    <p>
+                        Wave, Orange Money, Free Money et les cartes bancaires seront pris en charge.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!--===================================
+            CALL TO ACTION
+====================================-->
+
+<section class="cta">
+
+    <div class="container">
+
+        <div class="cta-content">
+
+            <span class="cta-badge">
+                ⭐ Plus de 12 500 étudiants nous font confiance
+            </span>
+
+            <h2>
+                Trouvez votre futur logement étudiant dès aujourd'hui
+            </h2>
+
+            <p>
+                Rejoignez la première plateforme sénégalaise dédiée aux logements étudiants.
+                Rapide, sécurisée et pensée pour votre réussite.
+            </p>
+
+            <div class="cta-buttons">
+
+                <a href="rechercher.html" class="btn-primary">
+                    🔍 Rechercher un logement
+                </a>
+
+                <a href="publier-logement.html" class="btn-secondary">
+                    🏠 Publier une annonce
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="details-cta">
+
+    <h2>
+
+        Trouvez votre prochain logement étudiant
+
+    </h2>
+
+    <p>
+
+        Découvrez des centaines d'annonces adaptées
+        à votre budget et à vos besoins.
+
+    </p>
+
+    <a href="rechercher.html">
+
+        Explorer les logements
+
+    </a>
+
+</section>
+
+<!--===================================
+            FOOTER
+====================================-->
+
+<footer class="footer">
+
+    <div class="container">
+
+        <div class="footer-grid">
+
+            <!-- Logo -->
+            <div class="footer-col">
+
+                <h2 class="footer-logo">CampusLogis</h2>
+
+                <p>
+                    La plateforme sénégalaise qui aide les étudiants à trouver rapidement un logement fiable, sécurisé et abordable.
+                </p>
+
+                <div class="social-icons">
+
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+
+                </div>
+
+            </div>
+
+            <!-- Navigation -->
+            <div class="footer-col">
+
+                <h3>Navigation</h3>
+
+                <ul>
+
+                    <li><a href="index.html">Accueil</a></li>
+
+                    <li><a href="recherche.html">Rechercher</a></li>
+
+                    <li><a href="connexion.html">Connexion</a></li>
+
+                    <li><a href="inscription.html">Inscription</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Services -->
+            <div class="footer-col">
+
+                <h3>Services</h3>
+
+                <ul>
+
+                    <li><a href="#">Publier une annonce</a></li>
+
+                    <li><a href="#">Réserver</a></li>
+
+                    <li><a href="#">Favoris</a></li>
+
+                    <li><a href="#">Support</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Contact -->
+            <div class="footer-col">
+
+                <h3>Contact</h3>
+
+                <ul>
+
+                    <li><i class="fas fa-phone"></i> +221 77 000 00 00</li>
+
+                    <li><i class="fas fa-envelope"></i> contact@campuslogis.sn</li>
+
+                    <li><i class="fas fa-location-dot"></i> Dakar, Sénégal</li>
+
+                </ul>
+
+            </div>
+
+            <!-- Newsletter -->
+            <div class="footer-col">
+
+                <h3>Newsletter</h3>
+
+                <p>
+
+                    Recevez les nouveaux logements directement dans votre boîte mail.
+
+                </p>
+
+                <form class="newsletter">
+
+                    <input
+                        type="email"
+                        placeholder="Votre email"
+                    >
+
+                    <button>
+
+                        S'abonner
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <hr>
+
+        <div class="footer-bottom">
+
+            <p>
+
+                © 2026 CampusLogis. Tous droits réservés.
+
+            </p>
+
+            <div>
+
+                <a href="#">Mentions légales</a>
+
+                <a href="#">Confidentialité</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<button id="scrollTop">
+
+    <i class="fas fa-arrow-up"></i>
+
+</button>
+
+<div id="toast"></div>
+
+<script src="assets/js/main.js"></script>
+<script src="assets/js/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche | CampusLogis</title>
+
+    <link rel="stylesheet" href="assets/style.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+    
+    <section class="breadcrumb">
+
+    <div class="container">
+
+        <a href="index.html">Accueil</a>
+
+        <span>></span>
+
+        <span>Dashboard propriétaire</span>
+
+    </div>
+
+</section>
+
+
+<form class="publish-card" id="publishForm">
+
+    <div class="form-group">
+
+        <label>Titre du logement</label>
+        <input
+            type="text"
+            id="titre"
+            placeholder="Titre du logement">
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Ville</label>
+        <input
+            type="text"
+            id="ville"
+            placeholder="Ville">
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Prix mensuel</label>
+        <input
+            type="number"
+            id="prix"
+            placeholder="Prix mensuel">
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Nombre de chambres</label>
+        <input
+            type="number"
+            id="chambres"
+            placeholder="Nombre de chambres">
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Description</label>
+        <textarea
+            id="description"
+            placeholder="Description du logement"></textarea>
+
+    </div>
+
+    <div class="form-group">
+
+    <label>Photos</label>
+
+   <input type="file"
+    id="photo"
+    accept="image/*"
+    multiple>
+
+</div>
+
+    <button type="submit" class="publish-btn">
+        Publier le logement
+    </button>
+
+</form>
+
+
+<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

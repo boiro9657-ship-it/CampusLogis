@@ -1,23 +1,39 @@
-/* ===========================
-   RESET
-=========================== */
+/* ==========================
+        RESET
+========================== */
 
 *{
+
     margin:0;
+
     padding:0;
+
     box-sizing:border-box;
+
 }
 
-html{
-    scroll-behavior:smooth;
-}
-
+html,
 body{
-    font-family:'Inter',sans-serif;
-    background:#f8fafc;
-    color:#0D1B2A;
+
+    overflow-x:hidden;
+
+    width:100%;
+
 }
 
+/* ==========================
+        IMAGES
+========================== */
+
+img{
+
+    max-width:100%;
+
+    height:auto;
+
+    display:block;
+
+}
 /* ===========================
    VARIABLES
 =========================== */
@@ -504,6 +520,21 @@ header{
 
     background:#ef4444;
     color:white;
+    transform:scale(1.1);
+
+}
+
+/* ==========================
+    FAVORI ACTIF
+========================== */
+
+/* Style appliqué lorsqu'un logement est ajouté aux favoris */
+.favorite.active{
+
+    background:#EF4444;
+
+    color:white;
+
     transform:scale(1.1);
 
 }
@@ -3106,5 +3137,118 @@ td{
 #details-cta a:hover{
 
     transform:translateY(-5px);
+
+}
+
+/* ==========================
+        PAGE FAVORIS
+========================== */
+
+/* Bannière */
+#favoris-hero{
+
+    min-height:45vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    color:white;
+
+    background:
+    linear-gradient(
+        135deg,
+        #2563EB,
+        #1D4ED8,
+        #0F172A
+    );
+
+}
+
+/* Conteneur des cartes */
+#favoris-container{
+
+    max-width:1300px;
+
+    margin:80px auto;
+
+    padding:0 30px;
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(320px,1fr));
+
+    gap:30px;
+
+}
+
+/* ==========================
+        CORRECTION MOBILE
+========================== */
+
+/* Empêche le défilement horizontal */
+html,
+body{
+
+    width:100%;
+
+    overflow-x:hidden;
+
+}
+
+/* ==========================
+        RESPONSIVE HERO
+========================== */
+
+@media (max-width:768px){
+
+    .hero{
+
+        padding:120px 20px 60px;
+
+    }
+
+    .hero-content{
+
+        grid-template-columns:1fr;
+
+        gap:40px;
+
+        text-align:center;
+
+    }
+
+    .hero-left h1{
+
+        font-size:2.3rem;
+
+    }
+
+    .stats{
+
+        justify-content:center;
+
+        flex-wrap:wrap;
+
+        gap:25px;
+
+    }
+
+    .search-box{
+
+        flex-direction:column;
+
+    }
+
+    .search-box button{
+
+        width:100%;
+
+    }
 
 }

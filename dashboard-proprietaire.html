@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche | CampusLogis</title>
+
+    <link rel="stylesheet" href="assets/style.css">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+
+    <section class="breadcrumb">
+
+    <div class="container">
+
+        <a href="index.html">Accueil</a>
+
+        <span>></span>
+
+        <span>Dashboard propriétaire</span>
+
+    </div>
+
+</div>
+    
+
+</section>
+
+<section id="owner-dashboard">
+
+    <aside class="sidebar">
+
+        <h2>CampusLogis</h2>
+
+        <ul>
+
+            <li><a href="publier-logement.html"><i class="fas fa-home"></i> Tableau de bord</a></li>
+
+            <li><a href="publier-logement.html">
+                <i class="fas fa-plus-circle"></i>
+                Publier un logement
+            </a></li>
+
+            <li><a href="#">
+                <i class="fas fa-building"></i>
+                Mes annonces
+            </a></li>
+
+            <li><a href="#">
+                <i class="fas fa-calendar-check"></i>
+                Réservations
+            </a></li>
+
+            <li><a href="#">
+                <i class="fas fa-envelope"></i>
+                Messages
+            </a></li>
+
+            <li><a href="#">
+                <i class="fas fa-cog"></i>
+                Paramètres
+            </a></li>
+
+        </ul>
+
+    </aside>
+
+
+    <main class="dashboard-content">
+
+        <div class="dashboard-header">
+
+            <h1>Bonjour Ibrahima 👋</h1>
+
+            <p>Gérez facilement vos logements étudiants.</p>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <i class="fas fa-building"></i>
+                <h2>5</h2>
+                <p>Logements</p>
+            </div>
+
+            <div class="stat-card">
+                <i class="fas fa-calendar-check"></i>
+                <h2>12</h2>
+                <p>Réservations</p>
+            </div>
+
+            <div class="stat-card">
+                <i class="fas fa-money-bill-wave"></i>
+                <h2>450 000 F</h2>
+                <p>Revenus</p>
+            </div>
+
+        </div>
+
+
+        <div class="recent-section">
+
+            <h2>Mes annonces récentes</h2>
+
+            <div class="table-card">
+
+                <table>
+
+                    <tr>
+                        <th>Logement</th>
+                        <th>Ville</th>
+                        <th>Prix</th>
+                        <th>Statut</th>
+                    </tr>
+
+                    <tr>
+                        <td>Studio UCAD</td>
+                        <td>Dakar</td>
+                        <td>75 000 F</td>
+                        <td>Disponible</td>
+                    </tr>
+
+                    <tr>
+                        <td>Appartement F2</td>
+                        <td>Saint-Louis</td>
+                        <td>120 000 F</td>
+                        <td>Réservé</td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</section>
+
+<!-- ===========================
+        MES ANNONCES
+=========================== -->
+
+<section class="owner-properties">
+
+    <!-- En-tête de la section -->
+    <div class="section-header">
+
+        <h2>Mes annonces</h2>
+
+        <!-- Bouton pour publier un nouveau logement -->
+        <a href="publier-logement.html"
+           class="btn-primary">
+            + Ajouter
+        </a>
+
+    </div>
+
+    <!-- Carte d'un logement -->
+<div id="annonces-container"
+     class="property-grid">
+
+</div>
+
+<!-- ==========================
+        BOUTON MENU MOBILE
+========================== -->
+
+<script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

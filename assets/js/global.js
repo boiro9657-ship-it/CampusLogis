@@ -18,6 +18,30 @@ if(siteHeader){
 
     });
 
+    // Empêche la navbar fixe de cacher le haut de la page :
+    // mesure la vraie hauteur de la navbar (au lieu d'un
+    // chiffre codé en dur, qui se désynchronise dès que la
+    // navbar change de hauteur — mobile, contenu, police...)
+    // et l'expose en variable CSS + en décalage d'ancre.
+    const setScrollOffset = () => {
+
+        const height =
+        siteHeader.getBoundingClientRect().height;
+
+        document.documentElement.style.setProperty(
+            "--header-height",
+            height + "px"
+        );
+
+        document.documentElement.style.scrollPaddingTop =
+        (height + 15) + "px";
+
+    };
+
+    setScrollOffset();
+
+    window.addEventListener("resize", setScrollOffset);
+
 }
 
 /* ==========================

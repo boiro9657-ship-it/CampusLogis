@@ -270,11 +270,18 @@ header.scrolled{
 
 .breadcrumb{
 
-    background:#f8fafc;
+    background:#fff;
 
-    padding:20px 8%;
+    padding:16px 8%;
 
-    border-bottom:1px solid #e2e8f0;
+    border-bottom:1px solid #eef1f5;
+
+    /* La navbar est en position fixe : sans cette marge,
+       elle recouvre entièrement le fil d'Ariane au
+       chargement de la page. --header-height est mesurée
+       en JS (global.js) ; 127px est la valeur de repli
+       le temps que le script s'exécute. */
+    margin-top:var(--header-height, 127px);
 
 }
 
@@ -284,25 +291,71 @@ header.scrolled{
 
     align-items:center;
 
-    gap:12px;
+    gap:10px;
 
     flex-wrap:wrap;
+
+    font-size:14px;
 
 }
 
 .breadcrumb a{
 
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
     text-decoration:none;
 
-    color:#2563EB;
+    color:#64748B;
 
     font-weight:600;
 
+    padding:6px 4px;
+
+    border-radius:8px;
+
+    transition:.2s;
+
 }
 
-.breadcrumb span{
+.breadcrumb a:hover{
 
-    color:#64748B;
+    color:#2563EB;
+
+    background:#eff6ff;
+
+}
+
+.breadcrumb a i{
+
+    font-size:12px;
+
+    color:#94A3B8;
+
+}
+
+.breadcrumb a:hover i{
+
+    color:#2563EB;
+
+}
+
+.breadcrumb .breadcrumb-sep{
+
+    font-size:10px;
+
+    color:#CBD5E1;
+
+}
+
+.breadcrumb .breadcrumb-current{
+
+    color:#0D1B2A;
+
+    font-weight:600;
 
 }
 

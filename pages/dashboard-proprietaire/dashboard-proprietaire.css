@@ -249,3 +249,36 @@ td{
     }
 
 }
+
+@media(max-width:600px){
+
+    .dashboard-content{
+
+        padding:30px 20px;
+
+    }
+
+    .owner-properties{
+
+        padding:0 20px 40px;
+
+    }
+
+    .section-header{
+
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+
+    }
+
+    th,
+    td{
+
+        padding:14px 10px;
+
+        font-size:14px;
+
+    }
+
+}

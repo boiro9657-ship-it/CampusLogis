@@ -181,3 +181,37 @@
     outline:none;
 
 }
+
+@media(max-width:800px){
+
+    .auth{
+
+        padding:20px;
+
+    }
+
+    .auth-container{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .auth-image{
+
+        display:none;
+
+    }
+
+    .auth-form{
+
+        padding:40px 30px;
+
+    }
+
+    .auth-form h2{
+
+        font-size:2rem;
+
+    }
+
+}

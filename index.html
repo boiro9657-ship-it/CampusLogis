@@ -99,49 +99,22 @@
             </span>
 
             <h1>
-                Trouvez votre logement étudiant
-                <span>en toute simplicité.</span>
+                Votre partenaire de confiance pour le
+                <span>logement étudiant.</span>
             </h1>
 
             <p>
 
                 CampusLogis vous aide à trouver rapidement
                 des chambres, studios et appartements
-                proches de votre université.
+                proches de votre université, en toute simplicité.
 
             </p>
 
-            <form class="search-box" id="heroSearchForm">
-
-                <input
-                type="text"
-                id="heroVille"
-                placeholder="📍 Ville">
-
-                <select id="heroType">
-
-                    <option value="">Type</option>
-
-                    <option value="Chambre">Chambre</option>
-
-                    <option value="Studio">Studio</option>
-
-                    <option value="Appartement">Appartement</option>
-
-                </select>
-
-                <input
-                type="number"
-                id="heroBudget"
-                placeholder="Budget">
-
-                <button type="submit">
-
-                    Rechercher
-
-                </button>
-
-            </form>
+            <a href="pages/rechercher/rechercher.html" class="hero-cta">
+                Explorer les logements
+                <i class="fas fa-arrow-right"></i>
+            </a>
 
             <div class="stats">
 
@@ -185,6 +158,71 @@
     </div>
 
 </section>
+
+<!-- ===========================
+     CARTE DE RECHERCHE FLOTTANTE
+=========================== -->
+
+<div class="hero-search-card-wrap">
+
+    <div class="hero-search-card">
+
+        <div class="search-tabs">
+
+            <button type="button" class="search-tab active" data-type="">
+                <i class="fas fa-house"></i> Tous
+            </button>
+
+            <button type="button" class="search-tab" data-type="Chambre">
+                <i class="fas fa-bed"></i> Chambre
+            </button>
+
+            <button type="button" class="search-tab" data-type="Studio">
+                <i class="fas fa-door-open"></i> Studio
+            </button>
+
+            <button type="button" class="search-tab" data-type="Appartement">
+                <i class="fas fa-building"></i> Appartement
+            </button>
+
+        </div>
+
+        <form class="search-card-form" id="heroSearchForm">
+
+            <input type="hidden" id="heroType" value="">
+
+            <div class="search-card-field search-card-field-grow">
+
+                <i class="fas fa-location-dot"></i>
+
+                <input
+                type="text"
+                id="heroVille"
+                placeholder="Ville, quartier ou université...">
+
+            </div>
+
+            <div class="search-card-field">
+
+                <i class="fas fa-sack-dollar"></i>
+
+                <input
+                type="number"
+                id="heroBudget"
+                placeholder="Budget max (FCFA)">
+
+            </div>
+
+            <button type="submit" class="search-card-btn">
+                <i class="fas fa-search"></i>
+                Rechercher des logements
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
 
 <!-- ===========================
      LOGEMENTS POPULAIRES

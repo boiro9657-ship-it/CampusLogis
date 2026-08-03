@@ -4,6 +4,34 @@
    ========================================================== */
 
 /* ==========================
+    ONGLETS DE LA CARTE DE RECHERCHE
+========================== */
+
+const searchTabs =
+document.querySelectorAll(".search-tab");
+
+const heroTypeInput =
+document.getElementById("heroType");
+
+searchTabs.forEach(tab => {
+
+    tab.addEventListener("click", () => {
+
+        searchTabs.forEach(t => t.classList.remove("active"));
+
+        tab.classList.add("active");
+
+        if(heroTypeInput){
+
+            heroTypeInput.value = tab.dataset.type;
+
+        }
+
+    });
+
+});
+
+/* ==========================
     RECHERCHE DU HERO
 ========================== */
 

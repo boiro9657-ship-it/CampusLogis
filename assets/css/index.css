@@ -8,12 +8,10 @@
 
 .hero{
 
-    min-height:100vh;
-
     display:flex;
     align-items:center;
 
-    padding:140px 8% 80px;
+    padding:150px 8% 60px;
 
     background:linear-gradient(135deg,#f8fbff,#eef6ff);
 
@@ -85,77 +83,49 @@
 
 }
 
-.search-box{
+.hero-cta{
 
-    display:flex;
+    display:inline-flex;
 
-    gap:15px;
+    align-items:center;
 
-    padding:18px;
+    gap:12px;
 
-    background:white;
-
-    border-radius:18px;
-
-    box-shadow:0 20px 50px rgba(0,0,0,.08);
-
-    flex-wrap:wrap;
-
-}
-
-.search-box input,
-.search-box select{
-
-    flex:1;
-
-    border:none;
-
-    background:#f5f7fa;
-
-    padding:16px;
-
-    border-radius:12px;
-
-    outline:none;
-
-    font-size:15px;
-
-    transition:box-shadow .2s;
-
-}
-
-.search-box input:focus,
-.search-box select:focus{
-
-    box-shadow:0 0 0 4px rgba(37,99,235,.15);
-
-}
-
-.search-box button{
-
-    background:#2563EB;
+    background:#0D1B2A;
 
     color:white;
 
-    border:none;
+    text-decoration:none;
 
-    padding:16px 28px;
+    padding:17px 30px;
 
-    border-radius:12px;
+    border-radius:14px;
 
-    cursor:pointer;
-
-    font-weight:600;
+    font-weight:700;
 
     transition:.3s;
 
 }
 
-.search-box button:hover{
+.hero-cta i{
 
-    background:#1d4ed8;
+    transition:transform .3s;
+
+}
+
+.hero-cta:hover{
+
+    background:#F59E0B;
 
     transform:translateY(-3px);
+
+    box-shadow:0 15px 30px rgba(245,158,11,.3);
+
+}
+
+.hero-cta:hover i{
+
+    transform:translateX(4px);
 
 }
 
@@ -165,7 +135,7 @@
 
     gap:45px;
 
-    margin-top:50px;
+    margin-top:40px;
 
 }
 
@@ -226,6 +196,200 @@
         transform:translateY(0);
 
     }
+
+}
+
+/* ===========================
+   CARTE DE RECHERCHE FLOTTANTE
+=========================== */
+
+.hero-search-card-wrap{
+
+    position:relative;
+
+    z-index:5;
+
+    margin:-55px 8% 60px;
+
+}
+
+.hero-search-card{
+
+    max-width:1100px;
+
+    margin:auto;
+
+    background:white;
+
+    border-radius:28px;
+
+    padding:28px 30px;
+
+    box-shadow:0 30px 70px rgba(13,27,42,.16);
+
+}
+
+.search-tabs{
+
+    display:flex;
+
+    gap:8px;
+
+    margin-bottom:22px;
+
+    flex-wrap:wrap;
+
+}
+
+.search-tab{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    border:none;
+
+    background:#F3F4F6;
+
+    color:#475569;
+
+    padding:12px 20px;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    font-size:14px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.search-tab:hover{
+
+    background:#e8f1ff;
+
+    color:#2563EB;
+
+}
+
+.search-tab.active{
+
+    background:#2563EB;
+
+    color:white;
+
+    box-shadow:0 10px 20px rgba(37,99,235,.25);
+
+}
+
+.search-card-form{
+
+    display:flex;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+}
+
+.search-card-field{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    background:#f5f7fa;
+
+    border-radius:14px;
+
+    padding:0 18px;
+
+    flex:1;
+
+    min-width:180px;
+
+}
+
+.search-card-field-grow{
+
+    flex:2;
+
+    min-width:240px;
+
+}
+
+.search-card-field i{
+
+    color:#94A3B8;
+
+}
+
+.search-card-field input{
+
+    flex:1;
+
+    border:none;
+
+    background:transparent;
+
+    padding:17px 0;
+
+    outline:none;
+
+    font-size:15px;
+
+    font-family:inherit;
+
+    min-width:0;
+
+}
+
+.search-card-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    border:none;
+
+    background:#F59E0B;
+
+    color:white;
+
+    padding:17px 30px;
+
+    border-radius:14px;
+
+    font-weight:700;
+
+    font-size:15px;
+
+    cursor:pointer;
+
+    white-space:nowrap;
+
+    transition:.3s;
+
+}
+
+.search-card-btn:hover{
+
+    background:#0D1B2A;
+
+    transform:translateY(-3px);
+
+    box-shadow:0 15px 30px rgba(13,27,42,.25);
 
 }
 
@@ -1035,7 +1199,11 @@
 
     .hero{
 
-        padding:120px 20px 60px;
+        /* La navbar est plus haute sur mobile (menu empilé) :
+           on part de sa vraie hauteur mesurée en JS pour ne
+           pas repasser sous elle, avec un repli statique
+           suffisant si le script n'a pas encore tourné. */
+        padding:calc(var(--header-height, 160px) + 30px) 20px 60px;
 
     }
 
@@ -1065,13 +1233,48 @@
 
     }
 
-    .search-box{
+    .hero-cta{
 
-        flex-direction:column;
+        margin:auto;
 
     }
 
-    .search-box button{
+    .hero-search-card-wrap{
+
+        margin:-50px 20px 40px;
+
+    }
+
+    .hero-search-card{
+
+        padding:20px;
+
+        border-radius:22px;
+
+    }
+
+    .search-tabs{
+
+        gap:6px;
+
+    }
+
+    .search-tab{
+
+        padding:10px 14px;
+
+        font-size:13px;
+
+    }
+
+    .search-card-field,
+    .search-card-field-grow{
+
+        flex-basis:100%;
+
+    }
+
+    .search-card-btn{
 
         width:100%;
 

@@ -14,7 +14,8 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/index.css">
 
 </head>
 
@@ -24,35 +25,35 @@
 
 <nav class="navbar">
 
-    <a href="#" class="logo">
+    <a href="index.html" class="logo">
 
         <!-- Remplace plus tard par ton logo -->
-        <img src="images/logo.png.jpeg" alt="CampusLogis">
+        <img src="images/logo.jpg" alt="CampusLogis">
 
     </a>
 
     <ul class="nav-links">
 
-        <li><a href="index.html">Accueil</a></li>
+        <li><a href="index.html" class="active">Accueil</a></li>
 
-        <li><a href="rechercher.html">Rechercher</a></li>
+        <li><a href="pages/rechercher/rechercher.html">Rechercher</a></li>
 
-        <li><a href="apropos.html">À propos</a></li>
+        <li><a href="pages/apropos/apropos.html">À propos</a></li>
 
-        <li><a href="contacte.html">Contact</a></li>
+        <li><a href="pages/contacte/contacte.html">Contact</a></li>
 
-        <li><a href="assets/favoris.html">Favoris</a> </li>
+        <li><a href="pages/favoris/favoris.html">Favoris</a> </li>
 
          <li>
 
 
-            <a href="dashboard-proprietaire.html">
+            <a href="pages/dashboard-proprietaire/dashboard-proprietaire.html">
                 Tableau de bord
             </a>
         </li>
 
         <li>
-            <a href="publier-logement.html">
+            <a href="pages/publier-logement/publier-logement.html">
                 Publier un logement
             </a>
         </li>
@@ -68,12 +69,12 @@
 
     <div class="nav-buttons">
 
-        <a href="inscription.html" class="btn-login">
+        <a href="pages/inscription/inscription.html" class="btn-login">
 
             S'inscrire
         </a>
 
-        <a href="connexion.html" class="btn-login">
+        <a href="pages/connexion/connexion.html" class="btn-login">
             Se connecter
         </a>
     
@@ -110,35 +111,37 @@
 
             </p>
 
-            <div class="search-box">
+            <form class="search-box" id="heroSearchForm">
 
                 <input
                 type="text"
+                id="heroVille"
                 placeholder="📍 Ville">
 
-                <select>
+                <select id="heroType">
 
-                    <option>Type</option>
+                    <option value="">Type</option>
 
-                    <option>Chambre</option>
+                    <option value="Chambre">Chambre</option>
 
-                    <option>Studio</option>
+                    <option value="Studio">Studio</option>
 
-                    <option>Appartement</option>
+                    <option value="Appartement">Appartement</option>
 
                 </select>
 
                 <input
                 type="number"
+                id="heroBudget"
                 placeholder="Budget">
 
-                <button>
+                <button type="submit">
 
                     Rechercher
 
                 </button>
 
-            </div>
+            </form>
 
             <div class="stats">
 
@@ -174,7 +177,7 @@
         <div class="hero-right">
 
             <img
-            src="images/hero.png"
+            src="images/hero.jpg"
             alt="CampusLogis">
 
         </div>
@@ -213,22 +216,20 @@
 
                 <div class="card-image">
 
-                    <img src="images/logement6.jpg.png" alt="Logement">
+                    <img src="images/logement6.jpg" loading="lazy" alt="Logement">
 
                     <span class="badge-card">
                         Disponible
                     </span>
 
-        BOUTON FAVORI
-                ========================== 
-
-                <!--
-                    data-id permet d'identifier
-                    chaque logement de façon unique.
-                -->
+                <!-- ==========================
+                     BOUTON FAVORI
+                     data-id permet d'identifier
+                     chaque logement de façon unique.
+                     ========================== -->
                 <button
                     class="favorite"
-                    data-id="1">
+                    data-id="6">
 
                     ❤
 
@@ -273,7 +274,7 @@
 
                         </span>
 
-                        <a href="details-logement.html">
+                        <a href="pages/details-logement/details-logement.html">
 
                             Voir les détails →
 
@@ -286,17 +287,12 @@
             </div>
 
             <!-- Duplique cette carte pour en avoir 6 -->
-        </div>
-
-        <div class="cards">
-
-            <!-- Carte 1 -->
 
             <div class="card">
 
                 <div class="card-image">
 
-                    <img src="images/logement1.jpg.jpg" alt="Logement">
+                    <img src="images/logement1.jpg" loading="lazy" alt="Logement">
 
                     <span class="badge-card">
                         Disponible
@@ -350,7 +346,7 @@
 
                         </span>
 
-                        <a href="details-logement.html">
+                        <a href="pages/details-logement/details-logement.html">
 
                             Voir les détails →
 
@@ -363,17 +359,12 @@
             </div>
 
             <!-- Duplique cette carte pour en avoir 6 -->
-        </div>
-
-        <div class="cards">
-
-            <!-- Carte 1 -->
 
             <div class="card">
 
                 <div class="card-image">
 
-                    <img src="images/logement2.jpg.png" alt="Logement">
+                    <img src="images/logement2.jpg" loading="lazy" alt="Logement">
 
                     <span class="badge-card">
                         Disponible
@@ -426,7 +417,7 @@
 
                         </span>
 
-                        <a href="details-logement.html">
+                        <a href="pages/details-logement/details-logement.html">
 
                             Voir les détails →
 
@@ -439,17 +430,12 @@
             </div>
 
             <!-- Duplique cette carte pour en avoir 6 -->
-        </div>
-
-        <div class="cards">
-
-            <!-- Carte 1 -->
 
             <div class="card">
 
                 <div class="card-image">
 
-                    <img src="images/logement3.jpg.png" alt="Logement">
+                    <img src="images/logement3.jpg" loading="lazy" alt="Logement">
 
                     <span class="badge-card">
                         Disponible
@@ -503,7 +489,7 @@
 
                         </span>
 
-                        <a href="details-logement.html">
+                        <a href="pages/details-logement/details-logement.html">
 
                             Voir les détails →
 
@@ -516,17 +502,12 @@
             </div>
 
             <!-- Duplique cette carte pour en avoir 6 -->
-        </div>
-
-        <div class="cards">
-
-            <!-- Carte 1 -->
 
             <div class="card">
 
                 <div class="card-image">
 
-                    <img src="images/logement4.jpg.png" alt="Logement">
+                    <img src="images/logement4.jpg" loading="lazy" alt="Logement">
 
                     <span class="badge-card">
                         Disponible
@@ -580,7 +561,7 @@
 
                         </span>
 
-                        <a href="details-logement.html">
+                        <a href="pages/details-logement/details-logement.html">
 
                             Voir les détails →
 
@@ -593,17 +574,12 @@
             </div>
 
             <!-- Duplique cette carte pour en avoir 6 -->
-        </div>
-
-        <div class="cards">
-
-            <!-- Carte 1 -->
 
             <div class="card">
 
                 <div class="card-image">
 
-                    <img src="images/logement5.jpg.png" alt="Logement">
+                    <img src="images/logement5.jpg" loading="lazy" alt="Logement">
 
                     <span class="badge-card">
                         Disponible
@@ -656,7 +632,7 @@
 
                         </span>
 
-                        <a href="details-logement.html">
+                        <a href="pages/details-logement/details-logement.html">
 
                             Voir les détails →
 
@@ -910,7 +886,7 @@
 
             <div class="testimonial-card">
 
-                <img src="images/avatar3.jpg.jpg" alt="Étudiant">
+                <img src="images/avatar3.jpg" loading="lazy" alt="Étudiant">
 
                 <h3>Fatou Ndiaye</h3>
 
@@ -928,7 +904,7 @@
 
             <div class="testimonial-card">
 
-                <img src="images/avatar2.jpg.jpg" alt="Étudiant">
+                <img src="images/avatar2.jpg" loading="lazy" alt="Étudiant">
 
                 <h3>Mamadou Diallo</h3>
 
@@ -946,7 +922,7 @@
 
             <div class="testimonial-card">
 
-                <img src="images/avatar1.jpg.jpg" alt="Étudiant">
+                <img src="images/avatar1.jpg" loading="lazy" alt="Étudiant">
 
                 <h3>Awa Fall</h3>
 
@@ -1074,11 +1050,11 @@
 
             <div class="cta-buttons">
 
-                <a href="rechercher.html" class="btn-primary">
+                <a href="pages/rechercher/rechercher.html" class="btn-primary">
                     🔍 Rechercher un logement
                 </a>
 
-                <a href="publier-logement.html" class="btn-secondary">
+                <a href="pages/publier-logement/publier-logement.html" class="btn-secondary">
                     🏠 Publier une annonce
                 </a>
 
@@ -1105,7 +1081,7 @@
 
     </p>
 
-    <a href="rechercher.html">
+    <a href="pages/rechercher/rechercher.html">
 
         Explorer les logements
 
@@ -1155,11 +1131,11 @@
 
                     <li><a href="index.html">Accueil</a></li>
 
-                    <li><a href="recherche.html">Rechercher</a></li>
+                    <li><a href="pages/rechercher/rechercher.html">Rechercher</a></li>
 
-                    <li><a href="connexion.html">Connexion</a></li>
+                    <li><a href="pages/connexion/connexion.html">Connexion</a></li>
 
-                    <li><a href="inscription.html">Inscription</a></li>
+                    <li><a href="pages/inscription/inscription.html">Inscription</a></li>
 
                 </ul>
 
@@ -1172,13 +1148,13 @@
 
                 <ul>
 
-                    <li><a href="#">Publier une annonce</a></li>
+                    <li><a href="pages/publier-logement/publier-logement.html">Publier une annonce</a></li>
 
-                    <li><a href="#">Réserver</a></li>
+                    <li><a href="pages/rechercher/rechercher.html">Réserver</a></li>
 
-                    <li><a href="#">Favoris</a></li>
+                    <li><a href="pages/favoris/favoris.html">Favoris</a></li>
 
-                    <li><a href="#">Support</a></li>
+                    <li><a href="pages/contacte/contacte.html">Support</a></li>
 
                 </ul>
 
@@ -1263,7 +1239,7 @@
 
 <div id="toast"></div>
 
-<script src="assets/js/main.js"></script>
-<script src="assets/js/search.js"></script>
+<script src="assets/js/global.js"></script>
+<script src="assets/js/index.js"></script>
 </body>
 </html>

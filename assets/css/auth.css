@@ -1,0 +1,183 @@
+/* ==========================================================
+   AUTH.CSS
+   Partagé uniquement par connexion.html et inscription.html.
+   ========================================================== */
+
+.auth{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    padding:40px;
+
+    background:#f8fafc;
+
+}
+
+.auth-container{
+
+    max-width:1200px;
+    width:100%;
+
+    background:white;
+
+    border-radius:30px;
+
+    overflow:hidden;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    box-shadow:0 20px 60px rgba(0,0,0,.08);
+
+}
+
+.auth-image{
+
+    background:linear-gradient(135deg,#2563EB,#1D4ED8);
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    padding:50px;
+
+}
+
+.auth-image img{
+
+    width:100%;
+    max-width:450px;
+
+}
+
+.auth-form{
+
+    padding:70px;
+
+}
+
+.auth-form h2{
+
+    font-size:2.5rem;
+
+    margin-bottom:15px;
+
+}
+
+.auth-form p{
+
+    color:#64748B;
+
+    margin-bottom:35px;
+
+}
+
+.input-group{
+
+    margin-bottom:25px;
+
+}
+
+.input-group label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+}
+
+.input-group input{
+
+    width:100%;
+
+    padding:18px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:14px;
+
+    outline:none;
+
+    transition:border-color .2s, box-shadow .2s;
+
+}
+
+.input-group input:focus,
+.input-group select:focus{
+
+    border-color:#2563EB;
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+
+}
+
+.password-box{
+
+    position:relative;
+
+}
+
+.password-box i{
+
+    position:absolute;
+
+    right:20px;
+    top:50%;
+
+    transform:translateY(-50%);
+
+    cursor:pointer;
+
+}
+
+.login-btn{
+
+    width:100%;
+
+    padding:18px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#2563EB;
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.login-btn:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.input-group select{
+
+    width:100%;
+    padding:18px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:14px;
+
+    outline:none;
+
+}

@@ -1,0 +1,670 @@
+/* ==========================================================
+   GLOBAL.CSS
+   Styles partagés par les 10 pages du site : reset, variables,
+   navbar, footer, conteneur, breadcrumb, menu mobile, bouton
+   retour en haut, toast, boutons primaire/secondaire.
+   ========================================================== */
+
+/* ==========================
+        RESET
+========================== */
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+html,
+body{
+
+    overflow-x:hidden;
+
+    width:100%;
+
+}
+
+/* ==========================
+        IMAGES
+========================== */
+
+img{
+
+    max-width:100%;
+
+    height:auto;
+
+    display:block;
+
+}
+
+/* ===========================
+   VARIABLES
+=========================== */
+
+:root{
+
+    --primary:#0D1B2A;
+    --secondary:#F59E0B;
+    --blue:#2563EB;
+    --green:#10B981;
+    --light:#F3F4F6;
+    --white:#ffffff;
+
+}
+
+/* ===========================
+   CONTENEUR
+=========================== */
+
+.container{
+
+    max-width:1300px;
+    margin:auto;
+
+}
+
+/* ===========================
+   NAVBAR
+=========================== */
+
+header{
+
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    z-index:999;
+
+    backdrop-filter:blur(12px);
+    background:rgba(255,255,255,.88);
+
+    border-bottom:1px solid rgba(0,0,0,.05);
+
+    transition:box-shadow .3s;
+
+}
+
+header.scrolled{
+
+    box-shadow:0 8px 30px rgba(15,23,42,.08);
+
+}
+
+.navbar{
+
+    max-width:1300px;
+    margin:auto;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:18px 30px;
+
+}
+
+.logo img{
+
+    width:90px;
+
+}
+
+.nav-links{
+
+    display:flex;
+    list-style:none;
+    gap:30px;
+
+}
+
+.nav-links a{
+
+    text-decoration:none;
+    color:var(--primary);
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.nav-links a:hover{
+
+    color:var(--secondary);
+
+}
+
+.nav-links a.active{
+
+    color:var(--secondary);
+
+}
+
+.nav-buttons{
+
+    display:flex;
+    gap:25px;
+
+}
+
+.btn-login{
+
+    padding:12px 22px;
+
+    border:1px solid #F59E0B;
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    color: #F59E0B;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.btn-login:hover{
+
+    background-color: #F59E0B;
+
+    color:white;
+
+}
+
+/* ===========================
+   BOUTONS PRIMAIRE / SECONDAIRE
+   (partagés par plusieurs pages : accueil, dashboard...)
+=========================== */
+
+.btn-primary,
+.btn-secondary{
+
+    display:inline-block;
+
+    padding:18px 35px;
+
+    border-radius:50px;
+
+    text-decoration:none;
+
+    font-weight:700;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    border:none;
+
+    transition:.4s;
+
+}
+
+.btn-primary{
+
+    background:#F59E0B;
+
+    color:#fafafb;
+
+}
+
+.btn-secondary{
+
+    border:2px solid white;
+
+    color:white;
+
+    background:transparent;
+
+}
+
+.btn-primary:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 20px 40px rgba(0,0,0,.2);
+
+}
+
+.btn-secondary:hover{
+
+    background:white;
+
+    color:#2563EB;
+
+    transform:translateY(-6px);
+
+}
+
+/* ===========================
+   BADGE (hero secondaire : sur fond bleu dégradé)
+=========================== */
+
+.hero-badge{
+
+    display:inline-block;
+
+    background:rgba(255,255,255,.15);
+
+    padding:10px 20px;
+
+    border-radius:40px;
+
+    margin-bottom:20px;
+
+    backdrop-filter:blur(10px);
+
+    font-weight:600;
+
+}
+
+/* ===========================
+   BREADCRUMB
+=========================== */
+
+.breadcrumb{
+
+    background:#f8fafc;
+
+    padding:20px 8%;
+
+    border-bottom:1px solid #e2e8f0;
+
+}
+
+.breadcrumb .container{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    flex-wrap:wrap;
+
+}
+
+.breadcrumb a{
+
+    text-decoration:none;
+
+    color:#2563EB;
+
+    font-weight:600;
+
+}
+
+.breadcrumb span{
+
+    color:#64748B;
+
+}
+
+/*===================================
+            FOOTER
+====================================*/
+
+.footer{
+
+    background:#0F172A;
+
+    color:#fff;
+
+    padding:90px 8% 30px;
+
+}
+
+.footer-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:40px;
+
+}
+
+.footer-logo{
+
+    color:#2563EB;
+
+    margin-bottom:20px;
+
+}
+
+.footer p{
+
+    color:#CBD5E1;
+
+    line-height:1.8;
+
+}
+
+.footer h3{
+
+    margin-bottom:20px;
+
+}
+
+.footer ul{
+
+    list-style:none;
+
+}
+
+.footer ul li{
+
+    margin-bottom:15px;
+
+    color:#CBD5E1;
+
+}
+
+.footer a{
+
+    color:#CBD5E1;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+}
+
+.footer a:hover{
+
+    color:#2563EB;
+
+}
+
+.social-icons{
+
+    margin-top:20px;
+
+}
+
+.social-icons a{
+
+    display:inline-flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    width:45px;
+
+    height:45px;
+
+    background:#1E293B;
+
+    border-radius:50%;
+
+    margin-right:10px;
+
+    transition:.3s;
+
+}
+
+.social-icons a:hover{
+
+    background:#2563EB;
+
+    color:white;
+
+}
+
+.newsletter{
+
+    margin-top:20px;
+
+}
+
+.newsletter input{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:10px;
+
+    margin-bottom:15px;
+
+    outline:none;
+
+}
+
+.newsletter button{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#2563EB;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+.newsletter button:hover{
+
+    background:#1D4ED8;
+
+}
+
+.footer hr{
+
+    margin:50px 0 25px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+}
+
+.footer-bottom{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    flex-wrap:wrap;
+
+    gap:20px;
+
+    align-items:center;
+
+}
+
+.footer-bottom a{
+
+    margin-left:20px;
+
+}
+
+/* ==========================
+        MENU HAMBURGER
+========================== */
+
+.menu-toggle{
+
+    display:none;
+
+    font-size:28px;
+
+    color:var(--primary);
+
+    cursor:pointer;
+
+}
+
+@media(max-width:992px){
+
+    .menu-toggle{
+
+        display:block;
+
+    }
+
+    .nav-links{
+
+        display:none;
+
+    }
+
+    .nav-buttons{
+
+        display:none;
+
+    }
+
+}
+
+.nav-links.active{
+
+    display:flex;
+
+    flex-direction:column;
+
+    position:absolute;
+
+    top:90px;
+
+    left:0;
+
+    width:100%;
+
+    background:white;
+
+    padding:30px;
+
+    gap:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+}
+
+.nav-buttons.active{
+
+    display:flex;
+
+    flex-direction:column;
+
+    position:absolute;
+
+    top:380px;
+
+    left:0;
+
+    width:100%;
+
+    background:white;
+
+    padding:20px 30px;
+
+    gap:15px;
+
+}
+
+/* ==========================
+       RETOUR EN HAUT
+========================== */
+
+#scrollTop{
+
+    position:fixed;
+
+    bottom:30px;
+    right:30px;
+
+    width:55px;
+    height:55px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #2563EB,
+        #1D4ED8
+    );
+
+    color:white;
+
+    font-size:20px;
+
+    cursor:pointer;
+
+    display:none;
+
+    box-shadow:
+    0 10px 25px rgba(37,99,235,.35);
+
+    transition:.3s;
+
+    z-index:999;
+
+}
+
+#scrollTop:hover{
+
+    transform:translateY(-5px);
+
+}
+
+/* ==========================
+        TOAST
+========================== */
+
+#toast{
+
+    position:fixed;
+
+    top:30px;
+    right:30px;
+
+    background:#16A34A;
+
+    color:white;
+
+    padding:18px 25px;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,.2);
+
+    opacity:0;
+
+    transform:translateX(100px);
+
+    transition:.4s;
+
+    z-index:9999;
+
+}
+
+#toast.show{
+
+    opacity:1;
+
+    transform:translateX(0);
+
+}

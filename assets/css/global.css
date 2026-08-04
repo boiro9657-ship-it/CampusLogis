@@ -1051,3 +1051,11 @@ header.scrolled{
     transform:translateX(0);
 
 }
+
+/* Variante pour les messages d'erreur/avertissement (ex. "vous
+   devez être connecté"), pour ne pas ressembler à une réussite. */
+#toast.toast-error{
+
+    background:#D97706;
+
+}

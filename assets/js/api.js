@@ -42,7 +42,12 @@ async function apiFetch(path, options = {}){
         const message =
         (data && data.error) || "Une erreur est survenue.";
 
-        throw new Error(message);
+        const erreur =
+        new Error(message);
+
+        erreur.status = response.status;
+
+        throw erreur;
 
     }
 

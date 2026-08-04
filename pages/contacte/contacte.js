@@ -25,7 +25,7 @@ if(contactForm){
 
         if(!nom || !email || !sujet || !message){
 
-            showToast("Veuillez remplir tous les champs.");
+            showToast("Veuillez remplir tous les champs.", "error");
 
             return;
         }
@@ -51,7 +51,7 @@ if(contactForm){
 
         }catch(error){
 
-            showToast("Impossible d'envoyer le message pour le moment.");
+            showToast("Impossible d'envoyer le message pour le moment.", "error");
 
         }finally{
 

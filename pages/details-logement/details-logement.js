@@ -28,7 +28,7 @@ async function chargerLogement(id){
 
     }catch(error){
 
-        showToast("Logement introuvable.");
+        showToast("Logement introuvable.", "error");
 
         return;
     }

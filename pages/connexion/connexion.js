@@ -58,7 +58,7 @@ if(loginForm){
 
         if(!email || !pass){
 
-            showToast("Veuillez remplir tous les champs.");
+            showToast("Veuillez remplir tous les champs.", "error");
 
             return;
         }
@@ -86,7 +86,7 @@ if(loginForm){
 
         }catch(error){
 
-            showToast("Email ou mot de passe incorrect.");
+            showToast("Email ou mot de passe incorrect.", "error");
 
             submitBtn.disabled = false;
 

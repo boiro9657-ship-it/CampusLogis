@@ -32,14 +32,14 @@ if(registerForm){
 
         if(!nom || !email || !role || !password){
 
-            showToast("Veuillez remplir tous les champs.");
+            showToast("Veuillez remplir tous les champs.", "error");
 
             return;
         }
 
         if(password !== confirmPassword){
 
-            showToast("Les mots de passe ne correspondent pas.");
+            showToast("Les mots de passe ne correspondent pas.", "error");
 
             return;
         }
@@ -76,7 +76,7 @@ if(registerForm){
 
         }catch(error){
 
-            showToast(error.message);
+            showToast(error.message, "error");
 
         }finally{
 

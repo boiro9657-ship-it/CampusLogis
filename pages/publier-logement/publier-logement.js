@@ -57,14 +57,14 @@ if(publishForm){
 
             if(!titre || !ville || !prix){
 
-                showToast("Veuillez remplir tous les champs obligatoires.");
+                showToast("Veuillez remplir tous les champs obligatoires.", "error");
 
                 return;
             }
 
             if(!fichiers || fichiers.length === 0){
 
-                showToast("Veuillez sélectionner une image.");
+                showToast("Veuillez sélectionner une image.", "error");
 
                 return;
             }
@@ -106,7 +106,7 @@ if(publishForm){
 
             }catch(error){
 
-                showToast(error.message);
+                showToast(error.message, "error");
 
                 submitBtn.disabled = false;
 

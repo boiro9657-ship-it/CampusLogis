@@ -182,7 +182,7 @@ async function toggleFavorite(button){
 
     }catch(error){
 
-        showToast("Connectez-vous pour ajouter des favoris.");
+        showToast("Connectez-vous pour ajouter des favoris.", "error");
 
     }
 
@@ -258,7 +258,29 @@ async function reserverLogement(logementId){
 
     }catch(error){
 
-        showToast("Connectez-vous pour réserver un logement.");
+        if(error.status === 401){
+
+            showToast("Connectez-vous pour réserver un logement — redirection...", "error");
+
+            const lienConnexion =
+            document.querySelector(".btn-nav-link");
+
+            setTimeout(()=>{
+
+                if(lienConnexion){
+
+                    window.location.href =
+                    lienConnexion.getAttribute("href");
+
+                }
+
+            }, 1500);
+
+        }else{
+
+            showToast("Impossible d'envoyer la demande de réservation.", "error");
+
+        }
 
     }
 
@@ -284,13 +306,18 @@ function attacherBoutonsReservation(container){
         TOAST
 ========================== */
 
-function showToast(message){
+function showToast(message, type = "success"){
 
     const toast =
     document.getElementById("toast");
 
+    const icone =
+    type === "error" ? "⚠️" : "✅";
+
     toast.innerHTML =
-    "✅ " + message;
+    icone + " " + message;
+
+    toast.classList.toggle("toast-error", type === "error");
 
     toast.classList.add("show");
 

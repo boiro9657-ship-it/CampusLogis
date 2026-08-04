@@ -81,7 +81,7 @@ async function chargerAnnonces(){
 
     }catch(error){
 
-        showToast("Impossible de charger vos annonces.");
+        showToast("Impossible de charger vos annonces.", "error");
 
         return;
     }
@@ -162,7 +162,7 @@ async function supprimerLogement(id){
 
     }catch(error){
 
-        showToast("Suppression impossible.");
+        showToast("Suppression impossible.", "error");
 
     }
 
@@ -187,7 +187,7 @@ async function chargerReservations(){
 
     }catch(error){
 
-        showToast("Impossible de charger vos réservations.");
+        showToast("Impossible de charger vos réservations.", "error");
 
         return;
     }

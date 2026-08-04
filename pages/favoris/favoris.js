@@ -94,7 +94,7 @@ async function chargerFavoris(){
                     ❤️ Retirer des favoris
                 </button>
 
-                <a href="../details-logement/details-logement.html">
+                <a href="../details-logement/details-logement.html?id=${logement.id}">
                     Voir les détails
                 </a>
 

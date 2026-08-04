@@ -277,7 +277,7 @@ function carteLogementHTML(logement){
                     Réserver
                 </button>
 
-                <a href="pages/details-logement/details-logement.html">
+                <a href="pages/details-logement/details-logement.html?id=${logement.id}">
                     Voir les détails →
                 </a>
 

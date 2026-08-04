@@ -167,7 +167,7 @@ function carteRechercheHTML(logement){
 
             <div class="housing-actions">
 
-                <a href="../details-logement/details-logement.html"
+                <a href="../details-logement/details-logement.html?id=${logement.id}"
                 class="btn-details">
                     Voir plus
                 </a>

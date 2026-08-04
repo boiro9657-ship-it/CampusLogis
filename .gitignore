@@ -2,3 +2,6 @@
 # généré à l'exécution, pas du code source.
 backend/uploads/logements/*
 !backend/uploads/logements/.gitkeep
+
+# Configuration locale de l'outil Claude Code, pas du projet.
+.claude/

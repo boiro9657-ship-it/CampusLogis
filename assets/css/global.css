@@ -831,21 +831,30 @@ header.scrolled{
 
     }
 
-    /* Ordre d'affichage explicite : logo puis hamburger
-       doivent rester sur la première ligne. Sans ça,
-       .nav-links (flex-basis:100%) force un retour à la
+    /* Ordre d'affichage explicite : logo, bouton "Se connecter"
+       puis hamburger doivent rester sur la première ligne. Sans
+       ça, .nav-links (flex-basis:100%) force un retour à la
        ligne AVANT le hamburger même invisible (max-height:0),
-       ce qui pousse le hamburger sur sa propre ligne et
-       laisse la navbar fermée anormalement haute. */
+       ce qui pousse le hamburger sur sa propre ligne et laisse
+       la navbar fermée anormalement haute. */
     .logo{
 
         order:1;
 
     }
 
-    .menu-toggle{
+    /* Reste visible en permanence à côté du hamburger : c'est
+       l'action prioritaire, elle ne doit pas être cachée
+       derrière un clic supplémentaire sur mobile. */
+    .nav-buttons{
 
         order:2;
+
+    }
+
+    .menu-toggle{
+
+        order:3;
 
     }
 
@@ -861,10 +870,9 @@ header.scrolled{
 
     }
 
-    .nav-links,
-    .nav-buttons{
+    .nav-links{
 
-        order:3;
+        order:4;
 
         flex-basis:100%;
 
@@ -894,13 +902,14 @@ header.scrolled{
 
     }
 
-    .nav-buttons.active{
+}
 
-        max-height:200px;
+@media(max-width:420px){
 
-        padding:10px 0 25px;
+    .btn-nav-link{
 
-        gap:15px;
+        padding:9px 14px;
+        font-size:.9rem;
 
     }
 

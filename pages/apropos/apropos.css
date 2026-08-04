@@ -100,6 +100,92 @@
 }
 
 /* ==========================
+        MISSION / VISION / OBJECTIFS
+========================== */
+
+.mission-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:30px;
+
+    margin-top:45px;
+
+}
+
+.mission-card{
+
+    background:white;
+
+    padding:35px 30px;
+
+    border-radius:var(--radius-lg);
+
+    text-align:center;
+
+    box-shadow:var(--shadow-sm);
+
+    transition:.4s;
+
+}
+
+.mission-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:var(--shadow-md);
+
+}
+
+.mission-icon{
+
+    width:60px;
+    height:60px;
+
+    margin:0 auto 20px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:var(--primary-light);
+
+    border-radius:50%;
+
+    color:var(--primary);
+
+    font-size:26px;
+
+}
+
+.mission-card h3{
+
+    color:var(--primary);
+    margin-bottom:10px;
+
+}
+
+.mission-card p{
+
+    color:var(--gray-500);
+    line-height:1.7;
+    font-size:.95rem;
+
+}
+
+@media(max-width:800px){
+
+    .mission-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+/* ==========================
         STATISTIQUES
 ========================== */
 

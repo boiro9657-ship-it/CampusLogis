@@ -59,16 +59,11 @@ document.querySelector(".menu-toggle");
 const navLinks =
 document.querySelector(".nav-links");
 
-const navButtons =
-document.querySelector(".nav-buttons");
-
 if(menuToggle && navLinks){
 
     menuToggle.addEventListener("click",()=>{
 
         navLinks.classList.toggle("active");
-
-    navButtons.classList.toggle("active");
 
     const icon =
     menuToggle.querySelector("i");

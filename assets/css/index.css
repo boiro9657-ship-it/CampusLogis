@@ -564,8 +564,7 @@
 }
 
 /* Badge "Premium" : empilé sous le badge Disponible, sur
-   la même carte. Dégradé or pour se distinguer nettement
-   du vert/bleu utilisés partout ailleurs sur le site. */
+   la même carte. */
 .badge-premium{
 
     position:absolute;
@@ -577,7 +576,7 @@
     align-items:center;
     gap:5px;
 
-    background:linear-gradient(135deg,#F59E0B,#D97706);
+    background:linear-gradient(135deg,var(--secondary),var(--secondary-dark));
     color:white;
 
     padding:7px 14px;
@@ -587,7 +586,7 @@
     font-size:13px;
     font-weight:700;
 
-    box-shadow:0 8px 18px rgba(217,119,6,.35);
+    box-shadow:0 8px 18px rgba(111,190,68,.35);
 
     z-index:2;
 
@@ -603,7 +602,7 @@
    annonce premium — pas seulement le badge. */
 .card-premium{
 
-    border:2px solid #F59E0B;
+    border:2px solid var(--secondary);
 
 }
 

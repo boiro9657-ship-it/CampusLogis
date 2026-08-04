@@ -128,7 +128,7 @@
     align-items:center;
     gap:6px;
 
-    background:linear-gradient(135deg,#F59E0B,#D97706);
+    background:linear-gradient(135deg,var(--secondary),var(--secondary-dark));
     color:white;
 
     padding:8px 18px;
@@ -138,7 +138,7 @@
     font-size:13px;
     font-weight:700;
 
-    box-shadow:0 8px 18px rgba(217,119,6,.35);
+    box-shadow:0 8px 18px rgba(111,190,68,.35);
 
     white-space:nowrap;
 
@@ -252,7 +252,7 @@
 
 .pricing-card-featured .pricing-features i{
 
-    color:#F59E0B;
+    color:var(--secondary);
 
 }
 
@@ -314,7 +314,7 @@
 
 .pricing-btn-solid{
 
-    background:linear-gradient(135deg,#F59E0B,#D97706);
+    background:linear-gradient(135deg,var(--secondary),var(--secondary-dark));
 
     color:white;
 
@@ -324,7 +324,7 @@
 
     transform:translateY(-2px);
 
-    box-shadow:0 10px 24px rgba(217,119,6,.35);
+    box-shadow:0 10px 24px rgba(111,190,68,.35);
 
 }
 

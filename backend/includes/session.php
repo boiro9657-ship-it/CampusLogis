@@ -45,3 +45,22 @@ function requireOwner(int $logementId): int
 
     return $userId;
 }
+
+/**
+ * Bloque l'accès (401 si non connecté, 403 si le compte connecté
+ * n'a pas le rôle admin). Retourne l'id de l'admin connecté sinon.
+ */
+function requireAdmin(): int
+{
+    $userId = requireAuth();
+
+    $stmt = getPdo()->prepare('SELECT role FROM utilisateurs WHERE id = ?');
+    $stmt->execute([$userId]);
+    $utilisateur = $stmt->fetch();
+
+    if (!$utilisateur || $utilisateur['role'] !== 'admin') {
+        jsonError('Action réservée aux administrateurs.', 403);
+    }
+
+    return $userId;
+}

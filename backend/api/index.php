@@ -51,6 +51,11 @@ try {
             handleContactRoute($rest, $method);
             break;
 
+        case 'admin':
+            require __DIR__ . '/routes/admin.php';
+            handleAdminRoute($rest, $method);
+            break;
+
         default:
             jsonError('Route introuvable.', 404);
 

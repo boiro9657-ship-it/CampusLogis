@@ -132,23 +132,27 @@ if(scrollTopBtn){
 
 if(typeof apiFetch !== "undefined"){
 
-    apiFetch("/auth/me").then(()=>{
+    apiFetch("/auth/me").then((utilisateur)=>{
 
         const navBtn =
         document.querySelector(".btn-nav-link");
 
-        // Réutilise le lien déjà présent dans le menu (chemin
-        // relatif correct quelle que soit la profondeur de la
-        // page) plutôt que de le recalculer à la main ici.
-        const dashboardLink =
-        document.querySelector('.nav-links a[href*="dashboard-proprietaire"]');
+        if(!navBtn) return;
 
-        if(navBtn && dashboardLink){
+        // window.API_BASE ("backend/api" ou "../../backend/api"
+        // selon la profondeur de la page) donne déjà le chemin
+        // relatif vers la racine du site, sans avoir à le
+        // recalculer autrement ici.
+        const racine =
+        window.API_BASE.replace("backend/api", "");
 
-            navBtn.textContent = "Mon compte";
-            navBtn.setAttribute("href", dashboardLink.getAttribute("href"));
+        const lienTableauDeBord =
+        utilisateur.role === "admin"
+        ? racine + "pages/dashboard-admin/dashboard-admin.html"
+        : racine + "pages/dashboard-proprietaire/dashboard-proprietaire.html";
 
-        }
+        navBtn.textContent = "Mon compte";
+        navBtn.setAttribute("href", lienTableauDeBord);
 
     }).catch(()=>{});
 

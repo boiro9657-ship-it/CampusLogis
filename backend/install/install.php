@@ -44,6 +44,13 @@ try {
     ");
     $etapes[] = 'Table "utilisateurs" prête.';
 
+    // Élargit la colonne role si elle a été créée avant l'ajout
+    // du rôle admin (sans danger à rejouer, même si déjà à jour).
+    $pdo->exec("
+        ALTER TABLE utilisateurs
+        MODIFY role ENUM('etudiant','proprietaire','admin') NOT NULL DEFAULT 'etudiant'
+    ");
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS logements (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -130,6 +137,33 @@ try {
     } else {
 
         $etapes[] = 'Annonces de démonstration déjà présentes, rien ajouté.';
+
+    }
+
+    // Compte administrateur par défaut, créé une seule fois (si
+    // aucun admin n'existe encore). Pas d'auto-inscription admin
+    // possible depuis le site pour des raisons de sécurité.
+    $nbAdmins = $pdo->query("SELECT COUNT(*) FROM utilisateurs WHERE role = 'admin'")->fetchColumn();
+
+    if ($nbAdmins == 0) {
+
+        $stmt = $pdo->prepare('
+            INSERT INTO utilisateurs (nom_complet, email, mot_de_passe, role)
+            VALUES (?, ?, ?, ?)
+        ');
+
+        $stmt->execute([
+            'Administrateur',
+            'admin@terangahome.sn',
+            password_hash('Admin123!', PASSWORD_DEFAULT),
+            'admin',
+        ]);
+
+        $etapes[] = 'Compte administrateur créé : admin@terangahome.sn / Admin123!';
+
+    } else {
+
+        $etapes[] = 'Compte administrateur déjà présent, rien créé.';
 
     }
 

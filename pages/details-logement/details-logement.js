@@ -61,12 +61,7 @@ async function chargerLogement(id){
 
     }
 
-    if(logement.image_url){
-
-        document.querySelector(".gallery-main img").src =
-        logement.image_url;
-
-    }
+    afficherGalerie(logement.medias || []);
 
     const contactBtn =
     document.getElementById("contactOwnerBtn");
@@ -83,6 +78,54 @@ async function chargerLogement(id){
             reserverLogement(id);
 
         });
+
+    }
+
+}
+
+/**
+ * Reconstruit la galerie (#details-gallery) à partir des vrais
+ * médias du logement : la première image en grand, le reste
+ * (images et vidéos) en vignettes. Ne touche à rien si le
+ * logement n'a aucun média (garde le contenu de démonstration).
+ */
+function afficherGalerie(medias){
+
+    if(!medias || medias.length === 0) return;
+
+    const images =
+    medias.filter(m => m.type === "image");
+
+    const reste =
+    medias.filter((m, i) => i !== medias.indexOf(images[0]));
+
+    const galleryMain =
+    document.querySelector(".gallery-main");
+
+    const gallerySide =
+    document.querySelector(".gallery-side");
+
+    if(galleryMain && images[0]){
+
+        galleryMain.innerHTML =
+        `<img src="${images[0].url}" alt="Photo du logement">`;
+
+    }
+
+    if(gallerySide){
+
+        gallerySide.innerHTML =
+        reste.map(media => {
+
+            if(media.type === "video"){
+
+                return `<video src="${media.url}" controls></video>`;
+
+            }
+
+            return `<img src="${media.url}" loading="lazy" alt="Photo du logement">`;
+
+        }).join("");
 
     }
 

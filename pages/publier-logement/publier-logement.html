@@ -128,13 +128,29 @@
 
     <div class="form-group">
 
-    <label>Photo</label>
+        <label>Photos (1 à 8)</label>
 
-   <input type="file"
-    id="photo"
-    accept="image/*">
+        <input type="file"
+        id="photos"
+        name="photos[]"
+        accept="image/*"
+        multiple>
 
-</div>
+        <p class="form-hint">La première photo sélectionnée sera utilisée comme photo de couverture.</p>
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Vidéos (facultatif, jusqu'à 2)</label>
+
+        <input type="file"
+        id="videos"
+        name="videos[]"
+        accept="video/*"
+        multiple>
+
+    </div>
 
     <button type="submit" class="publish-btn">
         Publier le logement

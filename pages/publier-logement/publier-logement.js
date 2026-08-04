@@ -49,11 +49,17 @@ if(publishForm){
             const description =
             document.getElementById("description").value.trim();
 
-            const photo =
-            document.getElementById("photo");
+            const photosInput =
+            document.getElementById("photos");
 
-            const fichiers =
-            photo.files;
+            const videosInput =
+            document.getElementById("videos");
+
+            const photos =
+            photosInput.files;
+
+            const videos =
+            videosInput.files;
 
             if(!titre || !ville || !prix){
 
@@ -62,9 +68,23 @@ if(publishForm){
                 return;
             }
 
-            if(!fichiers || fichiers.length === 0){
+            if(!photos || photos.length === 0){
 
-                showToast("Veuillez sélectionner une image.", "error");
+                showToast("Veuillez sélectionner au moins une photo.", "error");
+
+                return;
+            }
+
+            if(photos.length > 8){
+
+                showToast("8 photos maximum par annonce.", "error");
+
+                return;
+            }
+
+            if(videos.length > 2){
+
+                showToast("2 vidéos maximum par annonce.", "error");
 
                 return;
             }
@@ -83,7 +103,18 @@ if(publishForm){
             formData.append("prix", prix);
             formData.append("chambres", chambres);
             formData.append("description", description);
-            formData.append("photo", fichiers[0]);
+
+            for(const fichier of photos){
+
+                formData.append("photos[]", fichier);
+
+            }
+
+            for(const fichier of videos){
+
+                formData.append("videos[]", fichier);
+
+            }
 
             try{
 

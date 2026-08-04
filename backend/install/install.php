@@ -71,6 +71,19 @@ try {
     $etapes[] = 'Table "logements" prête.';
 
     $pdo->exec("
+        CREATE TABLE IF NOT EXISTS logement_medias (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            logement_id INT NOT NULL,
+            type ENUM('image','video') NOT NULL,
+            url VARCHAR(255) NOT NULL,
+            position INT DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (logement_id) REFERENCES logements(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "logement_medias" prête.';
+
+    $pdo->exec("
         CREATE TABLE IF NOT EXISTS favoris (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,

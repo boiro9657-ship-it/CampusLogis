@@ -60,6 +60,15 @@
     font-weight:600;
 }
 
+.form-hint{
+
+    margin-top:8px;
+
+    color:var(--gray-500);
+
+    font-size:13px;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea{

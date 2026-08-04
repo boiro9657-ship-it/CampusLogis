@@ -100,8 +100,22 @@ function getLogement(int $id): void
         jsonError('Logement introuvable.', 404);
     }
 
+    $stmt = getPdo()->prepare('
+        SELECT type, url FROM logement_medias
+        WHERE logement_id = ?
+        ORDER BY position ASC, id ASC
+    ');
+    $stmt->execute([$id]);
+    $logement['medias'] = $stmt->fetchAll();
+
     jsonResponse($logement);
 }
+
+// Limites côté serveur : au-delà, les fichiers en trop sont
+// simplement ignorés (le client valide déjà ces mêmes bornes
+// avant l'envoi pour prévenir l'utilisateur).
+const MAX_PHOTOS = 8;
+const MAX_VIDEOS = 2;
 
 function createLogement(): void
 {
@@ -118,24 +132,111 @@ function createLogement(): void
         jsonError('Titre, ville et prix sont obligatoires.');
     }
 
+    $photos = extraireFichiers($_FILES['photos'] ?? null);
+    $videos = extraireFichiers($_FILES['videos'] ?? null);
+
+    if (count($photos) === 0) {
+        jsonError('Au moins une photo est obligatoire.');
+    }
+
+    $photos = array_slice($photos, 0, MAX_PHOTOS);
+    $videos = array_slice($videos, 0, MAX_VIDEOS);
+
+    $medias = [];
     $imageUrl = null;
 
-    if (!empty($_FILES['photo']['tmp_name'])) {
-        $imageUrl = enregistrerPhoto($_FILES['photo']);
+    foreach ($photos as $fichier) {
+
+        $url = enregistrerMedia($fichier, ['jpg', 'jpeg', 'png', 'webp']);
+
+        if ($url) {
+            $medias[] = ['type' => 'image', 'url' => $url];
+
+            if ($imageUrl === null) {
+                $imageUrl = $url;
+            }
+        }
+    }
+
+    foreach ($videos as $fichier) {
+
+        $url = enregistrerMedia($fichier, ['mp4', 'webm', 'mov']);
+
+        if ($url) {
+            $medias[] = ['type' => 'video', 'url' => $url];
+        }
+    }
+
+    if ($imageUrl === null) {
+        jsonError('La photo fournie est invalide (formats acceptés : jpg, png, webp).');
     }
 
     $pdo = getPdo();
 
-    $stmt = $pdo->prepare('
-        INSERT INTO logements (owner_id, titre, ville, type, prix, chambres, description, image_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ');
-    $stmt->execute([$userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl]);
+    // Transaction : le logement et ses médias doivent être créés
+    // ensemble, jamais l'un sans l'autre.
+    $pdo->beginTransaction();
+
+    try {
+
+        $stmt = $pdo->prepare('
+            INSERT INTO logements (owner_id, titre, ville, type, prix, chambres, description, image_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ');
+        $stmt->execute([$userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl]);
+
+        $logementId = $pdo->lastInsertId();
+
+        $stmtMedia = $pdo->prepare('
+            INSERT INTO logement_medias (logement_id, type, url, position)
+            VALUES (?, ?, ?, ?)
+        ');
+
+        foreach ($medias as $position => $media) {
+            $stmtMedia->execute([$logementId, $media['type'], $media['url'], $position]);
+        }
+
+        $pdo->commit();
+
+    } catch (Throwable $e) {
+
+        $pdo->rollBack();
+        throw $e;
+
+    }
 
     jsonResponse([
-        'id'      => $pdo->lastInsertId(),
+        'id'      => $logementId,
         'message' => 'Logement publié avec succès.',
     ], 201);
+}
+
+/**
+ * Reconstruit un tableau de fichiers individuels à partir de la
+ * structure $_FILES d'un champ multiple (name="photos[]"), en
+ * ignorant les emplacements vides (aucun fichier sélectionné).
+ */
+function extraireFichiers(?array $champFichiers): array
+{
+    if (!$champFichiers || !isset($champFichiers['name'])) {
+        return [];
+    }
+
+    $fichiers = [];
+
+    foreach ($champFichiers['name'] as $i => $nom) {
+
+        if ($nom === '' || $champFichiers['error'][$i] !== UPLOAD_ERR_OK) {
+            continue;
+        }
+
+        $fichiers[] = [
+            'name'     => $champFichiers['name'][$i],
+            'tmp_name' => $champFichiers['tmp_name'][$i],
+        ];
+    }
+
+    return $fichiers;
 }
 
 function updateLogement(int $id): void
@@ -175,9 +276,8 @@ function deleteLogement(int $id): void
     jsonResponse(['message' => 'Logement supprimé.']);
 }
 
-function enregistrerPhoto(array $fichier): ?string
+function enregistrerMedia(array $fichier, array $extensionsAutorisees): ?string
 {
-    $extensionsAutorisees = ['jpg', 'jpeg', 'png', 'webp'];
     $extension = strtolower(pathinfo($fichier['name'], PATHINFO_EXTENSION));
 
     if (!in_array($extension, $extensionsAutorisees, true)) {

@@ -1,8 +1,24 @@
 /* ==========================================================
    PUBLIER-LOGEMENT.JS — page de publication uniquement
-   Enregistre l'annonce dans localStorage puis redirige
-   vers le tableau de bord propriétaire.
+   Page protégée : envoie le formulaire (dont la photo) en
+   multipart/form-data à l'API, puis redirige vers le tableau
+   de bord propriétaire.
    ========================================================== */
+
+(async () => {
+
+    try{
+
+        await apiFetch("/auth/me");
+
+    }catch(error){
+
+        window.location.href =
+        "../connexion/connexion.html";
+
+    }
+
+})();
 
 const publishForm =
 document.getElementById("publishForm");
@@ -11,15 +27,18 @@ if(publishForm){
 
     publishForm.addEventListener(
         "submit",
-        (e)=>{
+        async (e)=>{
 
             e.preventDefault();
 
             const titre =
-            document.getElementById("titre").value;
+            document.getElementById("titre").value.trim();
 
             const ville =
-            document.getElementById("ville").value;
+            document.getElementById("ville").value.trim();
+
+            const type =
+            document.getElementById("type").value;
 
             const prix =
             document.getElementById("prix").value;
@@ -28,7 +47,7 @@ if(publishForm){
             document.getElementById("chambres").value;
 
             const description =
-            document.getElementById("description").value;
+            document.getElementById("description").value.trim();
 
             const photo =
             document.getElementById("photo");
@@ -36,67 +55,62 @@ if(publishForm){
             const fichiers =
             photo.files;
 
-            if(!fichiers || fichiers.length === 0){
+            if(!titre || !ville || !prix){
 
-            alert(
-                "Veuillez sélectionner une image."
-            );
+                showToast("Veuillez remplir tous les champs obligatoires.");
 
-            return;
-
+                return;
             }
 
-            const reader =
-            new FileReader();
+            if(!fichiers || fichiers.length === 0){
 
-            reader.onload =
-            function(){
+                showToast("Veuillez sélectionner une image.");
 
-                const logement = {
+                return;
+            }
 
-                    id: Date.now(),
+            const submitBtn =
+            publishForm.querySelector(".publish-btn");
 
-                    titre,
-                    ville,
-                    prix,
-                    chambres,
-                    description,
+            submitBtn.disabled = true;
 
-                   image: reader.result
+            const formData =
+            new FormData();
 
+            formData.append("titre", titre);
+            formData.append("ville", ville);
+            formData.append("type", type);
+            formData.append("prix", prix);
+            formData.append("chambres", chambres);
+            formData.append("description", description);
+            formData.append("photo", fichiers[0]);
 
-                };
+            try{
 
-                let logements =
-                JSON.parse(
-                    localStorage.getItem(
-                        "logements"
-                    )
-                ) || [];
+                await apiFetch("/logements", {
 
-                logements.push(
-                    logement
-                );
+                    method: "POST",
 
-                localStorage.setItem(
-                    "logements",
-                    JSON.stringify(
-                        logements
-                    )
-                );
+                    body: formData
 
-                alert(
-                    "Logement publié avec succès !"
-                );
+                });
 
-                window.location.href =
-                "../dashboard-proprietaire/dashboard-proprietaire.html";
+                showToast("Logement publié avec succès !");
 
-            };
+                setTimeout(()=>{
 
-            reader.readAsDataURL(
-                fichiers[0]
-            );
+                    window.location.href =
+                    "../dashboard-proprietaire/dashboard-proprietaire.html";
+
+                }, 1200);
+
+            }catch(error){
+
+                showToast(error.message);
+
+                submitBtn.disabled = false;
+
+            }
 
         }
     );

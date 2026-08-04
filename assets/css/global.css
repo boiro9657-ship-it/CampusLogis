@@ -126,6 +126,54 @@ h1, h2, h3, h4, h5, h6{
 
 }
 
+/* État d'attente pendant le chargement des logements depuis
+   l'API (accueil et recherche). */
+.cards-loading,
+.cards-empty{
+
+    grid-column:1 / -1;
+
+    text-align:center;
+
+    padding:60px 20px;
+
+    color:var(--gray-500);
+
+}
+
+/* Bouton "Réserver" inline sur les cartes de logement (accueil
+   et recherche) : même poids visuel qu'un lien texte, pas un
+   bouton par défaut du navigateur. */
+.btn-reserver{
+
+    background:none;
+
+    border:none;
+
+    padding:0;
+
+    color:var(--primary);
+
+    font-weight:600;
+
+    font-family:inherit;
+
+    font-size:inherit;
+
+    cursor:pointer;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+}
+
+.btn-reserver:hover{
+
+    color:var(--secondary);
+
+}
+
 /* Texte "œillet" (ex. NOS LOGEMENTS, SIMPLE ET RAPIDE) : label
    court, majuscule, coloré, qui introduit un titre de section. */
 .eyebrow{

@@ -1,23 +1,51 @@
 /* ==========================================================
    FAVORIS.JS — page favoris uniquement
-   Affiche les logements sauvegardés dans localStorage.
+   Page protégée : affiche les logements favoris de
+   l'utilisateur connecté, chargés depuis l'API.
    ========================================================== */
 
 const favorisContainer =
-document.getElementById(
-    "favoris-container"
-);
+document.getElementById("favoris-container");
 
 if(favorisContainer){
 
-    // Récupère les identifiants des logements favoris
-    const favoris =
-    JSON.parse(
-        localStorage.getItem("favoris")
-    ) || [];
+    (async () => {
 
-    // Si aucun favori n'existe
-    if(favoris.length === 0){
+        try{
+
+            await apiFetch("/auth/me");
+
+        }catch(error){
+
+            window.location.href =
+            "../connexion/connexion.html";
+
+            return;
+        }
+
+        chargerFavoris();
+
+    })();
+
+}
+
+async function chargerFavoris(){
+
+    let logements;
+
+    try{
+
+        logements = await apiFetch("/favoris");
+
+    }catch(error){
+
+        favorisContainer.innerHTML =
+        '<p class="cards-empty">Impossible de charger vos favoris.</p>';
+
+        return;
+    }
+
+    if(!logements || logements.length === 0){
 
         favorisContainer.innerHTML = `
 
@@ -37,47 +65,58 @@ if(favorisContainer){
 
         `;
 
-    }else{
-        // Parcourt chaque logement favori
-        favoris.forEach(id=>{
+        return;
+    }
 
-            favorisContainer.innerHTML += `
+    favorisContainer.innerHTML =
+    logements.map(logement => {
 
-            <div class="similar-card">
+        const image =
+        logement.image_url || "../../images/logement1.jpg";
 
-                <img
-                src="../../images/logement${id}.jpg"
-                alt="Logement">
+        const prix =
+        Number(logement.prix).toLocaleString("fr-FR");
 
-                <div class="similar-content">
+        return `
+        <div class="similar-card">
 
-                    <h3>
+            <img
+            src="${image}"
+            alt="${logement.titre}">
 
-                        Logement ${id}
+            <div class="similar-content">
 
-                    </h3>
+                <h3>${logement.titre}</h3>
 
-                    <p>
+                <p>📍 ${logement.ville || ""} — ${prix} FCFA/mois</p>
 
-                        ❤️ Ajouté aux favoris
+                <button class="favorite active" data-id="${logement.id}">
+                    ❤️ Retirer des favoris
+                </button>
 
-                    </p>
-
-                    <a
-                    href="../details-logement/details-logement.html">
-
-                        Voir les détails
-
-                    </a>
-
-                </div>
+                <a href="../details-logement/details-logement.html">
+                    Voir les détails
+                </a>
 
             </div>
 
-     `;
+        </div>
+        `;
+
+    }).join("");
+
+    // Retirer un favori depuis cette page recharge simplement
+    // la liste, pour ne pas laisser une carte "fantôme" active.
+    favorisContainer.querySelectorAll(".favorite").forEach(btn => {
+
+        btn.addEventListener("click", async () => {
+
+            await toggleFavorite(btn);
+
+            chargerFavoris();
+
+        });
 
     });
-
-    }
 
 }

@@ -7,7 +7,7 @@ document.getElementById("contactForm");
 
 if(contactForm){
 
-    contactForm.addEventListener("submit",(e)=>{
+    contactForm.addEventListener("submit", async (e)=>{
 
         e.preventDefault();
 
@@ -30,9 +30,34 @@ if(contactForm){
             return;
         }
 
-        showToast("Message envoyé ! Nous vous répondrons rapidement.");
+        const submitBtn =
+        contactForm.querySelector("button[type='submit']");
 
-        contactForm.reset();
+        submitBtn.disabled = true;
+
+        try{
+
+            await apiFetch("/contact", {
+
+                method: "POST",
+
+                body: JSON.stringify({ nom, email, sujet, message })
+
+            });
+
+            showToast("Message envoyé ! Nous vous répondrons rapidement.");
+
+            contactForm.reset();
+
+        }catch(error){
+
+            showToast("Impossible d'envoyer le message pour le moment.");
+
+        }finally{
+
+            submitBtn.disabled = false;
+
+        }
 
     });
 

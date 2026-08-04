@@ -181,69 +181,111 @@ questions.forEach(question => {
 });
 
 /* ==========================
-    GESTION DES FAVORIS
+    LOGEMENTS POPULAIRES (API)
 ========================== */
 
-// Sélectionne tous les boutons favoris
-const favorites =
-document.querySelectorAll(".favorite");
+const featuredContainer =
+document.getElementById("featuredCards");
 
-// Récupère les favoris déjà enregistrés
-let favoris =
-JSON.parse(
-    localStorage.getItem("favoris")
-) || [];
+if(featuredContainer){
 
-// Parcourt chaque bouton favori
-favorites.forEach(button=>{
+    chargerLogementsPopulaires();
 
-    // Récupère l'identifiant du logement
-    const id =
-    button.dataset.id;
+}
 
-    // Si le logement est déjà dans les favoris,
-    // le cœur devient rouge au chargement de la page
-    if(favoris.includes(id)){
+async function chargerLogementsPopulaires(){
 
-        button.classList.add("active");
+    let logements;
 
+    try{
+
+        logements = await apiFetch("/logements");
+
+    }catch(error){
+
+        featuredContainer.innerHTML =
+        '<p class="cards-empty">Impossible de charger les logements pour le moment.</p>';
+
+        return;
     }
 
-    // Action lors d'un clic sur le cœur
-    button.addEventListener("click",()=>{
+    logements = (logements || []).slice(0, 6);
 
-        // Vérifie si le logement est déjà en favori
-        if(favoris.includes(id)){
+    if(logements.length === 0){
 
-            // Supprime le logement des favoris
-            favoris =
-            favoris.filter(
-                favori =>
-                favori !== id
-            );
+        featuredContainer.innerHTML =
+        '<p class="cards-empty">Aucun logement disponible pour le moment.</p>';
 
-            // Retire la couleur rouge
-            button.classList.remove("active");
+        return;
+    }
 
-        }else{
+    featuredContainer.innerHTML =
+    logements.map(carteLogementHTML).join("");
 
-            // Ajoute le logement aux favoris
-            favoris.push(id);
+    attacherBoutonsFavoris(featuredContainer);
+    attacherBoutonsReservation(featuredContainer);
 
-            // Colore le cœur en rouge
-            button.classList.add("active");
+}
 
-        }
+function carteLogementHTML(logement){
 
-        // Sauvegarde les favoris dans LocalStorage
-        localStorage.setItem(
+    const estPremium =
+    Number(logement.premium) === 1;
 
-            "favoris",
+    const image =
+    logement.image_url || "images/logement1.jpg";
 
-            JSON.stringify(favoris)
+    const prix =
+    Number(logement.prix).toLocaleString("fr-FR");
 
-        );
+    return `
+    <div class="card ${estPremium ? "card-premium" : ""}">
 
-    });
+        <div class="card-image">
 
-});
+            <img src="${image}" loading="lazy" alt="${logement.titre}">
+
+            <span class="badge-card">Disponible</span>
+
+            ${estPremium ? `
+            <span class="badge-premium">
+                <i class="ph ph-crown-simple"></i> Premium
+            </span>
+            ` : ""}
+
+            <button class="favorite" data-id="${logement.id}">❤</button>
+
+        </div>
+
+        <div class="card-content">
+
+            <h3>${logement.titre}</h3>
+
+            <p class="price">${prix} FCFA / mois</p>
+
+            <p class="location">📍 ${logement.ville || ""}</p>
+
+            <div class="infos">
+                <span>🛏 ${logement.chambres || 0} Chambre(s)</span>
+            </div>
+
+            <div class="bottom-card">
+
+                <span>⭐ 4.9</span>
+
+                <button class="btn-reserver" data-id="${logement.id}">
+                    Réserver
+                </button>
+
+                <a href="pages/details-logement/details-logement.html">
+                    Voir les détails →
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+    `;
+
+}

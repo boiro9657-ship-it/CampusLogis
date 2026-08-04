@@ -265,6 +265,55 @@ tr:hover td{
 
 }
 
+.reservations-list{
+
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+
+}
+
+.reservation-card{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+
+    background:white;
+    padding:22px 25px;
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
+
+}
+
+.reservation-card h3{
+
+    color:var(--primary);
+    margin-bottom:4px;
+
+}
+
+.reservation-card p{
+
+    color:var(--gray-500);
+    font-size:.9rem;
+
+}
+
+.reservation-statut{
+
+    padding:6px 14px;
+    border-radius:var(--radius-full);
+    font-size:.85rem;
+    font-weight:600;
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+}
+
 .property-card{
 
     background:white;

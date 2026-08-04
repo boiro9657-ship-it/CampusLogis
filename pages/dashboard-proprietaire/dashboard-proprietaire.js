@@ -1,7 +1,50 @@
 /* ==========================================================
    DASHBOARD-PROPRIETAIRE.JS — page tableau de bord uniquement
-   Affiche/supprime/modifie les logements publiés (localStorage).
+   Page protégée : redirige vers la connexion si aucune session
+   active. Affiche et supprime les logements du propriétaire
+   connecté via l'API.
    ========================================================== */
+
+(async () => {
+
+    try{
+
+        await apiFetch("/auth/me");
+
+    }catch(error){
+
+        window.location.href =
+        "../connexion/connexion.html";
+
+        return;
+    }
+
+    chargerAnnonces();
+    chargerReservations();
+
+})();
+
+/* ==========================
+    DÉCONNEXION
+========================== */
+
+const logoutLink =
+document.getElementById("logoutLink");
+
+if(logoutLink){
+
+    logoutLink.addEventListener("click", async (e) => {
+
+        e.preventDefault();
+
+        await apiFetch("/auth/logout", { method:"POST" });
+
+        window.location.href =
+        "../../index.html";
+
+    });
+
+}
 
 /* ==========================
     LIENS SIDEBAR À VENIR
@@ -19,21 +62,31 @@ document.querySelectorAll(".sidebar-soon").forEach(link => {
 
 });
 
+/* ==========================
+    MES ANNONCES
+========================== */
+
 const container =
-document.getElementById(
-    "annonces-container"
-);
+document.getElementById("annonces-container");
 
-if(container){
+async function chargerAnnonces(){
 
-    const logements =
-    JSON.parse(
-        localStorage.getItem(
-            "logements"
-        )
-    ) || [];
+    if(!container) return;
 
-    if(logements.length === 0){
+    let logements = [];
+
+    try{
+
+        logements = await apiFetch("/logements/mine");
+
+    }catch(error){
+
+        showToast("Impossible de charger vos annonces.");
+
+        return;
+    }
+
+    if(!logements || logements.length === 0){
 
         container.innerHTML = `
         <div class="empty-state">
@@ -49,80 +102,140 @@ if(container){
         </div>
         `;
 
+        return;
     }
 
-    logements.forEach(
-        logement => {
+    container.innerHTML =
+    logements.map(logement => `
+        <div class="property-card">
 
-            container.innerHTML += `
-            <div class="property-card">
+            ${
+                logement.image_url
+                ?
+                `<img
+                    src="${logement.image_url}"
+                    class="property-image">`
+                :
+                ""
+            }
 
-                ${
-                    logement.image
-                    ?
-                    `<img
-                        src="${logement.image}"
-                        class="property-image">`
-                    :
-                    ""
-                }
+            <div class="property-content">
 
-                <div class="property-content">
+                <h3>${logement.titre}</h3>
 
-                    <h3>${logement.titre}</h3>
+                <p>📍 ${logement.ville || ""}</p>
 
-                    <p>📍 ${logement.ville}</p>
+                <p>💰 ${logement.prix} FCFA</p>
 
-                    <p>💰 ${logement.prix} FCFA</p>
+                <p>🛏 ${logement.chambres || 0} chambre(s)</p>
 
-                    <p>🛏 ${logement.chambres} chambre(s)</p>
+                <p>${logement.description || ""}</p>
 
-                    <p>${logement.description}</p>
-
-                    <button onclick="supprimerLogement(${logement.id})">
-                    🗑 Supprimer
-                    </button>
-
-                    <button onclick="modifierLogement(${logement.id})">
-                    ✏ Modifier
-                    </button>
-
-                </div>
+                <button data-id="${logement.id}" class="btn-supprimer">
+                🗑 Supprimer
+                </button>
 
             </div>
-            `;
 
-        }
-    );
+        </div>
+    `).join("");
+
+    container.querySelectorAll(".btn-supprimer").forEach(btn => {
+
+        btn.addEventListener("click", () => {
+
+            supprimerLogement(btn.dataset.id);
+
+        });
+
+    });
 
 }
 
-function supprimerLogement(id){
+async function supprimerLogement(id){
 
-    let logements =
-    JSON.parse(
-        localStorage.getItem("logements")
-    ) || [];
+    try{
 
-    logements = logements.filter(
-        logement => logement.id !== id
-    );
+        await apiFetch("/logements/" + id, { method:"DELETE" });
 
-    localStorage.setItem(
-        "logements",
-        JSON.stringify(logements)
-    );
+        chargerAnnonces();
 
-    location.reload();
+    }catch(error){
+
+        showToast("Suppression impossible.");
+
+    }
+
 }
 
-function modifierLogement(id){
+/* ==========================
+    RÉSERVATIONS REÇUES
+========================== */
 
-    localStorage.setItem(
-        "logementAModifier",
-        id
-    );
+const reservationsContainer =
+document.getElementById("reservations-container");
 
-    window.location.href =
-    "../publier-logement/publier-logement.html";
+async function chargerReservations(){
+
+    if(!reservationsContainer) return;
+
+    let reservations = [];
+
+    try{
+
+        reservations = await apiFetch("/reservations/owner");
+
+    }catch(error){
+
+        showToast("Impossible de charger vos réservations.");
+
+        return;
+    }
+
+    if(!reservations || reservations.length === 0){
+
+        reservationsContainer.innerHTML = `
+        <div class="empty-state">
+
+            <i class="ph ph-calendar-check"></i>
+
+            <p>Vous n'avez encore reçu aucune demande de réservation.</p>
+
+        </div>
+        `;
+
+        return;
+    }
+
+    const libellesStatut = {
+        en_attente: "En attente",
+        confirmee: "Confirmée",
+        annulee: "Annulée"
+    };
+
+    reservationsContainer.innerHTML =
+    reservations.map(reservation => `
+        <div class="reservation-card">
+
+            <div>
+
+                <h3>${reservation.titre}</h3>
+
+                <p>📍 ${reservation.ville || ""} — demandé par ${reservation.locataire_nom}</p>
+
+                ${
+                    reservation.message
+                    ? `<p>💬 ${reservation.message}</p>`
+                    : ""
+                }
+
+            </div>
+
+            <span class="reservation-statut">
+                ${libellesStatut[reservation.statut] || reservation.statut}
+            </span>
+
+        </div>
+    `).join("");
+
 }

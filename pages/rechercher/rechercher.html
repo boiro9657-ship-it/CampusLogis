@@ -102,163 +102,9 @@
 
     <div class="container">
 
-        <div class="cards-grid">
+        <div class="cards-grid" id="searchResults">
 
-            <!-- Carte 1 -->
-            <div class="housing-card">
-
-                <img src="../../images/logement4.jpg" loading="lazy" alt="Résidence Fann">
-
-                <span class="badge-card">Disponible</span>
-
-                <button
-                    class="favorite"
-                    data-id="4">
-
-                    <i class="ph ph-heart"></i>
-
-                </button>
-
-                <div class="housing-content">
-
-                    <h3>Résidence Fann</h3>
-
-                    <p>
-                        <i class="ph ph-map-pin"></i>
-                        Fann, Dakar
-                    </p>
-
-                    <h4>75 000 FCFA/mois</h4>
-
-                    <div class="housing-info">
-
-                        <span>
-                            <i class="ph ph-bed"></i>
-                            2 chambres
-                        </span>
-
-                        <span>
-                            <i class="ph ph-bathtub"></i>
-                            1 salle de bain
-                        </span>
-
-                    </div>
-
-                    <a href="../details-logement/details-logement.html"
-                    class="btn-details">
-
-                        Voir plus
-
-                    </a>
-
-                </div>
-
-            </div>
-
-            <!-- Carte 2 -->
-            <div class="housing-card">
-
-                <img src="../../images/logement6.jpg" loading="lazy" alt="Studio Ouakam">
-
-                <span class="badge-card">Disponible</span>
-
-                <button
-                    class="favorite"
-                    data-id="6">
-
-                    <i class="ph ph-heart"></i>
-
-                </button>
-
-                <div class="housing-content">
-
-                    <h3>Studio Ouakam</h3>
-
-                    <p>
-                        <i class="ph ph-map-pin"></i>
-                        Ouakam, Dakar
-                    </p>
-
-                    <h4>60 000 FCFA/mois</h4>
-
-                    <div class="housing-info">
-
-                        <span>
-                            <i class="ph ph-bed"></i>
-                            1 chambre
-                        </span>
-
-                        <span>
-                            <i class="ph ph-wifi-high"></i>
-                            Wifi
-                        </span>
-
-                    </div>
-
-                    <a href="../details-logement/details-logement.html"
-                    class="btn-details">
-
-                        Voir plus
-
-                    </a>
-                </div>
-
-            </div>
-
-            <!-- Carte 3 -->
-            <div class="housing-card housing-card-premium">
-
-                <img src="../../images/logement3.jpg" loading="lazy" alt="Appartement">
-
-                <span class="badge-card">Disponible</span>
-
-                <span class="badge-premium">
-                    <i class="ph ph-crown-simple"></i> Premium
-                </span>
-
-                <button
-                     class="favorite"
-                     data-id="3">
-
-                    <i class="ph ph-heart"></i>
-
-                </button>
-
-                <div class="housing-content">
-
-                    <h3>Appartement Amitié</h3>
-
-                    <p>
-                        <i class="ph ph-map-pin"></i>
-                        Amitié, Dakar
-                    </p>
-
-                    <h4>90 000 FCFA/mois</h4>
-
-                    <div class="housing-info">
-
-                        <span>
-                            <i class="ph ph-bed"></i>
-                            3 chambres
-                        </span>
-
-                        <span>
-                            <i class="ph ph-wifi-high"></i>
-                            Wifi
-                        </span>
-
-                    </div>
-
-                    <a href="../details-logement/details-logement.html"
-                    class="btn-details">
-
-                        Voir plus
-
-                    </a>
-
-                </div>
-
-            </div>
+            <p class="cards-loading">Chargement des logements...</p>
 
         </div>
 
@@ -346,6 +192,8 @@
 
 <div id="toast"></div>
 
+<script>window.API_BASE = "../../backend/api";</script>
+<script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/global.js"></script>
 <script src="./rechercher.js"></script>
 

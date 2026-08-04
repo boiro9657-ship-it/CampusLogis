@@ -127,6 +127,160 @@ if(scrollTopBtn){
 }
 
 /* ==========================
+    ÉTAT DE CONNEXION (NAVBAR)
+========================== */
+
+if(typeof apiFetch !== "undefined"){
+
+    apiFetch("/auth/me").then(()=>{
+
+        const navBtn =
+        document.querySelector(".btn-nav-link");
+
+        // Réutilise le lien déjà présent dans le menu (chemin
+        // relatif correct quelle que soit la profondeur de la
+        // page) plutôt que de le recalculer à la main ici.
+        const dashboardLink =
+        document.querySelector('.nav-links a[href*="dashboard-proprietaire"]');
+
+        if(navBtn && dashboardLink){
+
+            navBtn.textContent = "Mon compte";
+            navBtn.setAttribute("href", dashboardLink.getAttribute("href"));
+
+        }
+
+    }).catch(()=>{});
+
+}
+
+/* ==========================
+    FAVORIS (API)
+    Réutilisé par l'accueil, la recherche et la page favoris
+    pour tout bouton .favorite portant un data-id.
+========================== */
+
+async function toggleFavorite(button){
+
+    const logementId = button.dataset.id;
+
+    try{
+
+        if(button.classList.contains("active")){
+
+            await apiFetch("/favoris/" + logementId, { method:"DELETE" });
+
+            button.classList.remove("active");
+
+        }else{
+
+            await apiFetch("/favoris/" + logementId, { method:"POST" });
+
+            button.classList.add("active");
+
+        }
+
+    }catch(error){
+
+        showToast("Connectez-vous pour ajouter des favoris.");
+
+    }
+
+}
+
+async function marquerFavorisActifs(container){
+
+    let favoris;
+
+    try{
+
+        favoris = await apiFetch("/favoris");
+
+    }catch(error){
+
+        return;
+    }
+
+    const idsFavoris =
+    (favoris || []).map(f => String(f.id));
+
+    container.querySelectorAll(".favorite").forEach(btn => {
+
+        if(idsFavoris.includes(btn.dataset.id)){
+
+            btn.classList.add("active");
+
+        }
+
+    });
+
+}
+
+function attacherBoutonsFavoris(container){
+
+    container.querySelectorAll(".favorite").forEach(btn => {
+
+        btn.addEventListener("click", () => toggleFavorite(btn));
+
+    });
+
+    marquerFavorisActifs(container);
+
+}
+
+/* ==========================
+    RÉSERVATIONS (API)
+    Réutilisé par l'accueil et la recherche pour tout bouton
+    .btn-reserver portant un data-id.
+========================== */
+
+async function reserverLogement(logementId){
+
+    const message =
+    prompt("Un message pour le propriétaire ? (facultatif)");
+
+    if(message === null) return;
+
+    try{
+
+        await apiFetch("/reservations", {
+
+            method: "POST",
+
+            body: JSON.stringify({
+                logement_id: logementId,
+                message
+            })
+
+        });
+
+        showToast("Demande de réservation envoyée !");
+
+    }catch(error){
+
+        showToast("Connectez-vous pour réserver un logement.");
+
+    }
+
+}
+
+function attacherBoutonsReservation(container){
+
+    container.querySelectorAll(".btn-reserver").forEach(btn => {
+
+        btn.addEventListener("click", (e) => {
+
+            e.preventDefault();
+
+            reserverLogement(btn.dataset.id);
+
+        });
+
+    });
+
+}
+
+/* ==========================
         TOAST
 ========================== */
 

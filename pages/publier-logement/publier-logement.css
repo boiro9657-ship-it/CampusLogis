@@ -61,6 +61,7 @@
 }
 
 .form-group input,
+.form-group select,
 .form-group textarea{
 
     width:100%;
@@ -75,10 +76,15 @@
 
     font-size:15px;
 
+    font-family:inherit;
+
+    background:white;
+
     transition:border-color .2s, box-shadow .2s;
 }
 
 .form-group input:focus,
+.form-group select:focus,
 .form-group textarea:focus{
 
     border-color:var(--primary);

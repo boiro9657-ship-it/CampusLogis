@@ -46,7 +46,7 @@ document.getElementById("loginForm");
 
 if(loginForm){
 
-    loginForm.addEventListener("submit",(e)=>{
+    loginForm.addEventListener("submit", async (e)=>{
 
         e.preventDefault();
 
@@ -63,7 +63,34 @@ if(loginForm){
             return;
         }
 
-        showToast("Connexion au backend bientôt disponible.");
+        const submitBtn =
+        loginForm.querySelector(".login-btn");
+
+        submitBtn.disabled = true;
+
+        try{
+
+            await apiFetch("/auth/login", {
+
+                method: "POST",
+
+                body: JSON.stringify({
+                    email,
+                    mot_de_passe: pass
+                })
+
+            });
+
+            window.location.href =
+            "../../index.html";
+
+        }catch(error){
+
+            showToast("Email ou mot de passe incorrect.");
+
+            submitBtn.disabled = false;
+
+        }
 
     });
 

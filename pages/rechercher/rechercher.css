@@ -292,6 +292,16 @@
 
 }
 
+.housing-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+}
+
 .btn-details{
 
     display:inline-block;

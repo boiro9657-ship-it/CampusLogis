@@ -1,0 +1,4 @@
+# Photos de logements uploadées par les utilisateurs : contenu
+# généré à l'exécution, pas du code source.
+backend/uploads/logements/*
+!backend/uploads/logements/.gitkeep

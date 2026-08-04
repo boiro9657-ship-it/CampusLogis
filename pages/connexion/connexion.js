@@ -18,8 +18,8 @@ if(togglePassword && password){
             password.type="text";
 
             togglePassword.classList.replace(
-                "fa-eye",
-                "fa-eye-slash"
+                "ph-eye",
+                "ph-eye-slash"
             );
 
         }else{
@@ -27,8 +27,8 @@ if(togglePassword && password){
             password.type="password";
 
             togglePassword.classList.replace(
-                "fa-eye-slash",
-                "fa-eye"
+                "ph-eye-slash",
+                "ph-eye"
             );
 
         }

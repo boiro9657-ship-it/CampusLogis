@@ -38,7 +38,7 @@ if(container){
         container.innerHTML = `
         <div class="empty-state">
 
-            <i class="fas fa-house-circle-xmark"></i>
+            <i class="ph ph-house-simple"></i>
 
             <p>Vous n'avez encore publié aucune annonce.</p>
 

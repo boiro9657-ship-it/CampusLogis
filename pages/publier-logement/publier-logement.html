@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Publier un logement | CampusLogis</title>
+    <title>Publier un logement | TerangaHome</title>
+    <meta name="description" content="Publiez gratuitement votre annonce de logement sur TerangaHome et touchez des locataires partout au Sénégal.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
     <link rel="stylesheet" href="../../assets/css/global.css">
     <link rel="stylesheet" href="./publier-logement.css">
 
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
 
@@ -18,7 +19,7 @@
 <nav class="navbar">
 
     <a href="../../index.html" class="logo">
-        <img src="../../images/logo.jpg" alt="CampusLogis">
+        <span class="logo-word"><span class="logo-word-1">Teranga</span><span class="logo-word-2">Home</span></span>
     </a>
 
     <ul class="nav-links">
@@ -44,32 +45,15 @@
     </ul>
 
     <div class="menu-toggle">
-        <i class="fas fa-bars"></i>
+        <i class="ph ph-list"></i>
     </div>
 
-    <div class="nav-buttons">
-        <a href="../inscription/inscription.html" class="btn-login">S'inscrire</a>
-        <a href="../connexion/connexion.html" class="btn-login">Se connecter</a>
+    <div class="nav-buttons">        <a href="../connexion/connexion.html" class="btn-nav-link">Se connecter</a>
     </div>
 
 </nav>
 
 </header>
-
-    <section class="breadcrumb">
-
-    <div class="container">
-
-        <a href="../../index.html"><i class="fas fa-house"></i> Accueil</a>
-
-        <i class="fas fa-chevron-right breadcrumb-sep"></i>
-
-        <span class="breadcrumb-current">Publier un logement</span>
-
-    </div>
-
-</section>
-
 <div class="publish-header">
 
     <h1>Publier un logement</h1>
@@ -152,15 +136,15 @@
         <div class="footer-grid">
 
             <div class="footer-col">
-                <h2 class="footer-logo">CampusLogis</h2>
+                <h2 class="footer-logo"><span class="logo-word-1">Teranga</span><span class="logo-word-2">Home</span></h2>
                 <p>
-                    La plateforme sénégalaise qui aide les étudiants à trouver rapidement un logement fiable, sécurisé et abordable.
+                    La plateforme sénégalaise qui aide chacun à trouver rapidement un logement fiable, sécurisé et abordable, partout au Sénégal.
                 </p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="ph ph-facebook-logo"></i></a>
+                    <a href="#"><i class="ph ph-instagram-logo"></i></a>
+                    <a href="#"><i class="ph ph-linkedin-logo"></i></a>
+                    <a href="#"><i class="ph ph-tiktok-logo"></i></a>
                 </div>
             </div>
 
@@ -178,6 +162,7 @@
                 <h3>Services</h3>
                 <ul>
                     <li><a href="./publier-logement.html">Publier une annonce</a></li>
+                    <li><a href="../tarifs/tarifs.html">Tarifs</a></li>
                     <li><a href="../rechercher/rechercher.html">Réserver</a></li>
                     <li><a href="../favoris/favoris.html">Favoris</a></li>
                     <li><a href="../contacte/contacte.html">Support</a></li>
@@ -187,9 +172,9 @@
             <div class="footer-col">
                 <h3>Contact</h3>
                 <ul>
-                    <li><i class="fas fa-phone"></i> +221 77 000 00 00</li>
-                    <li><i class="fas fa-envelope"></i> contact@campuslogis.sn</li>
-                    <li><i class="fas fa-location-dot"></i> Dakar, Sénégal</li>
+                    <li><i class="ph ph-phone"></i> +221 77 000 00 00</li>
+                    <li><i class="ph ph-envelope-simple"></i> contact@terangahome.sn</li>
+                    <li><i class="ph ph-map-pin"></i> Dakar, Sénégal</li>
                 </ul>
             </div>
 
@@ -207,7 +192,7 @@
         <hr>
 
         <div class="footer-bottom">
-            <p>© 2026 CampusLogis. Tous droits réservés.</p>
+            <p>© 2026 TerangaHome. Tous droits réservés.</p>
             <div>
                 <a href="#">Mentions légales</a>
                 <a href="#">Confidentialité</a>
@@ -219,7 +204,7 @@
 </footer>
 
 <button id="scrollTop">
-    <i class="fas fa-arrow-up"></i>
+    <i class="ph ph-arrow-up"></i>
 </button>
 
 <div id="toast"></div>

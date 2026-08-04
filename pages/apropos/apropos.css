@@ -4,6 +4,11 @@
 
 #about-hero{
 
+    /* Le fil d'Ariane a été retiré : ce bloc suit directement
+       la navbar fixe, il doit donc reprendre lui-même le
+       décalage qu'elle mesure en JS. */
+    margin-top:var(--header-height, 84px);
+
     min-height:50vh;
 
     display:flex;
@@ -16,9 +21,8 @@
     background:
     linear-gradient(
         135deg,
-        #2563EB 0%,
-        #1D4ED8 50%,
-        #0F172A 100%
+        var(--primary),
+        var(--primary-dark)
     );
 
     position:relative;
@@ -176,13 +180,17 @@
 
 .founder-card{
 
+    display:flex;
+    align-items:center;
+    gap:40px;
+
     background:white;
 
-    padding:60px 40px;
+    padding:50px;
 
     border-radius:35px;
 
-    text-align:center;
+    text-align:left;
 
     width:84%;
     max-width:700px;
@@ -196,19 +204,19 @@
 
 .founder-card img{
 
-    width:180px;
-    height:180px;
+    width:150px;
+    height:150px;
+
+    flex-shrink:0;
 
     object-fit:cover;
 
     border-radius:50%;
 
-    border:6px solid white;
+    border:6px solid var(--primary-light);
 
     box-shadow:
-    0 15px 35px rgba(37,99,235,.20);
-
-    margin-bottom:25px;
+    0 15px 35px rgba(20,92,61,.20);
 
     transition:.4s;
 
@@ -217,6 +225,44 @@
 .founder-card img:hover{
 
     transform:scale(1.05);
+
+}
+
+.founder-info h3{
+
+    color:var(--primary);
+    font-size:1.4rem;
+    margin-bottom:6px;
+
+}
+
+.founder-role{
+
+    display:block;
+
+    color:var(--secondary);
+    font-weight:600;
+
+    margin-bottom:14px;
+
+}
+
+.founder-info p{
+
+    color:var(--gray-500);
+    line-height:1.7;
+
+}
+
+@media(max-width:640px){
+
+    .founder-card{
+
+        flex-direction:column;
+        text-align:center;
+        padding:40px 30px;
+
+    }
 
 }
 
@@ -230,7 +276,7 @@ body{
 
     radial-gradient(
     circle at top left,
-    rgba(37,99,235,.08),
+    rgba(20,92,61,.08),
     transparent 40%),
 
     #F8FAFC;

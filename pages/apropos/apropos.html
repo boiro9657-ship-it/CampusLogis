@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>À propos | CampusLogis</title>
+    <title>À propos | TerangaHome</title>
+    <meta name="description" content="TerangaHome : la plateforme sénégalaise qui simplifie la recherche de logement, pour tous, partout au Sénégal.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <!-- CSS -->
     <link rel="stylesheet" href="../../assets/css/global.css">
@@ -27,8 +25,7 @@
 
     <a href="../../index.html" class="logo">
 
-        <!-- Remplace plus tard par ton logo -->
-        <img src="../../images/logo.jpg" alt="CampusLogis">
+        <span class="logo-word"><span class="logo-word-1">Teranga</span><span class="logo-word-2">Home</span></span>
 
     </a>
 
@@ -61,17 +58,12 @@
 
     <div class="menu-toggle">
 
-    <i class="fas fa-bars"></i>
+    <i class="ph ph-list"></i>
 
     </div>
 
     <div class="nav-buttons">
-
-        <a href="../inscription/inscription.html" class="btn-login">
-            S'inscrire
-        </a>
-
-        <a href="../connexion/connexion.html" class="btn-login">
+        <a href="../connexion/connexion.html" class="btn-nav-link">
             Se connecter
         </a>
 
@@ -80,33 +72,18 @@
 </nav>
 
 </header>
-
-<section class="breadcrumb">
-
-    <div class="container">
-
-        <a href="../../index.html"><i class="fas fa-house"></i> Accueil</a>
-
-        <i class="fas fa-chevron-right breadcrumb-sep"></i>
-
-        <span class="breadcrumb-current">À propos</span>
-
-    </div>
-
-</section>
-
 <section id="about-hero">
 
     <div class="hero-content">
 
        <span class="badge">
-         CampusLogis
+         TerangaHome
         </span>
 
         <h1>À propos de nous</h1>
 
         <p>
-            Trouvez votre logement étudiant en toute simplicité.
+            Trouvez votre logement en toute simplicité, partout au Sénégal.
         </p>
 
     </div>
@@ -121,9 +98,9 @@
 
         <p>
 
-            CampusLogis a pour objectif de simplifier
-            la recherche de logements pour les étudiants
-            en mettant en relation étudiants et propriétaires
+            TerangaHome a pour objectif de simplifier
+            la recherche de logements pour tous
+            en mettant en relation locataires et propriétaires
             sur une plateforme moderne, rapide et sécurisée.
 
         </p>
@@ -148,7 +125,7 @@
 
         <div class="stat-card">
             <h3>1000+</h3>
-            <p>Étudiants</p>
+            <p>Locataires</p>
         </div>
 
     </div>
@@ -163,7 +140,7 @@
 
         <div class="value-card">
 
-            <i class="fas fa-house"></i>
+            <i class="ph ph-house"></i>
 
             <h3>Simplicité</h3>
 
@@ -175,7 +152,7 @@
 
         <div class="value-card">
 
-            <i class="fas fa-shield-halved"></i>
+            <i class="ph ph-shield-check"></i>
 
             <h3>Confiance</h3>
 
@@ -187,7 +164,7 @@
 
         <div class="value-card">
 
-            <i class="fas fa-bolt"></i>
+            <i class="ph ph-lightning"></i>
 
             <h3>Rapidité</h3>
 
@@ -204,11 +181,20 @@
 <div class="founder-card">
 
     <img
-    src="../../images/ibrahima.jpg" loading="lazy">
+    src="../../images/ibrahima.jpg" loading="lazy" alt="Ibrahima Boiro">
 
-    <h3>Ibrahima Boiro</h3>
+    <div class="founder-info">
 
-    <p>Fondateur de CampusLogis</p>
+        <h3>Ibrahima Boiro</h3>
+
+        <span class="founder-role">Fondateur de TerangaHome</span>
+
+        <p>
+            Convaincu que chaque Sénégalais mérite un accès simple
+            et fiable au logement, où qu'il se trouve dans le pays.
+        </p>
+
+    </div>
 
 </div>
 
@@ -220,21 +206,21 @@
 
             <div class="footer-col">
 
-                <h2 class="footer-logo">CampusLogis</h2>
+                <h2 class="footer-logo"><span class="logo-word-1">Teranga</span><span class="logo-word-2">Home</span></h2>
 
                 <p>
-                    La plateforme sénégalaise qui aide les étudiants à trouver rapidement un logement fiable, sécurisé et abordable.
+                    La plateforme sénégalaise qui aide chacun à trouver rapidement un logement fiable, sécurisé et abordable, partout au Sénégal.
                 </p>
 
                 <div class="social-icons">
 
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="ph ph-facebook-logo"></i></a>
 
-                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="ph ph-instagram-logo"></i></a>
 
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="ph ph-linkedin-logo"></i></a>
 
-                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="ph ph-tiktok-logo"></i></a>
 
                 </div>
 
@@ -265,6 +251,7 @@
                 <ul>
 
                     <li><a href="../publier-logement/publier-logement.html">Publier une annonce</a></li>
+                    <li><a href="../tarifs/tarifs.html">Tarifs</a></li>
 
                     <li><a href="../rechercher/rechercher.html">Réserver</a></li>
 
@@ -282,11 +269,11 @@
 
                 <ul>
 
-                    <li><i class="fas fa-phone"></i> +221 77 000 00 00</li>
+                    <li><i class="ph ph-phone"></i> +221 77 000 00 00</li>
 
-                    <li><i class="fas fa-envelope"></i> contact@campuslogis.sn</li>
+                    <li><i class="ph ph-envelope-simple"></i> contact@terangahome.sn</li>
 
-                    <li><i class="fas fa-location-dot"></i> Dakar, Sénégal</li>
+                    <li><i class="ph ph-map-pin"></i> Dakar, Sénégal</li>
 
                 </ul>
 
@@ -316,7 +303,7 @@
 
         <div class="footer-bottom">
 
-            <p>© 2026 CampusLogis. Tous droits réservés.</p>
+            <p>© 2026 TerangaHome. Tous droits réservés.</p>
 
             <div>
                 <a href="#">Mentions légales</a>
@@ -330,7 +317,7 @@
 </footer>
 
 <button id="scrollTop">
-    <i class="fas fa-arrow-up"></i>
+    <i class="ph ph-arrow-up"></i>
 </button>
 
 <div id="toast"></div>

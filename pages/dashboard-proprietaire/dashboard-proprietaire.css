@@ -4,6 +4,8 @@
 
 #owner-dashboard{
 
+    margin-top:var(--header-height, 84px);
+
     display:grid;
     grid-template-columns:280px 1fr;
 
@@ -15,7 +17,7 @@
 
 .sidebar{
 
-    background:#0F172A;
+    background:var(--primary);
 
     color:white;
 
@@ -26,6 +28,15 @@
 .sidebar h2{
 
     margin-bottom:50px;
+
+}
+
+/* Fond de sidebar sombre (var(--primary)) : le ton foncé du
+   wordmark ("Teranga") y serait invisible sans cette
+   surcharge, comme sur le footer. */
+.sidebar h2 .logo-word-1{
+
+    color:#fff;
 
 }
 
@@ -58,6 +69,12 @@
 .dashboard-content{
 
     padding:50px;
+
+    /* Élément enfant d'une grille CSS : sans ça, min-width:auto
+       (valeur par défaut) empêche ce bloc de rétrécir sous la
+       largeur intrinsèque du tableau, ce qui pousse toute la
+       page en débordement horizontal sur mobile. */
+    min-width:0;
 
 }
 
@@ -103,7 +120,7 @@
 
     font-size:35px;
 
-    color:#2563EB;
+    color:var(--primary);
 
     margin-bottom:20px;
 
@@ -248,6 +265,28 @@ tr:hover td{
 
 }
 
+.property-card{
+
+    background:white;
+
+    border-radius:var(--radius-lg);
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow-md);
+
+    transition:.3s;
+
+}
+
+.property-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:var(--shadow-lg);
+
+}
+
 .property-image{
 
     width:100%;
@@ -256,11 +295,31 @@ tr:hover td{
 
     object-fit:cover;
 
-    border-radius:15px;
-
-    margin-bottom:15px;
-
     display:block;
+
+}
+
+.property-content{
+
+    padding:25px;
+
+}
+
+.property-content h3{
+
+    color:var(--primary);
+
+    margin-bottom:10px;
+
+}
+
+.property-content p{
+
+    color:var(--gray-500);
+
+    margin-bottom:6px;
+
+    font-size:14px;
 
 }
 
@@ -294,14 +353,14 @@ tr:hover td{
 
 .property-content button:last-of-type{
 
-    background:#2563EB;
+    background:var(--primary);
     color:white;
 
 }
 
 .property-content button:last-of-type:hover{
 
-    background:#1D4ED8;
+    background:var(--primary-dark);
     transform:translateY(-2px);
 
 }

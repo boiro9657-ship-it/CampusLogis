@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recherche | CampusLogis</title>
+    <title>Recherche | TerangaHome</title>
+    <meta name="description" content="Recherchez une chambre, un studio, un appartement ou une villa partout au Sénégal sur TerangaHome.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
     <link rel="stylesheet" href="../../assets/css/global.css">
     <link rel="stylesheet" href="./rechercher.css">
 
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
 
@@ -18,7 +19,7 @@
 <nav class="navbar">
 
     <a href="../../index.html" class="logo">
-        <img src="../../images/logo.jpg" alt="CampusLogis">
+        <span class="logo-word"><span class="logo-word-1">Teranga</span><span class="logo-word-2">Home</span></span>
     </a>
 
     <ul class="nav-links">
@@ -44,38 +45,21 @@
     </ul>
 
     <div class="menu-toggle">
-        <i class="fas fa-bars"></i>
+        <i class="ph ph-list"></i>
     </div>
 
-    <div class="nav-buttons">
-        <a href="../inscription/inscription.html" class="btn-login">S'inscrire</a>
-        <a href="../connexion/connexion.html" class="btn-login">Se connecter</a>
+    <div class="nav-buttons">        <a href="../connexion/connexion.html" class="btn-nav-link">Se connecter</a>
     </div>
 
 </nav>
 
 </header>
-
-    <section class="breadcrumb">
-
-    <div class="container">
-
-        <a href="../../index.html"><i class="fas fa-house"></i> Accueil</a>
-
-        <i class="fas fa-chevron-right breadcrumb-sep"></i>
-
-        <span class="breadcrumb-current">Rechercher</span>
-
-    </div>
-
-</section>
-
     <!-- HERO -->
     <section id="search-hero">
 
     <div class="container">
 
-        <h1>Trouvez votre logement étudiant idéal</h1>
+        <h1>Trouvez votre logement idéal</h1>
 
         <p>
             Découvrez des logements fiables et abordables partout au Sénégal.
@@ -99,10 +83,12 @@
                 <option>Chambre</option>
                 <option>Studio</option>
                 <option>Appartement</option>
+                <option>Villa</option>
+                <option>Bureau</option>
             </select>
 
             <button type="submit">
-                <i class="fas fa-search"></i>
+                <i class="ph ph-magnifying-glass"></i>
                 Rechercher
             </button>
 
@@ -129,7 +115,7 @@
                     class="favorite"
                     data-id="4">
 
-                    <i class="fas fa-heart"></i>
+                    <i class="ph ph-heart"></i>
 
                 </button>
 
@@ -138,7 +124,7 @@
                     <h3>Résidence Fann</h3>
 
                     <p>
-                        <i class="fas fa-location-dot"></i>
+                        <i class="ph ph-map-pin"></i>
                         Fann, Dakar
                     </p>
 
@@ -147,12 +133,12 @@
                     <div class="housing-info">
 
                         <span>
-                            <i class="fas fa-bed"></i>
+                            <i class="ph ph-bed"></i>
                             2 chambres
                         </span>
 
                         <span>
-                            <i class="fas fa-bath"></i>
+                            <i class="ph ph-bathtub"></i>
                             1 salle de bain
                         </span>
 
@@ -172,7 +158,7 @@
             <!-- Carte 2 -->
             <div class="housing-card">
 
-                <img src="../../images/logement6.jpg" loading="lazy" alt="Studio UCAD">
+                <img src="../../images/logement6.jpg" loading="lazy" alt="Studio Ouakam">
 
                 <span class="badge-card">Disponible</span>
 
@@ -180,16 +166,16 @@
                     class="favorite"
                     data-id="6">
 
-                    <i class="fas fa-heart"></i>
+                    <i class="ph ph-heart"></i>
 
                 </button>
 
                 <div class="housing-content">
 
-                    <h3>Studio UCAD</h3>
+                    <h3>Studio Ouakam</h3>
 
                     <p>
-                        <i class="fas fa-location-dot"></i>
+                        <i class="ph ph-map-pin"></i>
                         Ouakam, Dakar
                     </p>
 
@@ -198,12 +184,12 @@
                     <div class="housing-info">
 
                         <span>
-                            <i class="fas fa-bed"></i>
+                            <i class="ph ph-bed"></i>
                             1 chambre
                         </span>
 
                         <span>
-                            <i class="fas fa-wifi"></i>
+                            <i class="ph ph-wifi-high"></i>
                             Wifi
                         </span>
 
@@ -220,17 +206,21 @@
             </div>
 
             <!-- Carte 3 -->
-            <div class="housing-card">
+            <div class="housing-card housing-card-premium">
 
                 <img src="../../images/logement3.jpg" loading="lazy" alt="Appartement">
 
                 <span class="badge-card">Disponible</span>
 
+                <span class="badge-premium">
+                    <i class="ph ph-crown-simple"></i> Premium
+                </span>
+
                 <button
                      class="favorite"
                      data-id="3">
 
-                    <i class="fas fa-heart"></i>
+                    <i class="ph ph-heart"></i>
 
                 </button>
 
@@ -239,7 +229,7 @@
                     <h3>Appartement Amitié</h3>
 
                     <p>
-                        <i class="fas fa-location-dot"></i>
+                        <i class="ph ph-map-pin"></i>
                         Amitié, Dakar
                     </p>
 
@@ -248,12 +238,12 @@
                     <div class="housing-info">
 
                         <span>
-                            <i class="fas fa-bed"></i>
+                            <i class="ph ph-bed"></i>
                             3 chambres
                         </span>
 
                         <span>
-                            <i class="fas fa-wifi"></i>
+                            <i class="ph ph-wifi-high"></i>
                             Wifi
                         </span>
 
@@ -283,15 +273,15 @@
         <div class="footer-grid">
 
             <div class="footer-col">
-                <h2 class="footer-logo">CampusLogis</h2>
+                <h2 class="footer-logo"><span class="logo-word-1">Teranga</span><span class="logo-word-2">Home</span></h2>
                 <p>
-                    La plateforme sénégalaise qui aide les étudiants à trouver rapidement un logement fiable, sécurisé et abordable.
+                    La plateforme sénégalaise qui aide chacun à trouver rapidement un logement fiable, sécurisé et abordable, partout au Sénégal.
                 </p>
                 <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="ph ph-facebook-logo"></i></a>
+                    <a href="#"><i class="ph ph-instagram-logo"></i></a>
+                    <a href="#"><i class="ph ph-linkedin-logo"></i></a>
+                    <a href="#"><i class="ph ph-tiktok-logo"></i></a>
                 </div>
             </div>
 
@@ -309,6 +299,7 @@
                 <h3>Services</h3>
                 <ul>
                     <li><a href="../publier-logement/publier-logement.html">Publier une annonce</a></li>
+                    <li><a href="../tarifs/tarifs.html">Tarifs</a></li>
                     <li><a href="./rechercher.html">Réserver</a></li>
                     <li><a href="../favoris/favoris.html">Favoris</a></li>
                     <li><a href="../contacte/contacte.html">Support</a></li>
@@ -318,9 +309,9 @@
             <div class="footer-col">
                 <h3>Contact</h3>
                 <ul>
-                    <li><i class="fas fa-phone"></i> +221 77 000 00 00</li>
-                    <li><i class="fas fa-envelope"></i> contact@campuslogis.sn</li>
-                    <li><i class="fas fa-location-dot"></i> Dakar, Sénégal</li>
+                    <li><i class="ph ph-phone"></i> +221 77 000 00 00</li>
+                    <li><i class="ph ph-envelope-simple"></i> contact@terangahome.sn</li>
+                    <li><i class="ph ph-map-pin"></i> Dakar, Sénégal</li>
                 </ul>
             </div>
 
@@ -338,7 +329,7 @@
         <hr>
 
         <div class="footer-bottom">
-            <p>© 2026 CampusLogis. Tous droits réservés.</p>
+            <p>© 2026 TerangaHome. Tous droits réservés.</p>
             <div>
                 <a href="#">Mentions légales</a>
                 <a href="#">Confidentialité</a>
@@ -350,7 +341,7 @@
 </footer>
 
 <button id="scrollTop">
-    <i class="fas fa-arrow-up"></i>
+    <i class="ph ph-arrow-up"></i>
 </button>
 
 <div id="toast"></div>

@@ -8,6 +8,8 @@
 
 #search-hero{
 
+    margin-top:var(--header-height, 84px);
+
     min-height:60vh;
 
     display:flex;
@@ -21,9 +23,8 @@
     background:
     linear-gradient(
         135deg,
-        #0D1B2A,
-        #1E3A8A,
-        #2563EB
+        var(--primary),
+        var(--primary-dark)
     );
 
     position:relative;
@@ -105,9 +106,9 @@
 .search-page-box input:focus,
 .search-page-box select:focus{
 
-    border-color:#2563EB;
+    border-color:var(--primary);
 
-    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    box-shadow:0 0 0 4px rgba(20,92,61,.12);
 
 }
 
@@ -115,7 +116,7 @@
 
     border:none;
 
-    background:#2563EB;
+    background:var(--secondary);
 
     color:white;
 
@@ -133,7 +134,7 @@
 
 .search-page-box button:hover{
 
-    background:#1D4ED8;
+    background:var(--secondary-dark);
 
     transform:translateY(-3px);
 
@@ -191,18 +192,57 @@
 
 }
 
+/* Badge "Premium" : empilé sous le badge Disponible. */
+.badge-premium{
+
+    position:absolute;
+
+    top:62px;
+    left:18px;
+
+    display:flex;
+    align-items:center;
+    gap:5px;
+
+    background:linear-gradient(135deg,#F59E0B,#D97706);
+    color:white;
+
+    padding:7px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+    font-weight:700;
+
+    box-shadow:0 8px 18px rgba(217,119,6,.35);
+
+    z-index:2;
+
+}
+
+.badge-premium i{
+
+    font-size:13px;
+
+}
+
+.housing-card-premium{
+
+    border:2px solid #F59E0B;
+
+}
+
 .housing-card{
 
     position:relative;
 
     background:white;
 
-    border-radius:25px;
+    border-radius:var(--radius-lg);
 
     overflow:hidden;
 
-    box-shadow:
-    0 15px 40px rgba(0,0,0,.08);
+    box-shadow:var(--shadow-md);
 
     transition:.3s;
 
@@ -211,6 +251,8 @@
 .housing-card:hover{
 
     transform:translateY(-10px);
+
+    box-shadow:var(--shadow-lg);
 
 }
 
@@ -244,7 +286,7 @@
 
 .housing-content h4{
 
-    color:#2563EB;
+    color:var(--primary);
 
     margin:20px 0;
 
@@ -254,7 +296,7 @@
 
     display:inline-block;
 
-    background:#F59E0B;
+    background:var(--secondary);
 
     color:white;
 

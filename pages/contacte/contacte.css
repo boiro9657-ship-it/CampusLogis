@@ -4,6 +4,8 @@
 
 #contact-hero{
 
+    margin-top:var(--header-height, 84px);
+
     min-height:55vh;
 
     display:flex;
@@ -16,9 +18,8 @@
     background:
     linear-gradient(
         135deg,
-        #2563EB 0%,
-        #1D4ED8 50%,
-        #0F172A 100%
+        var(--primary),
+        var(--primary-dark)
     );
 
     position:relative;
@@ -155,9 +156,9 @@
 .contact-form input:focus,
 .contact-form textarea:focus{
 
-    border-color:#2563EB;
+    border-color:var(--primary);
 
-    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    box-shadow:0 0 0 4px rgba(20,92,61,.12);
 
 }
 
@@ -189,7 +190,7 @@
 
     box-shadow:
     0 10px 25px
-    rgba(245,158,11,.35);
+    rgba(111,190,68,.35);
 
 }
 

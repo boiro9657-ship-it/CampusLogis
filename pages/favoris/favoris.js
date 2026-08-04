@@ -23,7 +23,7 @@ if(favorisContainer){
 
             <div class="empty-state">
 
-                <i class="fas fa-heart-crack"></i>
+                <i class="ph ph-heart-break"></i>
 
                 <h2>Vous n'avez encore aucun logement favori.</h2>
 

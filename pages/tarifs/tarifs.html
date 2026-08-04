@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Contact | TerangaHome</title>
-    <meta name="description" content="Contactez l'équipe TerangaHome pour toute question sur votre logement au Sénégal.">
+    <title>Tarifs propriétaires | TerangaHome</title>
+    <meta name="description" content="Formules Gratuit, Premium et Pro pour mettre en avant vos annonces sur TerangaHome.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
     <!-- Phosphor Icons -->
@@ -13,10 +12,9 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="./contacte.css">
+    <link rel="stylesheet" href="./tarifs.css">
 
 </head>
-
 <body>
 
 <header>
@@ -32,7 +30,7 @@
         <li><a href="../../index.html">Accueil</a></li>
         <li><a href="../rechercher/rechercher.html">Rechercher</a></li>
         <li><a href="../apropos/apropos.html">À propos</a></li>
-        <li><a href="./contacte.html" class="active">Contact</a></li>
+        <li><a href="../contacte/contacte.html">Contact</a></li>
         <li><a href="../favoris/favoris.html">Favoris</a> </li>
 
          <li>
@@ -59,80 +57,119 @@
 </nav>
 
 </header>
-    <section id="contact-hero">
+<section id="pricing-hero">
 
-    <div class="hero-content">
+    <div class="container">
 
-        <h1>Contactez-nous</h1>
+        <span class="hero-badge">TerangaHome Propriétaires</span>
+
+        <h1>Mettez vos annonces en avant</h1>
 
         <p>
-            Une question ou une suggestion ?
-            Nous sommes à votre écoute.
+            Choisissez la formule adaptée à vos besoins et donnez à vos logements
+            la visibilité qu'ils méritent auprès des locataires, partout au Sénégal.
         </p>
 
     </div>
 
 </section>
 
+<section id="pricing-plans">
 
-<section id="contact-container">
+    <div class="container">
 
-    <div class="contact-info">
+        <div class="pricing-grid">
 
-        <h2>Nos coordonnées</h2>
+            <div class="pricing-card">
 
-        <div class="info-card">
-            <i class="ph ph-map-pin"></i>
-            <p>Dakar, Sénégal</p>
+                <div class="pricing-card-header">
+                    <h3>Gratuit</h3>
+                    <p>Pour publier votre première annonce sans engagement.</p>
+                </div>
+
+                <div class="pricing-price">
+                    <span class="pricing-amount">0 F</span>
+                    <span class="pricing-period">/ mois</span>
+                </div>
+
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check-circle"></i> 1 annonce active</li>
+                    <li><i class="ph ph-check-circle"></i> Visibilité standard dans les résultats</li>
+                    <li><i class="ph ph-check-circle"></i> Messagerie avec les locataires</li>
+                    <li><i class="ph ph-check-circle"></i> Support par email</li>
+                </ul>
+
+                <a href="../publier-logement/publier-logement.html" class="pricing-btn pricing-btn-ghost">
+                    Publier gratuitement
+                </a>
+
+            </div>
+
+            <div class="pricing-card pricing-card-featured">
+
+                <span class="pricing-recommended">
+                    <i class="ph ph-crown-simple"></i> Recommandé
+                </span>
+
+                <div class="pricing-card-header">
+                    <h3>Premium</h3>
+                    <p>Pour louer plus vite grâce à une meilleure visibilité.</p>
+                </div>
+
+                <div class="pricing-price">
+                    <span class="pricing-amount">5 000 F</span>
+                    <span class="pricing-period">/ mois</span>
+                </div>
+
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check-circle"></i> Jusqu'à 5 annonces actives</li>
+                    <li><i class="ph ph-check-circle"></i> Badge "Premium" sur vos annonces</li>
+                    <li><i class="ph ph-check-circle"></i> Mise en avant dans les résultats de recherche</li>
+                    <li><i class="ph ph-check-circle"></i> Statistiques de consultation</li>
+                    <li><i class="ph ph-check-circle"></i> Support prioritaire</li>
+                </ul>
+
+                <button type="button" class="pricing-btn pricing-btn-solid" data-plan="Premium">
+                    Passer au Premium
+                </button>
+
+            </div>
+
+            <div class="pricing-card">
+
+                <div class="pricing-card-header">
+                    <h3>Pro</h3>
+                    <p>Pour les propriétaires et agences avec plusieurs biens.</p>
+                </div>
+
+                <div class="pricing-price">
+                    <span class="pricing-amount">15 000 F</span>
+                    <span class="pricing-period">/ mois</span>
+                </div>
+
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check-circle"></i> Annonces illimitées</li>
+                    <li><i class="ph ph-check-circle"></i> Badge "Premium" + position prioritaire</li>
+                    <li><i class="ph ph-check-circle"></i> Statistiques avancées</li>
+                    <li><i class="ph ph-check-circle"></i> Support dédié 7j/7</li>
+                </ul>
+
+                <button type="button" class="pricing-btn pricing-btn-ghost" data-plan="Pro">
+                    Contacter l'équipe
+                </button>
+
+            </div>
+
         </div>
 
-        <div class="info-card">
-            <i class="ph ph-envelope-simple"></i>
-            <p>contact@terangahome.sn</p>
-        </div>
-
-        <div class="info-card">
-            <i class="ph ph-phone"></i>
-            <p>+221 XX XXX XX XX</p>
+        <div class="pricing-note">
+            <i class="ph ph-info"></i>
+            Les paiements Wave, Orange Money et Free Money seront disponibles
+            prochainement. Le passage aux formules Premium et Pro ouvrira une
+            liste d'attente en attendant leur mise en ligne.
         </div>
 
     </div>
-
-
-    <form class="contact-form" id="contactForm">
-
-        <h2>Envoyez-nous un message</h2>
-
-        <input
-        type="text"
-        id="nom"
-        placeholder="Votre nom"
-        required>
-
-        <input
-        type="email"
-        id="email"
-        placeholder="Votre email"
-        required>
-
-        <input
-        type="text"
-        id="sujet"
-        placeholder="Sujet"
-        required>
-
-        <textarea
-        id="message"
-        rows="6"
-        placeholder="Votre message"
-        required>
-        </textarea>
-
-        <button type="submit">
-            Envoyer
-        </button>
-
-    </form>
 
 </section>
 
@@ -169,10 +206,9 @@
                 <h3>Services</h3>
                 <ul>
                     <li><a href="../publier-logement/publier-logement.html">Publier une annonce</a></li>
-                    <li><a href="../tarifs/tarifs.html">Tarifs</a></li>
-                    <li><a href="../rechercher/rechercher.html">Réserver</a></li>
+                    <li><a href="./tarifs.html">Tarifs</a></li>
                     <li><a href="../favoris/favoris.html">Favoris</a></li>
-                    <li><a href="./contacte.html">Support</a></li>
+                    <li><a href="../contacte/contacte.html">Support</a></li>
                 </ul>
             </div>
 
@@ -217,8 +253,7 @@
 <div id="toast"></div>
 
 <script src="../../assets/js/global.js"></script>
-<script src="./contacte.js"></script>
+<script src="./tarifs.js"></script>
 
 </body>
-
 </html>

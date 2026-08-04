@@ -5,6 +5,8 @@
 
 .auth{
 
+    margin-top:var(--header-height, 84px);
+
     min-height:100vh;
 
     display:flex;
@@ -39,7 +41,7 @@
 
 .auth-image{
 
-    background:linear-gradient(135deg,#2563EB,#1D4ED8);
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
 
     display:flex;
 
@@ -114,9 +116,9 @@
 .input-group input:focus,
 .input-group select:focus{
 
-    border-color:#2563EB;
+    border-color:var(--primary);
 
-    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    box-shadow:0 0 0 4px rgba(20,92,61,.12);
 
 }
 
@@ -149,7 +151,7 @@
 
     border-radius:14px;
 
-    background:#2563EB;
+    background:var(--primary);
 
     color:white;
 

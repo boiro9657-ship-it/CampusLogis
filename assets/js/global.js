@@ -40,6 +40,11 @@ if(siteHeader){
 
     setScrollOffset();
 
+    // Recalcule une fois toutes les ressources chargées (polices,
+    // icônes Phosphor) : leur chargement asynchrone peut changer
+    // la hauteur réelle de la navbar après la première mesure.
+    window.addEventListener("load", setScrollOffset);
+
     window.addEventListener("resize", setScrollOffset);
 
 }
@@ -71,15 +76,15 @@ if(menuToggle && navLinks){
     if(navLinks.classList.contains("active")){
 
         icon.classList.replace(
-            "fa-bars",
-            "fa-xmark"
+            "ph-list",
+            "ph-x"
         );
 
     }else{
 
         icon.classList.replace(
-            "fa-xmark",
-            "fa-bars"
+            "ph-x",
+            "ph-list"
         );
 
     }

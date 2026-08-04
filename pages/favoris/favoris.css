@@ -45,6 +45,49 @@
 
 }
 
+/* État vide */
+.empty-state{
+
+    grid-column:1 / -1;
+
+    text-align:center;
+
+    padding:70px 30px;
+
+    background:white;
+
+    border-radius:25px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.06);
+
+}
+
+.empty-state i{
+
+    font-size:44px;
+
+    color:#CBD5E1;
+
+    margin-bottom:20px;
+
+}
+
+.empty-state h2{
+
+    color:#0D1B2A;
+
+    margin-bottom:12px;
+
+}
+
+.empty-state p{
+
+    color:#64748B;
+
+    margin-bottom:25px;
+
+}
+
 /* Cartes générées en JS (même gabarit que "logements similaires") */
 .similar-card{
 

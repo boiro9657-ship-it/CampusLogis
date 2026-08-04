@@ -21,12 +21,19 @@ if(favorisContainer){
 
         favorisContainer.innerHTML = `
 
-            <h2>
+            <div class="empty-state">
 
-                Vous n'avez encore
-                aucun logement favori.
+                <i class="fas fa-heart-crack"></i>
 
-            </h2>
+                <h2>Vous n'avez encore aucun logement favori.</h2>
+
+                <p>Parcourez les annonces et cliquez sur le cœur pour les enregistrer ici.</p>
+
+                <a href="../rechercher/rechercher.html" class="btn-primary">
+                    Découvrir des logements
+                </a>
+
+            </div>
 
         `;
 

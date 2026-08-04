@@ -2,6 +2,34 @@
    PUBLIER-LOGEMENT.CSS — page de publication uniquement
    ========================================================== */
 
+.publish-header{
+
+    max-width:800px;
+
+    margin:60px auto 30px;
+
+    padding:0 20px;
+
+    text-align:center;
+
+}
+
+.publish-header h1{
+
+    color:#0D1B2A;
+
+    font-family:'Poppins',sans-serif;
+
+    margin-bottom:12px;
+
+}
+
+.publish-header p{
+
+    color:#64748B;
+
+}
+
 .publish-card{
 
     max-width:800px;

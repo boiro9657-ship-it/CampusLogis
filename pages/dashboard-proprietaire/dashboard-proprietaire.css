@@ -142,6 +142,78 @@ td{
 
 }
 
+tr:hover td{
+
+    background:#f8fafc;
+
+}
+
+.status-badge{
+
+    display:inline-block;
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.status-available{
+
+    background:#DCFCE7;
+    color:#16A34A;
+
+}
+
+.status-booked{
+
+    background:#FEF3C7;
+    color:#D97706;
+
+}
+
+/* ==========================
+        ÉTAT VIDE "MES ANNONCES"
+========================== */
+
+.empty-state{
+
+    grid-column:1 / -1;
+
+    text-align:center;
+
+    padding:60px 30px;
+
+    background:white;
+
+    border-radius:25px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.06);
+
+}
+
+.empty-state i{
+
+    font-size:40px;
+
+    color:#CBD5E1;
+
+    margin-bottom:20px;
+
+}
+
+.empty-state p{
+
+    color:#64748B;
+
+    margin-bottom:25px;
+
+}
+
 /* ==========================
         MES ANNONCES
 ========================== */

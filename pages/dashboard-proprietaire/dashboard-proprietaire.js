@@ -33,6 +33,24 @@ if(container){
         )
     ) || [];
 
+    if(logements.length === 0){
+
+        container.innerHTML = `
+        <div class="empty-state">
+
+            <i class="fas fa-house-circle-xmark"></i>
+
+            <p>Vous n'avez encore publié aucune annonce.</p>
+
+            <a href="../publier-logement/publier-logement.html" class="btn-primary">
+                + Publier mon premier logement
+            </a>
+
+        </div>
+        `;
+
+    }
+
     logements.forEach(
         logement => {
 

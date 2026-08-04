@@ -170,6 +170,27 @@
 
 }
 
+.badge-card{
+
+    position:absolute;
+
+    top:18px;
+    left:18px;
+
+    background:#10B981;
+    color:white;
+
+    padding:8px 15px;
+
+    border-radius:30px;
+
+    font-size:14px;
+    font-weight:600;
+
+    z-index:2;
+
+}
+
 .housing-card{
 
     position:relative;

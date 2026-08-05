@@ -68,6 +68,13 @@ if(publishForm){
                 return;
             }
 
+            if(Number(prix) < 20000){
+
+                showToast("Le prix minimum est de 20 000 FCFA.", "error");
+
+                return;
+            }
+
             if(!photos || photos.length === 0){
 
                 showToast("Veuillez sélectionner au moins une photo.", "error");

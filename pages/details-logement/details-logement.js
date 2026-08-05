@@ -45,9 +45,6 @@ async function chargerLogement(id){
     document.querySelector(".property-info .location").innerHTML =
     `<i class="ph ph-map-pin"></i> ${logement.ville || ""}`;
 
-    document.querySelector(".property-info .description").textContent =
-    logement.description || "";
-
     const descriptionCompleteEl =
     document.getElementById("descriptionComplete");
 

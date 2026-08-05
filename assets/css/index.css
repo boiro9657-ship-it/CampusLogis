@@ -875,6 +875,74 @@
 }
 
 /*====================================
+      VIDÉO TUTORIEL
+====================================*/
+
+.video-tutoriel{
+
+    padding:100px 8%;
+
+}
+
+.video-wrap{
+
+    max-width:900px;
+
+    margin:50px auto 0;
+
+    border-radius:25px;
+
+    overflow:hidden;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.1);
+
+}
+
+.video-wrap video{
+
+    width:100%;
+
+    display:block;
+
+}
+
+.video-placeholder{
+
+    aspect-ratio:16/9;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:15px;
+
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+
+    color:white;
+
+}
+
+.video-placeholder i{
+
+    font-size:70px;
+
+    opacity:.85;
+
+}
+
+.video-placeholder p{
+
+    font-weight:600;
+
+    opacity:.9;
+
+}
+
+/*====================================
       POURQUOI TERANGAHOME
 ====================================*/
 

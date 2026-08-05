@@ -64,6 +64,11 @@ function handleAdminRoute(array $segments, string $method): void
         return;
     }
 
+    if ($resource === 'visites' && $method === 'GET' && $id === 'stats') {
+        statsVisites();
+        return;
+    }
+
     jsonError('Route introuvable.', 404);
 }
 
@@ -168,4 +173,43 @@ function supprimerCommentaireAdmin(int $id): void
     getPdo()->prepare('DELETE FROM commentaires WHERE id = ?')->execute([$id]);
 
     jsonResponse(['message' => 'Commentaire supprimé.']);
+}
+
+/**
+ * Statistiques réelles de fréquentation (aucun chiffre inventé) :
+ * total de pages vues, visiteurs uniques (par empreinte IP),
+ * vues du jour, de la semaine, et détail des 7 derniers jours
+ * pour un mini graphique.
+ */
+function statsVisites(): void
+{
+    $pdo = getPdo();
+
+    $totalVues = $pdo->query('SELECT COUNT(*) FROM visites')->fetchColumn();
+    $visiteursUniques = $pdo->query('SELECT COUNT(DISTINCT ip_hash) FROM visites')->fetchColumn();
+
+    $vuesAujourdhui = $pdo->query("
+        SELECT COUNT(*) FROM visites WHERE DATE(created_at) = CURDATE()
+    ")->fetchColumn();
+
+    $vuesSemaine = $pdo->query("
+        SELECT COUNT(*) FROM visites WHERE created_at >= (CURDATE() - INTERVAL 7 DAY)
+    ")->fetchColumn();
+
+    $stmt = $pdo->query("
+        SELECT DATE(created_at) AS jour, COUNT(*) AS vues, COUNT(DISTINCT ip_hash) AS uniques
+        FROM visites
+        WHERE created_at >= (CURDATE() - INTERVAL 6 DAY)
+        GROUP BY DATE(created_at)
+        ORDER BY jour ASC
+    ");
+    $derniersJours = $stmt->fetchAll();
+
+    jsonResponse([
+        'total_vues'        => (int) $totalVues,
+        'visiteurs_uniques' => (int) $visiteursUniques,
+        'vues_aujourdhui'   => (int) $vuesAujourdhui,
+        'vues_semaine'      => (int) $vuesSemaine,
+        'derniers_jours'    => $derniersJours,
+    ]);
 }

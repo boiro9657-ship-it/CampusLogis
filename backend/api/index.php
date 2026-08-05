@@ -56,6 +56,11 @@ try {
             handleAdminRoute($rest, $method);
             break;
 
+        case 'visites':
+            require __DIR__ . '/routes/visites.php';
+            handleVisitesRoute($rest, $method);
+            break;
+
         default:
             jsonError('Route introuvable.', 404);
 

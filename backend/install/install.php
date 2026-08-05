@@ -262,6 +262,17 @@ try {
     ");
     $etapes[] = 'Table "commentaires" prête.';
 
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS visites (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            page VARCHAR(255) NOT NULL,
+            ip_hash VARCHAR(64) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_created_at (created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "visites" prête.';
+
     // Pas d'annonces de démonstration : seules de vraies annonces,
     // publiées par de vrais propriétaires contactables, doivent
     // apparaître sur le site. D'anciennes installations peuvent

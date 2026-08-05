@@ -5,6 +5,24 @@
    ========================================================== */
 
 /* ==========================
+    SUIVI DES VISITES
+    Un seul appel par chargement de page, sans bloquer le rendu
+    ni empêcher la page de fonctionner si ça échoue.
+========================== */
+
+if(typeof apiFetch !== "undefined"){
+
+    apiFetch("/visites", {
+
+        method: "POST",
+
+        body: JSON.stringify({ page: window.location.pathname })
+
+    }).catch(() => {});
+
+}
+
+/* ==========================
         OMBRE NAVBAR AU SCROLL
 ========================== */
 

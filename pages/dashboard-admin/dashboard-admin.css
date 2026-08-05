@@ -382,6 +382,40 @@ tr:hover td{
 
 }
 
+.revenue-note{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:12px;
+
+    margin-top:25px;
+
+    padding:20px 25px;
+
+    background:#FFF7ED;
+
+    color:#9A3412;
+
+    border-radius:15px;
+
+    font-size:14px;
+
+    line-height:1.6;
+
+}
+
+.revenue-note i{
+
+    font-size:20px;
+
+    flex-shrink:0;
+
+    margin-top:2px;
+
+}
+
 @media(max-width:900px){
 
     #admin-dashboard{

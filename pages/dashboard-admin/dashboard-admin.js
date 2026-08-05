@@ -33,6 +33,7 @@
     chargerReservations();
     chargerMessages();
     chargerCommentaires();
+    chargerStatsVisites();
 
 })();
 
@@ -451,5 +452,56 @@ async function chargerCommentaires(){
         });
 
     });
+
+}
+
+/* ==========================
+    STATISTIQUES DE VISITE
+========================== */
+
+async function chargerStatsVisites(){
+
+    let stats;
+
+    try{
+
+        stats = await apiFetch("/admin/visites/stats");
+
+    }catch(error){
+
+        showToast("Impossible de charger les statistiques.", "error");
+
+        return;
+    }
+
+    document.getElementById("statVuesTotal").textContent = stats.total_vues;
+    document.getElementById("statVisiteursUniques").textContent = stats.visiteurs_uniques;
+    document.getElementById("statVuesAujourdhui").textContent = stats.vues_aujourdhui;
+    document.getElementById("statVuesSemaine").textContent = stats.vues_semaine;
+
+    const table =
+    document.getElementById("tableVisites");
+
+    const lignesEntete =
+    table.querySelector("tr").outerHTML;
+
+    if(stats.derniers_jours.length === 0){
+
+        table.innerHTML =
+        lignesEntete +
+        `<tr><td colspan="3" style="text-align:center;color:#64748B;">Pas encore de données sur les 7 derniers jours.</td></tr>`;
+
+        return;
+    }
+
+    table.innerHTML =
+    lignesEntete +
+    stats.derniers_jours.map(j => `
+        <tr>
+            <td>${new Date(j.jour).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}</td>
+            <td>${j.vues}</td>
+            <td>${j.uniques}</td>
+        </tr>
+    `).join("");
 
 }

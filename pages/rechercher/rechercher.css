@@ -256,6 +256,14 @@
 
 }
 
+.card-image-wrap{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
 .housing-card img{
 
     width:100%;

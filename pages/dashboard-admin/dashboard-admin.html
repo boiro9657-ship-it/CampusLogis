@@ -86,6 +86,11 @@
                 Messages
             </a></li>
 
+            <li><a href="#commentaires">
+                <i class="ph ph-chats-circle"></i>
+                Commentaires
+            </a></li>
+
             <li><a href="#" id="logoutLink">
                 <i class="ph ph-sign-out"></i>
                 Déconnexion
@@ -135,6 +140,12 @@
                 <i class="ph ph-envelope-simple"></i>
                 <h2 id="statMessages">0</h2>
                 <p>Messages</p>
+            </div>
+
+            <div class="stat-card">
+                <i class="ph ph-chats-circle"></i>
+                <h2 id="statCommentaires">0</h2>
+                <p>Commentaires</p>
             </div>
 
         </div>
@@ -225,6 +236,31 @@
                 <th>Email</th>
                 <th>Sujet</th>
                 <th>Message</th>
+                <th></th>
+            </tr>
+        </table>
+    </div>
+
+</section>
+
+<!-- ===========================
+        COMMENTAIRES
+=========================== -->
+
+<section class="owner-properties" id="commentaires">
+
+    <div class="section-header">
+        <h2>Commentaires</h2>
+        <p style="color:#64748B; font-size:14px;">Supprimez les commentaires menaçants ou diffamatoires.</p>
+    </div>
+
+    <div class="table-card">
+        <table id="tableCommentaires">
+            <tr>
+                <th>Auteur</th>
+                <th>Annonce</th>
+                <th>Commentaire</th>
+                <th>Date</th>
                 <th></th>
             </tr>
         </table>

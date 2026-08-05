@@ -123,6 +123,7 @@ async function rechercherLogements(){
 
     attacherBoutonsFavoris(resultsContainer);
     attacherBoutonsReservation(resultsContainer);
+    demarrerCarrousels(resultsContainer);
 
 }
 
@@ -131,8 +132,11 @@ function carteRechercheHTML(logement){
     const estPremium =
     Number(logement.premium) === 1;
 
+    const photos =
+    (logement.photos ? logement.photos.split("|") : [logement.image_url]).filter(Boolean);
+
     const image =
-    logement.image_url || "../../images/logement1.jpg";
+    photos[0] || "../../images/logement1.jpg";
 
     const prix =
     Number(logement.prix).toLocaleString("fr-FR");
@@ -140,7 +144,13 @@ function carteRechercheHTML(logement){
     return `
     <div class="housing-card ${estPremium ? "housing-card-premium" : ""}">
 
-        <img src="${image}" loading="lazy" alt="${logement.titre}">
+        <div class="card-image-wrap">
+
+            <img src="${image}" data-photos="${photos.join("|")}" class="carousel-img" loading="lazy" alt="${logement.titre}">
+
+            <div class="carousel-dots"></div>
+
+        </div>
 
         <span class="badge-card">Disponible</span>
 

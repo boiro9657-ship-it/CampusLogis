@@ -26,6 +26,16 @@ function handleLogementsRoute(array $segments, string $method): void
         return;
     }
 
+    if ($method === 'GET' && is_numeric($first) && ($segments[1] ?? null) === 'commentaires') {
+        listCommentaires((int) $first);
+        return;
+    }
+
+    if ($method === 'POST' && is_numeric($first) && ($segments[1] ?? null) === 'commentaires') {
+        creerCommentaire((int) $first);
+        return;
+    }
+
     if ($method === 'GET' && is_numeric($first)) {
         getLogement((int) $first);
         return;
@@ -72,7 +82,12 @@ function listLogements(): void
         $params[] = (float) $_GET['budget'];
     }
 
-    $sql = 'SELECT * FROM logements';
+    $sql = "
+        SELECT l.*,
+            (SELECT GROUP_CONCAT(url ORDER BY position SEPARATOR '|')
+             FROM logement_medias m WHERE m.logement_id = l.id AND m.type = 'image') AS photos
+        FROM logements l
+    ";
 
     if ($conditions) {
         $sql .= ' WHERE ' . implode(' AND ', $conditions);
@@ -139,6 +154,7 @@ function getLogement(int $id): void
 {
     $stmt = getPdo()->prepare('
         SELECT l.*, u.nom_complet AS proprietaire_nom, u.telephone AS proprietaire_telephone,
+            u.photo_url AS proprietaire_photo,
             u.created_at AS proprietaire_membre_depuis,
             (
                 SELECT COUNT(*) FROM logements l2
@@ -410,4 +426,59 @@ function enregistrerMedia(array $fichier, array $extensionsAutorisees): ?string
     $baseDossier = str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'])));
 
     return $baseDossier . '/uploads/logements/' . $nomFichier;
+}
+
+/**
+ * Liste publique des commentaires d'une annonce, avec le nom et
+ * la photo de profil de l'auteur.
+ */
+function listCommentaires(int $logementId): void
+{
+    $stmt = getPdo()->prepare('
+        SELECT c.id, c.message, c.created_at, c.user_id,
+               u.nom_complet AS auteur_nom, u.photo_url AS auteur_photo
+        FROM commentaires c
+        JOIN utilisateurs u ON u.id = c.user_id
+        WHERE c.logement_id = ?
+        ORDER BY c.created_at DESC
+    ');
+    $stmt->execute([$logementId]);
+
+    jsonResponse($stmt->fetchAll());
+}
+
+/**
+ * Ajoute un commentaire sur une annonce. Ouvert à tout
+ * utilisateur connecté (locataire ou propriétaire) — la
+ * modération a posteriori (menaces, diffamation) est gérée par
+ * l'admin via /admin/commentaires.
+ */
+function creerCommentaire(int $logementId): void
+{
+    $userId = requireAuth();
+
+    $body = getJsonBody();
+    $message = trim($body['message'] ?? '');
+
+    if (!$message) {
+        jsonError('Le commentaire ne peut pas être vide.');
+    }
+
+    if (strlen($message) > 1000) {
+        jsonError('Le commentaire est trop long (1000 caractères maximum).');
+    }
+
+    $stmt = getPdo()->prepare('SELECT id FROM logements WHERE id = ?');
+    $stmt->execute([$logementId]);
+
+    if (!$stmt->fetch()) {
+        jsonError('Logement introuvable.', 404);
+    }
+
+    getPdo()->prepare('
+        INSERT INTO commentaires (logement_id, user_id, message)
+        VALUES (?, ?, ?)
+    ')->execute([$logementId, $userId, $message]);
+
+    jsonResponse(['message' => 'Commentaire publié.'], 201);
 }

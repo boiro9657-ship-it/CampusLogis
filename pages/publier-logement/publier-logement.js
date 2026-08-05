@@ -149,12 +149,7 @@ if(publishForm){
 
                 showToast("Logement publié avec succès !");
 
-                setTimeout(()=>{
-
-                    window.location.href =
-                    "../dashboard-proprietaire/dashboard-proprietaire.html";
-
-                }, 1200);
+                await afficherSuggestionPlan();
 
             }catch(error){
 
@@ -166,5 +161,63 @@ if(publishForm){
 
         }
     );
+
+}
+
+/**
+ * Après publication, suggère le plan le mieux adapté en se
+ * basant sur le vrai nombre d'annonces du propriétaire (pas une
+ * estimation) : le plan Gratuit ne permet qu'1 annonce active,
+ * Premium jusqu'à 5, Pro est illimité — cohérent avec tarifs.html.
+ */
+async function afficherSuggestionPlan(){
+
+    let nbAnnonces = 1;
+
+    try{
+
+        const mesLogements =
+        await apiFetch("/logements/mine");
+
+        nbAnnonces = mesLogements.length;
+
+    }catch(error){
+
+        // Si le comptage échoue, on affiche quand même la
+        // confirmation de publication sans recommandation précise.
+
+    }
+
+    const carte =
+    document.getElementById("planSuggestionCard");
+
+    if(nbAnnonces <= 1){
+
+        carte.innerHTML = `
+            <h3><i class="ph ph-check-circle"></i> Le plan Gratuit vous convient</h3>
+            <p>Avec ${nbAnnonces} annonce active, vous êtes exactement dans les limites du plan Gratuit. Rien à faire de plus pour l'instant.</p>
+        `;
+
+    }else if(nbAnnonces <= 5){
+
+        carte.innerHTML = `
+            <h3><i class="ph ph-crown-simple"></i> Le plan Premium vous correspond mieux</h3>
+            <p>Vous avez maintenant ${nbAnnonces} annonces — au-delà d'une seule, le plan Gratuit ne couvre plus vos besoins. Premium permet jusqu'à 5 annonces actives avec une meilleure visibilité.</p>
+        `;
+
+    }else{
+
+        carte.innerHTML = `
+            <h3><i class="ph ph-crown-simple"></i> Le plan Pro vous correspond mieux</h3>
+            <p>Avec ${nbAnnonces} annonces, le plan Pro (annonces illimitées, position prioritaire) est le plus adapté à votre activité.</p>
+        `;
+
+    }
+
+    publishForm.style.display = "none";
+
+    document.getElementById("planSuggestion").style.display = "";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
 }

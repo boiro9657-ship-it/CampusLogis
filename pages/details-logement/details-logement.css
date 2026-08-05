@@ -515,6 +515,16 @@
 
 }
 
+.owner-avatar-placeholder img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+}
+
 .owner-stats{
 
     display:flex;
@@ -594,6 +604,234 @@
 .owner-actions a:hover{
 
     transform:translateY(-4px);
+
+}
+
+/* ==========================
+    COMMENTAIRES
+========================== */
+
+#comments-section{
+
+    max-width:1300px;
+
+    margin:100px auto;
+
+    padding:0 30px;
+
+}
+
+.comments-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin-bottom:30px;
+
+}
+
+.comments-header h2{
+
+    color:var(--primary);
+
+}
+
+.comments-count{
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+    padding:6px 16px;
+
+    border-radius:20px;
+
+    font-weight:600;
+
+    font-size:14px;
+
+}
+
+.comments-carousel{
+
+    display:flex;
+
+    gap:20px;
+
+    overflow-x:auto;
+
+    scroll-snap-type:x mandatory;
+
+    padding-bottom:15px;
+
+    margin-bottom:30px;
+
+}
+
+.comment-card{
+
+    flex:0 0 320px;
+
+    scroll-snap-align:start;
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+
+}
+
+.comment-card-author{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:15px;
+
+}
+
+.comment-avatar{
+
+    width:44px;
+
+    height:44px;
+
+    border-radius:50%;
+
+    background:var(--primary-light);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    overflow:hidden;
+
+    flex-shrink:0;
+
+}
+
+.comment-avatar i{
+
+    font-size:20px;
+
+    color:var(--primary);
+
+}
+
+.comment-avatar img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+.comment-card-author h4{
+
+    font-size:15px;
+
+    margin-bottom:2px;
+
+}
+
+.comment-card-author span{
+
+    font-size:12px;
+
+    color:#94A3B8;
+
+}
+
+.comment-card p{
+
+    color:#475569;
+
+    line-height:1.6;
+
+    word-wrap:break-word;
+
+}
+
+.comments-empty{
+
+    color:#64748B;
+
+    padding:20px 0;
+
+}
+
+.comment-form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+.comment-form textarea{
+
+    width:100%;
+
+    min-height:100px;
+
+    padding:18px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:15px;
+
+    outline:none;
+
+    resize:none;
+
+    font-family:inherit;
+
+    font-size:15px;
+
+    transition:border-color .2s, box-shadow .2s;
+
+}
+
+.comment-form textarea:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(20,92,61,.12);
+
+}
+
+.comment-form .btn-primary{
+
+    align-self:flex-end;
+
+}
+
+.comment-connexion-requise{
+
+    color:#64748B;
+
+}
+
+.comment-connexion-requise a{
+
+    color:var(--primary);
+
+    font-weight:600;
 
 }
 

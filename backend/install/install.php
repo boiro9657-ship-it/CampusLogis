@@ -83,6 +83,20 @@ try {
         $etapes[] = 'Colonne "google_id" ajoutée.';
     }
 
+    // Photo de profil, ajoutée une seule fois pour les bases déjà
+    // existantes avant cette fonctionnalité.
+    $colonnePhotoExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'utilisateurs'
+        AND COLUMN_NAME = 'photo_url'
+    ")->fetchColumn();
+
+    if ($colonnePhotoExiste == 0) {
+        $pdo->exec("ALTER TABLE utilisateurs ADD COLUMN photo_url VARCHAR(255) NULL AFTER telephone");
+        $etapes[] = 'Colonne "photo_url" ajoutée.';
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS password_resets (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -234,6 +248,19 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "messages_contact" prête.';
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS commentaires (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            logement_id INT NOT NULL,
+            user_id INT NOT NULL,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (logement_id) REFERENCES logements(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "commentaires" prête.';
 
     // Pas d'annonces de démonstration : seules de vraies annonces,
     // publiées par de vrais propriétaires contactables, doivent

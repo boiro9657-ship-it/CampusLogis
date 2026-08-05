@@ -51,6 +51,16 @@ function handleAuthRoute(array $segments, string $method): void
         return;
     }
 
+    if ($action === 'profil' && $method === 'PUT' && ($segments[1] ?? null) === null) {
+        modifierProfil();
+        return;
+    }
+
+    if ($action === 'profil' && $method === 'POST' && ($segments[1] ?? null) === 'photo') {
+        modifierPhotoProfil();
+        return;
+    }
+
     jsonError('Route introuvable.', 404);
 }
 
@@ -227,7 +237,7 @@ function currentUser(): void
     }
 
     $stmt = getPdo()->prepare('
-        SELECT id, nom_complet, email, telephone, role
+        SELECT id, nom_complet, email, telephone, photo_url, role
         FROM utilisateurs WHERE id = ?
     ');
     $stmt->execute([$_SESSION['user_id']]);
@@ -238,6 +248,80 @@ function currentUser(): void
     }
 
     jsonResponse($utilisateur);
+}
+
+/**
+ * Met à jour les coordonnées du compte connecté (nom, téléphone,
+ * email). L'email reste unique en base — vérifié en excluant le
+ * compte courant.
+ */
+function modifierProfil(): void
+{
+    $userId = requireAuth();
+
+    $body = getJsonBody();
+
+    $nom = trim($body['nom_complet'] ?? '');
+    $telephone = trim($body['telephone'] ?? '');
+    $email = trim($body['email'] ?? '');
+
+    if (!$nom || !$email) {
+        jsonError('Nom et email sont obligatoires.');
+    }
+
+    $pdo = getPdo();
+
+    $stmt = $pdo->prepare('SELECT id FROM utilisateurs WHERE email = ? AND id != ?');
+    $stmt->execute([$email, $userId]);
+
+    if ($stmt->fetch()) {
+        jsonError('Un autre compte utilise déjà cet email.', 409);
+    }
+
+    $pdo->prepare('
+        UPDATE utilisateurs SET nom_complet = ?, telephone = ?, email = ?
+        WHERE id = ?
+    ')->execute([$nom, $telephone, $email, $userId]);
+
+    jsonResponse(['message' => 'Profil mis à jour avec succès.']);
+}
+
+/**
+ * Remplace la photo de profil du compte connecté. Un seul
+ * fichier ("photo"), image uniquement.
+ */
+function modifierPhotoProfil(): void
+{
+    $userId = requireAuth();
+
+    if (empty($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
+        jsonError('Aucune photo valide reçue.');
+    }
+
+    $extension = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+
+    if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+        jsonError('Formats acceptés : jpg, png, webp.');
+    }
+
+    $nomFichier = 'avatar_' . $userId . '_' . uniqid() . '.' . $extension;
+    $dossier = __DIR__ . '/../../uploads/avatars/';
+
+    if (!is_dir($dossier)) {
+        mkdir($dossier, 0755, true);
+    }
+
+    move_uploaded_file($_FILES['photo']['tmp_name'], $dossier . $nomFichier);
+
+    // Chemin public calculé depuis l'emplacement réel du front
+    // controller, comme pour les photos de logements.
+    $baseDossier = str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'])));
+    $url = $baseDossier . '/uploads/avatars/' . $nomFichier;
+
+    getPdo()->prepare('UPDATE utilisateurs SET photo_url = ? WHERE id = ?')
+        ->execute([$url, $userId]);
+
+    jsonResponse(['message' => 'Photo de profil mise à jour.', 'photo_url' => $url]);
 }
 
 /**

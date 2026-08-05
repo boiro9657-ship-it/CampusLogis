@@ -337,6 +337,91 @@ function attacherBoutonsReservation(container){
 }
 
 /* ==========================
+    CARROUSEL PHOTOS (CARTES)
+    Réutilisé par l'accueil et la recherche pour faire défiler
+    automatiquement les photos d'une annonce qui en a plusieurs
+    (image data-photos="url1|url2|url3"), avec des points de
+    navigation cliquables.
+========================== */
+
+function demarrerCarrousels(container){
+
+    container.querySelectorAll(".carousel-img[data-photos]").forEach(img => {
+
+        const photos =
+        img.dataset.photos.split("|").filter(Boolean);
+
+        if(photos.length <= 1) return;
+
+        const dotsContainer =
+        img.parentElement.querySelector(".carousel-dots");
+
+        let index = 0;
+
+        if(dotsContainer){
+
+            dotsContainer.innerHTML =
+            photos.map((_, i) => `<span class="carousel-dot${i === 0 ? " active" : ""}"></span>`).join("");
+
+        }
+
+        const afficherPhoto = (i) => {
+
+            index = i;
+            img.src = photos[index];
+
+            if(dotsContainer){
+
+                dotsContainer.querySelectorAll(".carousel-dot").forEach((dot, di) => {
+
+                    dot.classList.toggle("active", di === index);
+
+                });
+
+            }
+
+        };
+
+        let intervalle =
+        setInterval(() => afficherPhoto((index + 1) % photos.length), 3500);
+
+        const carte =
+        img.closest(".card, .housing-card");
+
+        if(carte){
+
+            carte.addEventListener("mouseenter", () => clearInterval(intervalle));
+
+            carte.addEventListener("mouseleave", () => {
+
+                intervalle = setInterval(() => afficherPhoto((index + 1) % photos.length), 3500);
+
+            });
+
+        }
+
+        if(dotsContainer){
+
+            dotsContainer.querySelectorAll(".carousel-dot").forEach((dot, i) => {
+
+                dot.addEventListener("click", (e) => {
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    afficherPhoto(i);
+
+                });
+
+            });
+
+        }
+
+    });
+
+}
+
+/* ==========================
         TOAST
 ========================== */
 

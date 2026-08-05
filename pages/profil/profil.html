@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Détails du logement | TerangaHome</title>
-    <meta name="description" content="Consultez tous les détails de ce logement disponible sur TerangaHome.">
+    <title>Mon profil | TerangaHome</title>
+    <meta name="description" content="Gérez votre photo de profil et vos coordonnées TerangaHome.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- CSS -->
     <link rel="stylesheet" href="../../assets/css/global.css">
-    <link rel="stylesheet" href="./details-logement.css">
+    <link rel="stylesheet" href="./profil.css">
 
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-
 <body>
 
 <header>
@@ -59,222 +54,60 @@
 </nav>
 
 </header>
-    <section id="details-hero">
 
-    <div class="hero-content">
+<section class="profil-section">
 
-        <span class="hero-badge">
+    <div class="profil-container">
 
-            TerangaHome
+        <h1>Mon profil</h1>
 
-        </span>
+        <p class="profil-intro">Gérez votre photo, votre nom et vos coordonnées.</p>
 
-        <h1>Studio Moderne à Point E</h1>
+        <div class="profil-card">
 
-        <p>
+            <div class="profil-avatar-zone">
 
-            Découvrez tous les détails de ce logement.
+                <div class="profil-avatar" id="profilAvatar">
+                    <i class="ph ph-user"></i>
+                </div>
 
-        </p>
-
-    </div>
-
-</section>
-
-<section id="details-gallery">
-
-    <div class="gallery-main">
-
-        <img src="../../images/logement1.jpg"
-             alt="Logement">
-
-    </div>
-
-    <div class="gallery-side">
-
-        <img src="../../images/logement2.jpg" loading="lazy"
-             alt="">
-
-        <img src="../../images/logement3.jpg" loading="lazy"
-             alt="">
-
-        <img src="../../images/logement4.jpg" loading="lazy"
-             alt="">
-
-        <img src="../../images/logement5.jpg" loading="lazy"
-             alt="">
-
-    </div>
-
-
-</section>
-
-<section id="property-details">
-
-    <div class="property-info">
-
-        <h2>Studio Moderne à Point E</h2>
-
-        <p class="location">
-            <i class="ph ph-map-pin"></i>
-            Point E, Dakar
-        </p>
-
-        <div class="property-features" id="propertyFeatures">
-
-            <span>
-                <i class="ph ph-bed"></i>
-                2 Chambres
-            </span>
-
-        </div>
-
-    </div>
-
-    <div class="price-card">
-
-        <h3>75 000 FCFA</h3>
-
-        <p>par mois</p>
-
-        <a href="#" class="reserve-btn" id="contactOwnerBtn">
-
-            Contacter le propriétaire
-
-        </a>
-
-    </div>
-
-</section>
-
-<section id="property-description">
-
-    <div class="description-card">
-
-        <h2>Description</h2>
-
-        <p id="descriptionComplete"></p>
-
-    </div>
-
-    <div class="equipment-card">
-
-        <h2>Équipements</h2>
-
-        <div class="equipment-grid"></div>
-
-    </div>
-
-</section>
-
-<section id="property-location" style="display:none;">
-
-    <div class="location-card">
-
-        <h2>Localisation</h2>
-
-        <p id="locationVille"><i class="ph ph-map-pin"></i></p>
-
-        <div class="map-embed">
-            <iframe
-                id="mapEmbed"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                allowfullscreen>
-            </iframe>
-        </div>
-
-        <a href="#" id="itineraireBtn" target="_blank" rel="noopener" class="btn-itineraire">
-            <i class="ph ph-navigation-arrow"></i>
-            Itinéraire
-        </a>
-
-    </div>
-
-</section>
-
-<section id="owner-section">
-
-    <div class="owner-card">
-
-        <div class="owner-avatar-placeholder">
-            <i class="ph ph-user"></i>
-        </div>
-
-        <div class="owner-info">
-
-            <h2>Propriétaire</h2>
-
-            <p id="ownerMembreDepuis"></p>
-
-            <div class="owner-stats">
-
-                <span id="ownerNbAnnonces"></span>
+                <div>
+                    <label for="photoInput" class="btn-changer-photo">
+                        <i class="ph ph-camera"></i>
+                        Changer la photo
+                    </label>
+                    <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" hidden>
+                    <p class="form-hint">JPG, PNG ou WEBP</p>
+                </div>
 
             </div>
 
+            <form id="profilForm">
+
+                <div class="form-group">
+                    <label>Nom complet</label>
+                    <input type="text" id="nom_complet" placeholder="Votre nom complet">
+                </div>
+
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="text" id="telephone" placeholder="+221 77 000 00 00">
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="Votre email">
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Enregistrer les modifications
+                </button>
+
+            </form>
+
         </div>
 
     </div>
-
-    <div class="owner-actions">
-
-        <a href="#" class="btn-call">
-
-            <i class="ph ph-phone"></i>
-
-            Appeler
-
-        </a>
-
-        <a href="#" class="btn-whatsapp">
-
-            <i class="ph ph-whatsapp-logo"></i>
-
-            WhatsApp
-
-        </a>
-
-        <a href="#" class="btn-message">
-
-            <i class="ph ph-envelope-simple"></i>
-
-            Envoyer un message
-
-        </a>
-
-    </div>
-
-</section>
-
-<section id="comments-section" style="display:none;">
-
-    <div class="comments-header">
-        <h2>Commentaires</h2>
-        <span id="commentsCount" class="comments-count"></span>
-    </div>
-
-    <div class="comments-carousel" id="commentsCarousel"></div>
-
-    <form id="commentForm" class="comment-form">
-
-        <textarea id="commentMessage" placeholder="Laissez un commentaire sur ce logement..." maxlength="1000"></textarea>
-
-        <button type="submit" class="btn-primary">Publier</button>
-
-    </form>
-
-    <p class="comment-connexion-requise" id="commentConnexionRequise" style="display:none;">
-        <a href="../connexion/connexion.html">Connectez-vous</a> pour laisser un commentaire.
-    </p>
-
-</section>
-
-<section id="similar-properties" style="display:none;">
-
-    <h2>Logements similaires</h2>
-
-    <div class="similar-grid" id="similarGrid"></div>
 
 </section>
 
@@ -361,6 +194,7 @@
 <script>window.API_BASE = "../../backend/api";</script>
 <script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/global.js"></script>
-<script src="./details-logement.js"></script>
+<script src="./profil.js"></script>
+
 </body>
 </html>

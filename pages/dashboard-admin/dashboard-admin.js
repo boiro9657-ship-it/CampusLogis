@@ -32,6 +32,7 @@
     chargerAnnonces();
     chargerReservations();
     chargerMessages();
+    chargerCommentaires();
 
 })();
 
@@ -374,6 +375,72 @@ async function chargerMessages(){
                 await apiFetch("/admin/messages/" + btn.dataset.id, { method:"DELETE" });
 
                 chargerMessages();
+
+            }catch(error){
+
+                showToast("Suppression impossible.", "error");
+
+            }
+
+        });
+
+    });
+
+}
+
+/* ==========================
+    COMMENTAIRES
+========================== */
+
+async function chargerCommentaires(){
+
+    let commentaires = [];
+
+    try{
+
+        commentaires = await apiFetch("/admin/commentaires");
+
+    }catch(error){
+
+        showToast("Impossible de charger les commentaires.", "error");
+
+        return;
+    }
+
+    document.getElementById("statCommentaires").textContent =
+    commentaires.length;
+
+    const table =
+    document.getElementById("tableCommentaires");
+
+    const lignesEntete =
+    table.querySelector("tr").outerHTML;
+
+    table.innerHTML =
+    lignesEntete +
+    commentaires.map(c => `
+        <tr>
+            <td>${c.auteur_nom}<br><span style="color:#94A3B8;font-size:12px;">${c.auteur_email}</span></td>
+            <td><a href="../details-logement/details-logement.html?id=${c.logement_id}" target="_blank">${c.logement_titre}</a></td>
+            <td class="wrap">${c.message}</td>
+            <td>${new Date(c.created_at).toLocaleDateString("fr-FR")}</td>
+            <td>
+                <button class="btn-supprimer-ligne" data-id="${c.id}">Supprimer</button>
+            </td>
+        </tr>
+    `).join("");
+
+    table.querySelectorAll(".btn-supprimer-ligne").forEach(btn => {
+
+        btn.addEventListener("click", async () => {
+
+            if(!confirm("Supprimer ce commentaire ? (menace, diffamation ou contenu inapproprié)")) return;
+
+            try{
+
+                await apiFetch("/admin/commentaires/" + btn.dataset.id, { method:"DELETE" });
+
+                chargerCommentaires();
 
             }catch(error){
 

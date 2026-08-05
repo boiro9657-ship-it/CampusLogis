@@ -54,6 +54,16 @@ function handleAdminRoute(array $segments, string $method): void
         return;
     }
 
+    if ($resource === 'commentaires' && $method === 'GET' && $id === null) {
+        listCommentairesAdmin();
+        return;
+    }
+
+    if ($resource === 'commentaires' && $method === 'DELETE' && is_numeric($id)) {
+        supprimerCommentaireAdmin((int) $id);
+        return;
+    }
+
     jsonError('Route introuvable.', 404);
 }
 
@@ -136,4 +146,26 @@ function supprimerMessage(int $id): void
     getPdo()->prepare('DELETE FROM messages_contact WHERE id = ?')->execute([$id]);
 
     jsonResponse(['message' => 'Message supprimé.']);
+}
+
+function listCommentairesAdmin(): void
+{
+    $stmt = getPdo()->query('
+        SELECT c.id, c.message, c.created_at,
+               u.nom_complet AS auteur_nom, u.email AS auteur_email,
+               l.id AS logement_id, l.titre AS logement_titre
+        FROM commentaires c
+        JOIN utilisateurs u ON u.id = c.user_id
+        JOIN logements l ON l.id = c.logement_id
+        ORDER BY c.created_at DESC
+    ');
+
+    jsonResponse($stmt->fetchAll());
+}
+
+function supprimerCommentaireAdmin(int $id): void
+{
+    getPdo()->prepare('DELETE FROM commentaires WHERE id = ?')->execute([$id]);
+
+    jsonResponse(['message' => 'Commentaire supprimé.']);
 }

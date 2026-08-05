@@ -100,6 +100,171 @@ async function chargerLogement(id){
 
     chargerLogementsSimilaires(logement);
 
+    chargerCommentaires(id);
+
+}
+
+/* ==========================
+    COMMENTAIRES
+========================== */
+
+async function chargerCommentaires(logementId){
+
+    const section =
+    document.getElementById("comments-section");
+
+    const carousel =
+    document.getElementById("commentsCarousel");
+
+    if(!section || !carousel) return;
+
+    section.style.display = "";
+
+    let commentaires;
+
+    try{
+
+        commentaires = await apiFetch("/logements/" + logementId + "/commentaires");
+
+    }catch(error){
+
+        return;
+    }
+
+    document.getElementById("commentsCount").textContent =
+    commentaires.length > 0 ? commentaires.length : "";
+
+    if(commentaires.length === 0){
+
+        carousel.innerHTML =
+        `<p class="comments-empty">Aucun commentaire pour l'instant. Soyez le premier à en laisser un !</p>`;
+
+    }else{
+
+        carousel.innerHTML =
+        commentaires.map(commentaireHTML).join("");
+
+    }
+
+    brancherFormulaireCommentaire(logementId);
+
+}
+
+function commentaireHTML(commentaire){
+
+    const date =
+    new Date(commentaire.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+
+    const avatar =
+    commentaire.auteur_photo
+    ? `<img src="${commentaire.auteur_photo}" alt="${commentaire.auteur_nom}">`
+    : `<i class="ph ph-user"></i>`;
+
+    return `
+    <div class="comment-card">
+
+        <div class="comment-card-author">
+
+            <div class="comment-avatar">${avatar}</div>
+
+            <div>
+                <h4>${commentaire.auteur_nom}</h4>
+                <span>${date}</span>
+            </div>
+
+        </div>
+
+        <p>${commentaire.message}</p>
+
+    </div>
+    `;
+
+}
+
+async function brancherFormulaireCommentaire(logementId){
+
+    const form =
+    document.getElementById("commentForm");
+
+    const connexionRequise =
+    document.getElementById("commentConnexionRequise");
+
+    if(!form) return;
+
+    let connecte = true;
+
+    try{
+
+        await apiFetch("/auth/me");
+
+    }catch(error){
+
+        connecte = false;
+
+    }
+
+    form.style.display = connecte ? "" : "none";
+
+    if(connexionRequise){
+
+        connexionRequise.style.display = connecte ? "none" : "";
+
+    }
+
+    if(!connecte || form.dataset.branche) return;
+
+    form.dataset.branche = "1";
+
+    form.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const messageEl =
+        document.getElementById("commentMessage");
+
+        const message =
+        messageEl.value.trim();
+
+        if(!message){
+
+            showToast("Le commentaire ne peut pas être vide.", "error");
+
+            return;
+        }
+
+        const submitBtn =
+        form.querySelector(".btn-primary");
+
+        submitBtn.disabled = true;
+
+        try{
+
+            await apiFetch("/logements/" + logementId + "/commentaires", {
+
+                method: "POST",
+
+                body: JSON.stringify({ message })
+
+            });
+
+            messageEl.value = "";
+
+            showToast("Commentaire publié.");
+
+            chargerCommentaires(logementId);
+
+        }catch(error){
+
+            showToast(error.message, "error");
+
+        }finally{
+
+            submitBtn.disabled = false;
+
+        }
+
+    });
+
 }
 
 /**
@@ -132,6 +297,16 @@ function afficherInfosProprietaire(logement){
 
         nbAnnoncesEl.textContent =
         `${nb} annonce${nb > 1 ? "s" : ""} publiée${nb > 1 ? "s" : ""}`;
+
+    }
+
+    const avatarEl =
+    document.querySelector(".owner-avatar-placeholder");
+
+    if(avatarEl && logement.proprietaire_photo){
+
+        avatarEl.innerHTML =
+        `<img src="${logement.proprietaire_photo}" alt="${logement.proprietaire_nom || "Propriétaire"}">`;
 
     }
 

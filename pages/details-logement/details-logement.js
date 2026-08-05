@@ -61,6 +61,8 @@ async function chargerLogement(id){
     document.querySelector(".price-card h3").textContent =
     prix + " FCFA";
 
+    afficherLocalisation(logement.ville);
+
     afficherCaracteristiques(logement);
 
     afficherGalerie(logement.medias || []);
@@ -267,6 +269,41 @@ function brancherBoutonContact(btn, telephone, construireHref, messageErreur){
     }
 
     btn.href = construireHref(formaterNumeroInternational(telephone));
+
+}
+
+/**
+ * Affiche une carte (Google Maps, sans clé API) et un lien
+ * "Itinéraire" pointant sur la ville/quartier réel du logement.
+ * Masque toute la section si aucune ville n'est renseignée.
+ */
+function afficherLocalisation(ville){
+
+    const section =
+    document.getElementById("property-location");
+
+    if(!section) return;
+
+    if(!ville){
+
+        section.style.display = "none";
+
+        return;
+    }
+
+    section.style.display = "";
+
+    const requete =
+    encodeURIComponent(ville + ", Sénégal");
+
+    document.getElementById("locationVille").innerHTML =
+    `<i class="ph ph-map-pin"></i> ${ville}`;
+
+    document.getElementById("mapEmbed").src =
+    `https://www.google.com/maps?q=${requete}&output=embed`;
+
+    document.getElementById("itineraireBtn").href =
+    `https://www.google.com/maps/dir/?api=1&destination=${requete}`;
 
 }
 

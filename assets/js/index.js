@@ -78,6 +78,13 @@ if(heroSearchForm){
         const budget =
         document.getElementById("heroBudget").value;
 
+        if(budget && Number(budget) < 10000){
+
+            showToast("Le budget minimum est de 10 000 FCFA.", "error");
+
+            return;
+        }
+
         const params = new URLSearchParams();
 
         if(ville) params.set("ville", ville);

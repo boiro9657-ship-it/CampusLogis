@@ -189,7 +189,10 @@
                 <input
                 type="text"
                 id="heroVille"
+                list="listeVilles"
                 placeholder="Ville ou quartier...">
+
+                <datalist id="listeVilles"></datalist>
 
             </div>
 
@@ -200,6 +203,7 @@
                 <input
                 type="number"
                 id="heroBudget"
+                min="10000"
                 placeholder="Budget max (FCFA)">
 
             </div>
@@ -776,6 +780,7 @@
 <script>window.API_BASE = "backend/api";</script>
 <script src="assets/js/api.js"></script>
 <script src="assets/js/global.js"></script>
+<script src="assets/js/senegal-locations.js"></script>
 <script src="assets/js/index.js"></script>
 </body>
 </html>

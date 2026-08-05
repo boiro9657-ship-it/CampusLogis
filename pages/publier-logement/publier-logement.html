@@ -76,11 +76,16 @@
 
     <div class="form-group">
 
-        <label>Ville</label>
+        <label>Ville / Quartier</label>
         <input
             type="text"
             id="ville"
-            placeholder="Ville">
+            list="listeVilles"
+            placeholder="Ex : Dakar - Almadies, Thiès...">
+
+        <datalist id="listeVilles"></datalist>
+
+        <p class="form-hint">Choisissez dans la liste ou précisez votre adresse.</p>
 
     </div>
 
@@ -305,6 +310,7 @@
 <script>window.API_BASE = "../../backend/api";</script>
 <script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/global.js"></script>
+<script src="../../assets/js/senegal-locations.js"></script>
 <script src="./publier-logement.js"></script>
 
 </body>

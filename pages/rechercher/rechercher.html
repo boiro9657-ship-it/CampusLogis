@@ -69,14 +69,15 @@
 
             <input type="text"
             id="searchVille"
+            list="listeVilles"
             placeholder="Ville ou quartier">
 
-            <select id="searchBudget">
-                <option value="">Budget maximum</option>
-                <option>50 000 FCFA</option>
-                <option>75 000 FCFA</option>
-                <option>100 000 FCFA</option>
-            </select>
+            <datalist id="listeVilles"></datalist>
+
+            <input type="number"
+            id="searchBudget"
+            min="10000"
+            placeholder="Budget maximum (FCFA)">
 
             <select id="searchType">
                 <option value="">Type de logement</option>
@@ -195,6 +196,7 @@
 <script>window.API_BASE = "../../backend/api";</script>
 <script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/global.js"></script>
+<script src="../../assets/js/senegal-locations.js"></script>
 <script src="./rechercher.js"></script>
 
 </body>

@@ -11,7 +11,7 @@ document.querySelector(".search-page-box");
 const villeInput =
 document.getElementById("searchVille");
 
-const budgetSelect =
+const budgetInput =
 document.getElementById("searchBudget");
 
 const typeSelect =
@@ -67,7 +67,7 @@ async function rechercherLogements(){
     typeSelect ? typeSelect.value : "";
 
     const budgetTexte =
-    budgetSelect ? budgetSelect.value : "";
+    budgetInput ? budgetInput.value : "";
 
     if(ville) query.set("ville", ville);
     if(type) query.set("type", type);
@@ -75,9 +75,16 @@ async function rechercherLogements(){
     if(budgetTexte){
 
         const budget =
-        parseInt(budgetTexte.replace(/\D/g, ""), 10);
+        parseInt(budgetTexte, 10);
 
         if(!isNaN(budget)){
+
+            if(budget < 10000){
+
+                showToast("Le budget minimum est de 10 000 FCFA.", "error");
+
+                return;
+            }
 
             query.set("budget", budget);
 

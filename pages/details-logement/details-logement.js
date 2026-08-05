@@ -81,6 +81,86 @@ async function chargerLogement(id){
 
     }
 
+    const ownerNomEl =
+    document.querySelector(".owner-info h2");
+
+    if(ownerNomEl){
+
+        ownerNomEl.textContent =
+        logement.proprietaire_nom || "Propriétaire";
+
+    }
+
+    brancherContactProprietaire(logement.proprietaire_telephone);
+
+}
+
+/**
+ * Branche "Appeler" et "WhatsApp" sur le vrai numéro du
+ * propriétaire (liens tel: et wa.me). Si aucun numéro n'est
+ * enregistré pour ce compte, affiche un message clair plutôt
+ * qu'un lien cassé.
+ */
+function brancherContactProprietaire(telephone){
+
+    const btnCall =
+    document.querySelector(".btn-call");
+
+    const btnWhatsapp =
+    document.querySelector(".btn-whatsapp");
+
+    if(!telephone){
+
+        [btnCall, btnWhatsapp].forEach(btn => {
+
+            if(!btn) return;
+
+            btn.addEventListener("click", (e) => {
+
+                e.preventDefault();
+
+                showToast("Le propriétaire n'a pas renseigné de numéro de téléphone.", "error");
+
+            });
+
+        });
+
+        return;
+    }
+
+    const numero =
+    formaterNumeroInternational(telephone);
+
+    if(btnCall) btnCall.href = "tel:+" + numero;
+    if(btnWhatsapp) btnWhatsapp.href = "https://wa.me/" + numero;
+
+}
+
+/**
+ * Nettoie un numéro saisi sous différentes formes (+221 77 ...,
+ * 00221 77 ..., 077 ...) vers un format international sans "+"
+ * (attendu par tel: et wa.me). Le préfixe 221 (Sénégal) est
+ * ajouté par défaut, la plateforme étant nationale.
+ */
+function formaterNumeroInternational(telephone){
+
+    let chiffres =
+    telephone.replace(/\D/g, "");
+
+    if(chiffres.startsWith("00")){
+        chiffres = chiffres.slice(2);
+    }
+
+    if(chiffres.startsWith("221")){
+        return chiffres;
+    }
+
+    if(chiffres.startsWith("0")){
+        chiffres = chiffres.slice(1);
+    }
+
+    return "221" + chiffres;
+
 }
 
 /**
@@ -133,13 +213,13 @@ function afficherGalerie(medias){
 
 /* ==========================
     ACTIONS PAS ENCORE DISPONIBLES
-    (appel, WhatsApp, message direct, logements similaires —
-    pas de numéro/messagerie propriétaire dans cette version)
+    (message direct, logements similaires — appel et WhatsApp
+    sont branchés sur le vrai numéro dans brancherContactProprietaire)
 ========================== */
 
 const selecteurActionsEnAttente =
 logementId
-? ".btn-call, .btn-whatsapp, .btn-message, .similar-content a"
+? ".btn-message, .similar-content a"
 : ".reserve-btn, .btn-call, .btn-whatsapp, .btn-message, .similar-content a";
 
 document.querySelectorAll(selecteurActionsEnAttente).forEach(el => {

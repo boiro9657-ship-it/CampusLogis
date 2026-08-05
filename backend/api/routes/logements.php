@@ -97,7 +97,12 @@ function listMesLogements(): void
 
 function getLogement(int $id): void
 {
-    $stmt = getPdo()->prepare('SELECT * FROM logements WHERE id = ?');
+    $stmt = getPdo()->prepare('
+        SELECT l.*, u.nom_complet AS proprietaire_nom, u.telephone AS proprietaire_telephone
+        FROM logements l
+        LEFT JOIN utilisateurs u ON u.id = l.owner_id
+        WHERE l.id = ?
+    ');
     $stmt->execute([$id]);
     $logement = $stmt->fetch();
 

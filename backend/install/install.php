@@ -202,36 +202,12 @@ try {
     ");
     $etapes[] = 'Table "messages_contact" prête.';
 
-    // Annonces de démonstration, une seule fois (si la table
-    // est encore vide), pour que le site ne parte pas sans rien
-    // à afficher avant les premières vraies publications.
-    $nbLogements = $pdo->query('SELECT COUNT(*) FROM logements')->fetchColumn();
-
-    if ($nbLogements == 0) {
-
-        $stmt = $pdo->prepare('
-            INSERT INTO logements (titre, ville, type, prix, chambres, description, image_url, premium, statut_validation)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ');
-
-        $demo = [
-            ['Studio Moderne', 'Dakar - Point E', 'Studio', 95000, 1, 'Studio moderne, calme et bien situé.', null, 1, 'approuve'],
-            ['Résidence Fann', 'Fann, Dakar', 'Appartement', 75000, 2, 'Appartement lumineux proche du centre.', null, 0, 'approuve'],
-            ['Studio Ouakam', 'Ouakam, Dakar', 'Studio', 60000, 1, 'Studio avec wifi, idéal pour un début rapide.', null, 0, 'approuve'],
-            ['Appartement Amitié', 'Amitié, Dakar', 'Appartement', 90000, 3, 'Grand appartement avec wifi.', null, 1, 'approuve'],
-        ];
-
-        foreach ($demo as $logement) {
-            $stmt->execute($logement);
-        }
-
-        $etapes[] = count($demo) . ' annonces de démonstration ajoutées.';
-
-    } else {
-
-        $etapes[] = 'Annonces de démonstration déjà présentes, rien ajouté.';
-
-    }
+    // Pas d'annonces de démonstration : seules de vraies annonces,
+    // publiées par de vrais propriétaires contactables, doivent
+    // apparaître sur le site. D'anciennes installations peuvent
+    // avoir des annonces sans propriétaire (owner_id NULL) issues
+    // d'une version antérieure ; on les retire ici, une seule fois.
+    $pdo->exec("DELETE FROM logements WHERE owner_id IS NULL");
 
     // Compte administrateur par défaut, créé une seule fois (si
     // aucun admin n'existe encore). Pas d'auto-inscription admin

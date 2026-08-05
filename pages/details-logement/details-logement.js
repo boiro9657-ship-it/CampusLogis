@@ -93,7 +93,104 @@ async function chargerLogement(id){
 
     }
 
+    afficherInfosProprietaire(logement);
+
     brancherContactProprietaire(logement);
+
+    chargerLogementsSimilaires(logement);
+
+}
+
+/**
+ * Affiche les vraies informations du propriétaire (date
+ * d'inscription réelle, nombre réel d'annonces approuvées) —
+ * plus de note ni de "propriétaire vérifié" fictifs.
+ */
+function afficherInfosProprietaire(logement){
+
+    const membreDepuisEl =
+    document.getElementById("ownerMembreDepuis");
+
+    if(membreDepuisEl && logement.proprietaire_membre_depuis){
+
+        const annee =
+        new Date(logement.proprietaire_membre_depuis).getFullYear();
+
+        membreDepuisEl.textContent =
+        `Membre depuis ${annee}`;
+
+    }
+
+    const nbAnnoncesEl =
+    document.getElementById("ownerNbAnnonces");
+
+    if(nbAnnoncesEl){
+
+        const nb =
+        Number(logement.proprietaire_nb_annonces || 0);
+
+        nbAnnoncesEl.textContent =
+        `${nb} annonce${nb > 1 ? "s" : ""} publiée${nb > 1 ? "s" : ""}`;
+
+    }
+
+}
+
+/**
+ * Charge de vraies annonces similaires (même ville, hors
+ * l'annonce actuelle) via l'API. Masque toute la section si
+ * aucune autre annonce n'est disponible dans la même ville.
+ */
+async function chargerLogementsSimilaires(logement){
+
+    const section =
+    document.getElementById("similar-properties");
+
+    const grid =
+    document.getElementById("similarGrid");
+
+    if(!section || !grid || !logement.ville) return;
+
+    let logements;
+
+    try{
+
+        logements = await apiFetch("/logements?ville=" + encodeURIComponent(logement.ville));
+
+    }catch(error){
+
+        return;
+    }
+
+    const similaires =
+    (logements || [])
+    .filter(l => String(l.id) !== String(logement.id))
+    .slice(0, 3);
+
+    if(similaires.length === 0) return;
+
+    grid.innerHTML =
+    similaires.map(l => `
+        <div class="similar-card">
+
+            <img src="${l.image_url || ""}" loading="lazy" alt="${l.titre}">
+
+            <div class="similar-content">
+
+                <h3>${l.titre}</h3>
+
+                <p>📍 ${l.ville || ""}</p>
+
+                <h4>${Number(l.prix).toLocaleString("fr-FR")} FCFA / mois</h4>
+
+                <a href="details-logement.html?id=${l.id}">Voir les détails</a>
+
+            </div>
+
+        </div>
+    `).join("");
+
+    section.style.display = "";
 
 }
 
@@ -290,14 +387,17 @@ function afficherGalerie(medias){
 
 /* ==========================
     ACTIONS PAS ENCORE DISPONIBLES
-    (logements similaires — appel, WhatsApp et message sont
-    branchés sur les vraies coordonnées dans brancherContactProprietaire)
+    (uniquement en accès direct sans ?id= — appel, WhatsApp,
+    message et logements similaires sont tous réels dès qu'un
+    vrai logement est chargé)
 ========================== */
 
 const selecteurActionsEnAttente =
 logementId
-? ".similar-content a"
-: ".reserve-btn, .btn-call, .btn-whatsapp, .btn-message, .similar-content a";
+? null
+: ".reserve-btn, .btn-call, .btn-whatsapp, .btn-message";
+
+if(selecteurActionsEnAttente){
 
 document.querySelectorAll(selecteurActionsEnAttente).forEach(el => {
 
@@ -310,3 +410,5 @@ document.querySelectorAll(selecteurActionsEnAttente).forEach(el => {
     });
 
 });
+
+}

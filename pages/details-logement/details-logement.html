@@ -220,33 +220,19 @@
 
     <div class="owner-card">
 
-        <img src="../../images/avatar2.jpg" loading="lazy" alt="Propriétaire">
+        <div class="owner-avatar-placeholder">
+            <i class="ph ph-user"></i>
+        </div>
 
         <div class="owner-info">
 
-            <h2>Ibrahima Boiro</h2>
+            <h2>Propriétaire</h2>
 
-            <span class="verified">
-
-                <i class="ph ph-check-circle"></i>
-
-                Propriétaire vérifié
-
-            </span>
-
-            <p>
-
-                Membre depuis 2025
-
-            </p>
+            <p id="ownerMembreDepuis"></p>
 
             <div class="owner-stats">
 
-                <span>⭐ 4.9</span>
-
-                <span>42 annonces</span>
-
-                <span>Répond en moins de 10 min</span>
+                <span id="ownerNbAnnonces"></span>
 
             </div>
 
@@ -284,67 +270,11 @@
 
 </section>
 
-<section id="similar-properties">
+<section id="similar-properties" style="display:none;">
 
     <h2>Logements similaires</h2>
 
-    <div class="similar-grid">
-
-        <div class="similar-card">
-
-            <img src="../../images/logement2.jpg" loading="lazy" alt="">
-
-            <div class="similar-content">
-
-                <h3>Studio Premium</h3>
-
-                <p>📍 Mermoz</p>
-
-                <h4>85 000 FCFA / mois</h4>
-
-                <a href="#">Voir les détails</a>
-
-            </div>
-
-        </div>
-
-        <div class="similar-card">
-
-            <img src="../../images/logement3.jpg" loading="lazy" alt="">
-
-            <div class="similar-content">
-
-                <h3>Appartement Amitié</h3>
-
-                <p>📍 Point E</p>
-
-                <h4>90 000 FCFA / mois</h4>
-
-                <a href="#">Voir les détails</a>
-
-            </div>
-
-        </div>
-
-        <div class="similar-card">
-
-            <img src="../../images/logement4.jpg" loading="lazy" alt="">
-
-            <div class="similar-content">
-
-                <h3>Studio Confort</h3>
-
-                <p>📍 Ouakam</p>
-
-                <h4>70 000 FCFA / mois</h4>
-
-                <a href="#">Voir les détails</a>
-
-            </div>
-
-        </div>
-
-    </div>
+    <div class="similar-grid" id="similarGrid"></div>
 
 </section>
 

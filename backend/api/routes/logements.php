@@ -16,6 +16,11 @@ function handleLogementsRoute(array $segments, string $method): void
         return;
     }
 
+    if ($method === 'GET' && $first === 'stats') {
+        statsPubliques();
+        return;
+    }
+
     if ($method === 'GET' && $first === null) {
         listLogements();
         return;
@@ -46,7 +51,10 @@ function handleLogementsRoute(array $segments, string $method): void
 
 function listLogements(): void
 {
-    $conditions = ["statut_validation = 'approuve'"];
+    // "owner_id IS NOT NULL" garantit que toute annonce publique
+    // a un vrai propriétaire contactable — aucune annonce fictive
+    // ou orpheline ne doit apparaître sur le site.
+    $conditions = ["statut_validation = 'approuve'", "owner_id IS NOT NULL"];
     $params = [];
 
     if (!empty($_GET['ville'])) {
@@ -78,6 +86,38 @@ function listLogements(): void
     jsonResponse($stmt->fetchAll());
 }
 
+/**
+ * Statistiques publiques réelles pour l'accueil (nombre de
+ * logements publiés, de propriétaires actifs, de villes
+ * couvertes) — aucun chiffre inventé, uniquement des annonces
+ * réelles et approuvées.
+ */
+function statsPubliques(): void
+{
+    $pdo = getPdo();
+
+    $nbLogements = $pdo->query("
+        SELECT COUNT(*) FROM logements
+        WHERE statut_validation = 'approuve' AND owner_id IS NOT NULL
+    ")->fetchColumn();
+
+    $nbProprietaires = $pdo->query("
+        SELECT COUNT(DISTINCT owner_id) FROM logements
+        WHERE statut_validation = 'approuve' AND owner_id IS NOT NULL
+    ")->fetchColumn();
+
+    $nbVilles = $pdo->query("
+        SELECT COUNT(DISTINCT ville) FROM logements
+        WHERE statut_validation = 'approuve' AND owner_id IS NOT NULL AND ville IS NOT NULL AND ville != ''
+    ")->fetchColumn();
+
+    jsonResponse([
+        'logements'     => (int) $nbLogements,
+        'proprietaires' => (int) $nbProprietaires,
+        'villes'        => (int) $nbVilles,
+    ]);
+}
+
 function listMesLogements(): void
 {
     $userId = requireAuth();
@@ -98,7 +138,12 @@ function listMesLogements(): void
 function getLogement(int $id): void
 {
     $stmt = getPdo()->prepare('
-        SELECT l.*, u.nom_complet AS proprietaire_nom, u.telephone AS proprietaire_telephone
+        SELECT l.*, u.nom_complet AS proprietaire_nom, u.telephone AS proprietaire_telephone,
+            u.created_at AS proprietaire_membre_depuis,
+            (
+                SELECT COUNT(*) FROM logements l2
+                WHERE l2.owner_id = l.owner_id AND l2.statut_validation = "approuve"
+            ) AS proprietaire_nb_annonces
         FROM logements l
         LEFT JOIN utilisateurs u ON u.id = l.owner_id
         WHERE l.id = ?

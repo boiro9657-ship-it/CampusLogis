@@ -93,62 +93,69 @@ if(heroSearchForm){
 }
 
 /* ==========================
-    COMPTEURS ANIMÉS
+    STATISTIQUES RÉELLES
+    (nombre réel de logements/propriétaires/villes, jamais de
+    chiffres inventés)
 ========================== */
 
-const counters = document.querySelectorAll(".counter");
+function animerCompteur(element, cible){
 
-const startCounter = (counter) => {
-
-    const target = +counter.dataset.target;
+    if(!element) return;
 
     let count = 0;
 
-    const increment = target / 150;
+    const increment = Math.max(cible / 60, 1);
 
     const update = () => {
 
         count += increment;
 
-        if(count < target){
+        if(count < cible){
 
-            counter.innerText = Math.floor(count);
+            element.textContent = Math.floor(count);
 
             requestAnimationFrame(update);
 
         }else{
 
-            counter.innerText = target.toLocaleString() + "+";
+            element.textContent = cible;
 
         }
 
     };
 
-    update();
+    if(cible > 0){
+        update();
+    }else{
+        element.textContent = "0";
+    }
 
-};
+}
 
-const observer = new IntersectionObserver((entries)=>{
+async function chargerStatistiques(){
 
-    entries.forEach(entry=>{
+    let stats;
 
-        if(entry.isIntersecting){
+    try{
 
-            startCounter(entry.target);
+        stats = await apiFetch("/logements/stats");
 
-            observer.unobserve(entry.target);
+    }catch(error){
 
-        }
+        return;
+    }
 
-    });
+    animerCompteur(document.getElementById("heroStatLogements"), stats.logements);
+    animerCompteur(document.getElementById("heroStatProprietaires"), stats.proprietaires);
+    animerCompteur(document.getElementById("heroStatVilles"), stats.villes);
 
-});
+    animerCompteur(document.getElementById("statLogements"), stats.logements);
+    animerCompteur(document.getElementById("statProprietaires"), stats.proprietaires);
+    animerCompteur(document.getElementById("statVilles"), stats.villes);
 
-counters.forEach(counter=>{
+}
 
-    observer.observe(counter);
-
-});
+chargerStatistiques();
 
 /* ==========================
     ACCORDÉON FAQ
@@ -270,8 +277,6 @@ function carteLogementHTML(logement){
             </div>
 
             <div class="bottom-card">
-
-                <span>⭐ 4.9</span>
 
                 <button class="btn-reserver" data-id="${logement.id}">
                     Réserver

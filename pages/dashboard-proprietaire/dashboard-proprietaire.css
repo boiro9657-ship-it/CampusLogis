@@ -231,6 +231,69 @@ tr:hover td{
 
 }
 
+.table-vide{
+
+    text-align:center;
+
+    padding:40px 20px;
+
+    color:#64748B;
+
+}
+
+/* ==========================
+    CTA "PUBLIER UNE ANNONCE"
+    (locataire sans annonce publiée)
+========================== */
+
+.cta-publier{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:25px;
+
+    flex-wrap:wrap;
+
+    margin-top:40px;
+
+    padding:35px;
+
+    background:var(--primary-light);
+
+    border-radius:25px;
+
+}
+
+.cta-publier i{
+
+    font-size:45px;
+
+    color:var(--primary);
+
+}
+
+.cta-publier h3{
+
+    color:var(--primary);
+
+    margin-bottom:6px;
+
+}
+
+.cta-publier p{
+
+    color:#475569;
+
+}
+
+.cta-publier .btn-primary{
+
+    margin-left:auto;
+
+}
+
 /* ==========================
         MES ANNONCES
 ========================== */
@@ -369,6 +432,41 @@ tr:hover td{
     margin-bottom:6px;
 
     font-size:14px;
+
+}
+
+.validation-badge{
+
+    display:inline-block;
+
+    padding:5px 12px;
+    border-radius:20px;
+
+    font-size:12px;
+    font-weight:600;
+
+    margin-bottom:10px;
+
+}
+
+.validation-badge-attente{
+
+    background:#FEF3C7;
+    color:#D97706;
+
+}
+
+.validation-badge-approuve{
+
+    background:#DCFCE7;
+    color:#16A34A;
+
+}
+
+.validation-badge-rejete{
+
+    background:#FEE2E2;
+    color:#DC2626;
 
 }
 

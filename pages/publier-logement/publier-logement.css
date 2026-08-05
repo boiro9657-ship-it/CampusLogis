@@ -109,6 +109,90 @@
     resize:none;
 }
 
+.form-section{
+
+    margin-top:40px;
+
+    padding-top:30px;
+
+    border-top:1px solid #e2e8f0;
+
+}
+
+.form-section h3{
+
+    color:var(--primary);
+
+    margin-bottom:8px;
+
+}
+
+.form-section > .form-hint{
+
+    margin-top:0;
+
+    margin-bottom:22px;
+
+}
+
+.equipements-choix{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+
+    gap:14px;
+
+}
+
+.checkbox-choix{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:14px 16px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:15px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    color:#475569;
+
+    transition:.2s;
+
+}
+
+.checkbox-choix:has(input:checked){
+
+    border-color:var(--primary);
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+}
+
+.checkbox-choix input{
+
+    width:auto;
+
+    accent-color:var(--primary);
+
+}
+
+.checkbox-choix i{
+
+    font-size:20px;
+
+}
+
 .publish-btn{
 
     border:none;

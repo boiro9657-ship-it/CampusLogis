@@ -154,6 +154,36 @@ if(typeof apiFetch !== "undefined"){
         navBtn.textContent = "Mon compte";
         navBtn.setAttribute("href", lienTableauDeBord);
 
+        // Le bouton "Déconnexion" du tableau de bord est dans la
+        // barre latérale, masquée sur mobile — sans ça, aucun
+        // moyen de se déconnecter depuis un téléphone. On ajoute
+        // donc un lien de déconnexion dans le menu mobile
+        // (hamburger), présent sur toutes les pages.
+        const navLinks =
+        document.querySelector(".nav-links");
+
+        if(navLinks && !document.getElementById("logoutNavLink")){
+
+            const item =
+            document.createElement("li");
+
+            item.innerHTML =
+            `<a href="#" id="logoutNavLink"><i class="ph ph-sign-out"></i> Déconnexion</a>`;
+
+            navLinks.appendChild(item);
+
+            document.getElementById("logoutNavLink").addEventListener("click", async (e)=>{
+
+                e.preventDefault();
+
+                await apiFetch("/auth/logout", { method:"POST" });
+
+                window.location.href = racine + "index.html";
+
+            });
+
+        }
+
     }).catch(()=>{});
 
 }

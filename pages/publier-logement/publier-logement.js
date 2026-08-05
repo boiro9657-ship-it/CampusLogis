@@ -111,6 +111,20 @@ if(publishForm){
             formData.append("chambres", chambres);
             formData.append("description", description);
 
+            const contactTelephone = document.getElementById("contact_telephone").value.trim();
+            const contactWhatsapp = document.getElementById("contact_whatsapp").value.trim();
+            const contactEmail = document.getElementById("contact_email").value.trim();
+
+            formData.append("contact_telephone", contactTelephone);
+            formData.append("contact_whatsapp", contactWhatsapp);
+            formData.append("contact_email", contactEmail);
+
+            document.querySelectorAll('input[name="equipements[]"]:checked').forEach(checkbox => {
+
+                formData.append("equipements[]", checkbox.value);
+
+            });
+
             for(const fichier of photos){
 
                 formData.append("photos[]", fichier);

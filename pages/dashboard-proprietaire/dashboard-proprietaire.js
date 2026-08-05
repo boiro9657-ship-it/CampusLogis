@@ -1,15 +1,21 @@
 /* ==========================================================
-   DASHBOARD-PROPRIETAIRE.JS — page tableau de bord uniquement
-   Page protégée : redirige vers la connexion si aucune session
-   active. Affiche et supprime les logements du propriétaire
-   connecté via l'API.
+   DASHBOARD-PROPRIETAIRE.JS — tableau de bord propriétaire ET
+   locataire (page partagée). Le contenu s'adapte au rôle réel
+   du compte connecté : un propriétaire voit ses annonces et les
+   réservations reçues ; un locataire voit ses propres
+   réservations et une invitation à publier s'il n'a encore
+   aucune annonce. Un locataire qui a quand même publié une
+   annonce (rien ne l'en empêche) voit "Mes annonces" apparaître
+   comme un propriétaire.
    ========================================================== */
+
+let utilisateurConnecte = null;
 
 (async () => {
 
     try{
 
-        await apiFetch("/auth/me");
+        utilisateurConnecte = await apiFetch("/auth/me");
 
     }catch(error){
 
@@ -19,8 +25,7 @@
         return;
     }
 
-    chargerAnnonces();
-    chargerReservations();
+    initDashboard();
 
 })();
 
@@ -63,15 +68,24 @@ document.querySelectorAll(".sidebar-soon").forEach(link => {
 });
 
 /* ==========================
-    MES ANNONCES
+    ORCHESTRATION DU TABLEAU DE BORD
 ========================== */
 
-const container =
-document.getElementById("annonces-container");
+async function initDashboard(){
 
-async function chargerAnnonces(){
+    const estProprietaire =
+    utilisateurConnecte.role === "proprietaire";
 
-    if(!container) return;
+    const premierPrenom =
+    (utilisateurConnecte.nom_complet || "").split(" ")[0];
+
+    document.getElementById("dashboardGreeting").textContent =
+    `Bonjour ${premierPrenom} 👋`;
+
+    document.getElementById("dashboardSubtitle").textContent =
+    estProprietaire
+    ? "Gérez facilement vos logements."
+    : "Suivez vos réservations et vos favoris.";
 
     let logements = [];
 
@@ -83,8 +97,96 @@ async function chargerAnnonces(){
 
         showToast("Impossible de charger vos annonces.", "error");
 
-        return;
     }
+
+    const aDesAnnonces =
+    logements.length > 0;
+
+    const sectionAnnonces =
+    document.getElementById("mes-annonces");
+
+    const ctaPublier =
+    document.getElementById("cta-publier");
+
+    if(aDesAnnonces || estProprietaire){
+
+        sectionAnnonces.style.display = "";
+        ctaPublier.style.display = "none";
+        afficherAnnonces(logements);
+
+    }else{
+
+        sectionAnnonces.style.display = "none";
+        ctaPublier.style.display = "";
+
+    }
+
+    const titreReservations =
+    document.getElementById("reservationsSectionTitle");
+
+    let reservations = [];
+
+    if(estProprietaire){
+
+        titreReservations.textContent = "Réservations reçues";
+
+        try{
+            reservations = await apiFetch("/reservations/owner");
+        }catch(error){
+            showToast("Impossible de charger vos réservations.", "error");
+        }
+
+        afficherReservations(reservations, "owner");
+
+    }else{
+
+        titreReservations.textContent = "Mes réservations";
+
+        try{
+            reservations = await apiFetch("/reservations/mine");
+        }catch(error){
+            showToast("Impossible de charger vos réservations.", "error");
+        }
+
+        afficherReservations(reservations, "locataire");
+
+    }
+
+    const nbEnAttente =
+    logements.filter(l => l.statut_validation === "en_attente").length;
+
+    document.getElementById("statPrincipal").textContent =
+    logements.length;
+
+    document.getElementById("statSecondaire").textContent =
+    reservations.length;
+
+    document.getElementById("statSecondaireLabel").textContent =
+    estProprietaire ? "Réservations reçues" : "Réservations effectuées";
+
+    document.getElementById("statTertiaire").textContent =
+    nbEnAttente;
+
+    afficherTableRecente(logements, reservations, aDesAnnonces || estProprietaire);
+
+}
+
+/* ==========================
+    MES ANNONCES
+========================== */
+
+const container =
+document.getElementById("annonces-container");
+
+const libellesValidation = {
+    en_attente: { texte: "⏳ En attente de validation", classe: "validation-badge-attente" },
+    approuve: { texte: "✅ Approuvée", classe: "validation-badge-approuve" },
+    rejete: { texte: "❌ Rejetée", classe: "validation-badge-rejete" }
+};
+
+function afficherAnnonces(logements){
+
+    if(!container) return;
 
     if(!logements || logements.length === 0){
 
@@ -110,6 +212,7 @@ async function chargerAnnonces(){
 
         const nbPhotos = Number(logement.nb_photos || 0);
         const nbVideos = Number(logement.nb_videos || 0);
+        const validation = libellesValidation[logement.statut_validation] || libellesValidation.en_attente;
 
         return `
         <div class="property-card">
@@ -125,6 +228,8 @@ async function chargerAnnonces(){
             }
 
             <div class="property-content">
+
+                <span class="validation-badge ${validation.classe}">${validation.texte}</span>
 
                 <h3>${logement.titre}</h3>
 
@@ -178,7 +283,7 @@ async function supprimerLogement(id){
 
         await apiFetch("/logements/" + id, { method:"DELETE" });
 
-        chargerAnnonces();
+        initDashboard();
 
     }catch(error){
 
@@ -189,38 +294,32 @@ async function supprimerLogement(id){
 }
 
 /* ==========================
-    RÉSERVATIONS REÇUES
+    RÉSERVATIONS
+    (reçues pour un propriétaire, effectuées pour un locataire)
 ========================== */
 
 const reservationsContainer =
 document.getElementById("reservations-container");
 
-async function chargerReservations(){
+function afficherReservations(reservations, mode){
 
     if(!reservationsContainer) return;
 
-    let reservations = [];
-
-    try{
-
-        reservations = await apiFetch("/reservations/owner");
-
-    }catch(error){
-
-        showToast("Impossible de charger vos réservations.", "error");
-
-        return;
-    }
-
     if(!reservations || reservations.length === 0){
 
-        reservationsContainer.innerHTML = `
+        reservationsContainer.innerHTML =
+        mode === "owner"
+        ? `
         <div class="empty-state">
-
             <i class="ph ph-calendar-check"></i>
-
             <p>Vous n'avez encore reçu aucune demande de réservation.</p>
-
+        </div>
+        `
+        : `
+        <div class="empty-state">
+            <i class="ph ph-calendar-check"></i>
+            <p>Vous n'avez encore fait aucune réservation.</p>
+            <a href="../rechercher/rechercher.html" class="btn-primary">Rechercher un logement</a>
         </div>
         `;
 
@@ -241,7 +340,7 @@ async function chargerReservations(){
 
                 <h3>${reservation.titre}</h3>
 
-                <p>📍 ${reservation.ville || ""} — demandé par ${reservation.locataire_nom}</p>
+                <p>📍 ${reservation.ville || ""}${mode === "owner" ? ` — demandé par ${reservation.locataire_nom}` : ""}</p>
 
                 ${
                     reservation.message
@@ -257,5 +356,85 @@ async function chargerReservations(){
 
         </div>
     `).join("");
+
+}
+
+/* ==========================
+    TABLEAU RÉCAPITULATIF
+    (annonces récentes si l'utilisateur en a, sinon réservations
+    récentes pour un locataire sans annonce)
+========================== */
+
+function afficherTableRecente(logements, reservations, afficherAnnoncesRecentes){
+
+    const table =
+    document.getElementById("tableRecent");
+
+    const titre =
+    document.getElementById("recentSectionTitle");
+
+    if(!table || !titre) return;
+
+    if(afficherAnnoncesRecentes){
+
+        titre.textContent = "Mes annonces récentes";
+
+        const recents =
+        logements.slice(0, 5);
+
+        if(recents.length === 0){
+            table.innerHTML = `<tr><td colspan="4" class="table-vide">Aucune annonce publiée pour le moment.</td></tr>`;
+            return;
+        }
+
+        table.innerHTML = `
+            <tr>
+                <th>Logement</th>
+                <th>Ville</th>
+                <th>Prix</th>
+                <th>Statut</th>
+            </tr>
+        ` + recents.map(l => `
+            <tr>
+                <td>${l.titre}</td>
+                <td>${l.ville || ""}</td>
+                <td>${Number(l.prix).toLocaleString("fr-FR")} F</td>
+                <td><span class="status-badge ${l.statut === "disponible" ? "status-available" : "status-booked"}">${l.statut}</span></td>
+            </tr>
+        `).join("");
+
+    }else{
+
+        titre.textContent = "Mes réservations récentes";
+
+        const recents =
+        reservations.slice(0, 5);
+
+        if(recents.length === 0){
+            table.innerHTML = `<tr><td colspan="3" class="table-vide">Aucune réservation pour le moment.</td></tr>`;
+            return;
+        }
+
+        const libellesStatut = {
+            en_attente: "En attente",
+            confirmee: "Confirmée",
+            annulee: "Annulée"
+        };
+
+        table.innerHTML = `
+            <tr>
+                <th>Logement</th>
+                <th>Ville</th>
+                <th>Statut</th>
+            </tr>
+        ` + recents.map(r => `
+            <tr>
+                <td>${r.titre}</td>
+                <td>${r.ville || ""}</td>
+                <td><span class="status-badge status-available">${libellesStatut[r.statut] || r.statut}</span></td>
+            </tr>
+        `).join("");
+
+    }
 
 }

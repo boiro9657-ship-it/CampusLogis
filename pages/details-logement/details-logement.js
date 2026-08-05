@@ -63,6 +63,8 @@ async function chargerLogement(id){
 
     afficherGalerie(logement.medias || []);
 
+    afficherEquipements(logement);
+
     const contactBtn =
     document.getElementById("contactOwnerBtn");
 
@@ -91,17 +93,18 @@ async function chargerLogement(id){
 
     }
 
-    brancherContactProprietaire(logement.proprietaire_telephone);
+    brancherContactProprietaire(logement);
 
 }
 
 /**
- * Branche "Appeler" et "WhatsApp" sur le vrai numéro du
- * propriétaire (liens tel: et wa.me). Si aucun numéro n'est
- * enregistré pour ce compte, affiche un message clair plutôt
- * qu'un lien cassé.
+ * Branche "Appeler", "WhatsApp" et "Envoyer un message" sur les
+ * vraies coordonnées de contact de l'annonce (liens tel:, wa.me
+ * et mailto:). Les coordonnées propres à l'annonce priment sur
+ * celles du compte propriétaire ; sans numéro/email disponible,
+ * affiche un message clair plutôt qu'un lien cassé.
  */
-function brancherContactProprietaire(telephone){
+function brancherContactProprietaire(logement){
 
     const btnCall =
     document.querySelector(".btn-call");
@@ -109,30 +112,104 @@ function brancherContactProprietaire(telephone){
     const btnWhatsapp =
     document.querySelector(".btn-whatsapp");
 
-    if(!telephone){
+    const btnMessage =
+    document.querySelector(".btn-message");
 
-        [btnCall, btnWhatsapp].forEach(btn => {
+    const telephoneEffectif =
+    logement.contact_telephone || logement.proprietaire_telephone;
 
-            if(!btn) return;
+    const whatsappEffectif =
+    logement.contact_whatsapp || logement.contact_telephone || logement.proprietaire_telephone;
 
-            btn.addEventListener("click", (e) => {
+    brancherBoutonContact(btnCall, telephoneEffectif, (numero) => "tel:+" + numero, "Le propriétaire n'a pas renseigné de numéro de téléphone.");
+    brancherBoutonContact(btnWhatsapp, whatsappEffectif, (numero) => "https://wa.me/" + numero, "Le propriétaire n'a pas renseigné de numéro WhatsApp.");
+
+    if(btnMessage){
+
+        if(logement.contact_email){
+
+            btnMessage.href = "mailto:" + logement.contact_email;
+
+        }else{
+
+            btnMessage.addEventListener("click", (e) => {
 
                 e.preventDefault();
 
-                showToast("Le propriétaire n'a pas renseigné de numéro de téléphone.", "error");
+                showToast("Le propriétaire n'a pas renseigné d'email de contact.", "error");
 
             });
+
+        }
+
+    }
+
+}
+
+/**
+ * Branche un bouton de contact (Appeler/WhatsApp) sur un numéro
+ * s'il est disponible, ou sur un message d'erreur clair sinon.
+ */
+function brancherBoutonContact(btn, telephone, construireHref, messageErreur){
+
+    if(!btn) return;
+
+    if(!telephone){
+
+        btn.addEventListener("click", (e) => {
+
+            e.preventDefault();
+
+            showToast(messageErreur, "error");
 
         });
 
         return;
     }
 
-    const numero =
-    formaterNumeroInternational(telephone);
+    btn.href = construireHref(formaterNumeroInternational(telephone));
 
-    if(btnCall) btnCall.href = "tel:+" + numero;
-    if(btnWhatsapp) btnWhatsapp.href = "https://wa.me/" + numero;
+}
+
+/**
+ * Affiche uniquement les équipements réellement cochés par le
+ * propriétaire (equip_wifi, equip_parking, ...). Masque toute la
+ * section si aucun équipement n'est renseigné, plutôt que
+ * d'afficher une liste vide.
+ */
+function afficherEquipements(logement){
+
+    const equipementsDisponibles = [
+        { cle: "equip_wifi", icone: "ph-wifi-high", libelle: "Wifi" },
+        { cle: "equip_parking", icone: "ph-car", libelle: "Parking" },
+        { cle: "equip_cuisine", icone: "ph-fork-knife", libelle: "Cuisine équipée" },
+        { cle: "equip_douche", icone: "ph-drop", libelle: "Douche" },
+        { cle: "equip_salon", icone: "ph-armchair", libelle: "Salon" },
+        { cle: "equip_balcon", icone: "ph-door-open", libelle: "Balcon" },
+    ];
+
+    const equipementsActifs =
+    equipementsDisponibles.filter(e => Number(logement[e.cle]) === 1);
+
+    const equipmentCard =
+    document.querySelector(".equipment-card");
+
+    const equipmentGrid =
+    document.querySelector(".equipment-grid");
+
+    if(!equipmentCard || !equipmentGrid) return;
+
+    if(equipementsActifs.length === 0){
+
+        equipmentCard.style.display = "none";
+
+        return;
+    }
+
+    equipmentGrid.innerHTML =
+    equipementsActifs.map(e => `
+        <span><i class="ph ${e.icone}"></i> ${e.libelle}</span>
+    `).join("");
 
 }
 
@@ -213,13 +290,13 @@ function afficherGalerie(medias){
 
 /* ==========================
     ACTIONS PAS ENCORE DISPONIBLES
-    (message direct, logements similaires — appel et WhatsApp
-    sont branchés sur le vrai numéro dans brancherContactProprietaire)
+    (logements similaires — appel, WhatsApp et message sont
+    branchés sur les vraies coordonnées dans brancherContactProprietaire)
 ========================== */
 
 const selecteurActionsEnAttente =
 logementId
-? ".btn-message, .similar-content a"
+? ".similar-content a"
 : ".reserve-btn, .btn-call, .btn-whatsapp, .btn-message, .similar-content a";
 
 document.querySelectorAll(selecteurActionsEnAttente).forEach(el => {

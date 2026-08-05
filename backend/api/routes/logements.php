@@ -46,7 +46,7 @@ function handleLogementsRoute(array $segments, string $method): void
 
 function listLogements(): void
 {
-    $conditions = [];
+    $conditions = ["statut_validation = 'approuve'"];
     $params = [];
 
     if (!empty($_GET['ville'])) {
@@ -138,6 +138,19 @@ function createLogement(): void
     $chambres = $_POST['chambres'] ?? null;
     $description = trim($_POST['description'] ?? '');
 
+    // Coordonnées de contact propres à l'annonce : facultatives,
+    // le propriétaire peut préférer un numéro/email différent de
+    // celui de son compte (ex. gérant, ligne dédiée).
+    $contactTelephone = trim($_POST['contact_telephone'] ?? '') ?: null;
+    $contactWhatsapp = trim($_POST['contact_whatsapp'] ?? '') ?: null;
+    $contactEmail = trim($_POST['contact_email'] ?? '') ?: null;
+
+    if ($contactEmail !== null && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
+        jsonError('L\'email de contact fourni est invalide.');
+    }
+
+    $equipements = extraireEquipements($_POST['equipements'] ?? []);
+
     if (!$titre || !$ville || !$prix) {
         jsonError('Titre, ville et prix sont obligatoires.');
     }
@@ -194,10 +207,19 @@ function createLogement(): void
     try {
 
         $stmt = $pdo->prepare('
-            INSERT INTO logements (owner_id, titre, ville, type, prix, chambres, description, image_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO logements (
+                owner_id, titre, ville, type, prix, chambres, description, image_url,
+                contact_telephone, contact_whatsapp, contact_email,
+                equip_wifi, equip_parking, equip_cuisine, equip_douche, equip_salon, equip_balcon
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
-        $stmt->execute([$userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl]);
+        $stmt->execute([
+            $userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl,
+            $contactTelephone, $contactWhatsapp, $contactEmail,
+            $equipements['wifi'], $equipements['parking'], $equipements['cuisine'],
+            $equipements['douche'], $equipements['salon'], $equipements['balcon'],
+        ]);
 
         $logementId = $pdo->lastInsertId();
 
@@ -253,6 +275,25 @@ function extraireFichiers(?array $champFichiers): array
     return $fichiers;
 }
 
+/**
+ * Normalise la liste d'équipements cochés (envoyée en
+ * "equipements[]") vers un tableau associatif complet 0/1, prêt
+ * à être inséré tel quel dans les colonnes equip_*.
+ */
+function extraireEquipements($equipementsBruts): array
+{
+    $liste = is_array($equipementsBruts) ? $equipementsBruts : [];
+
+    $disponibles = ['wifi', 'parking', 'cuisine', 'douche', 'salon', 'balcon'];
+    $resultat = [];
+
+    foreach ($disponibles as $cle) {
+        $resultat[$cle] = in_array($cle, $liste, true) ? 1 : 0;
+    }
+
+    return $resultat;
+}
+
 function updateLogement(int $id): void
 {
     requireOwner($id);
@@ -262,7 +303,13 @@ function updateLogement(int $id): void
     $champs = [];
     $params = [];
 
-    foreach (['titre', 'ville', 'type', 'prix', 'chambres', 'description', 'statut'] as $champ) {
+    $champsAutorises = [
+        'titre', 'ville', 'type', 'prix', 'chambres', 'description', 'statut',
+        'contact_telephone', 'contact_whatsapp', 'contact_email',
+        'equip_wifi', 'equip_parking', 'equip_cuisine', 'equip_douche', 'equip_salon', 'equip_balcon',
+    ];
+
+    foreach ($champsAutorises as $champ) {
         if (array_key_exists($champ, $body)) {
             $champs[] = "$champ = ?";
             $params[] = $body[$champ];

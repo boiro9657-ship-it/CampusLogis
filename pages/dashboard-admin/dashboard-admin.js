@@ -150,6 +150,15 @@ async function chargerAnnonces(){
     document.getElementById("statAnnonces").textContent =
     logements.length;
 
+    document.getElementById("statEnAttente").textContent =
+    logements.filter(l => l.statut_validation === "en_attente").length;
+
+    const libellesValidation = {
+        en_attente: "En attente",
+        approuve: "Approuvée",
+        rejete: "Rejetée"
+    };
+
     const table =
     document.getElementById("tableAnnonces");
 
@@ -170,6 +179,21 @@ async function chargerAnnonces(){
                 </span>
             </td>
             <td>
+                <span class="validation-badge validation-${l.statut_validation}">
+                    ${libellesValidation[l.statut_validation] || l.statut_validation}
+                </span>
+            </td>
+            <td>
+                ${
+                    l.statut_validation !== "approuve"
+                    ? `<button class="btn-approuver" data-id="${l.id}">Approuver</button>`
+                    : ""
+                }
+                ${
+                    l.statut_validation !== "rejete"
+                    ? `<button class="btn-rejeter" data-id="${l.id}">Rejeter</button>`
+                    : ""
+                }
                 <button class="btn-supprimer-ligne" data-id="${l.id}">Supprimer</button>
             </td>
         </tr>
@@ -196,6 +220,42 @@ async function chargerAnnonces(){
         });
 
     });
+
+    table.querySelectorAll(".btn-approuver").forEach(btn => {
+
+        btn.addEventListener("click", () => validerAnnonce(btn.dataset.id, "approuve"));
+
+    });
+
+    table.querySelectorAll(".btn-rejeter").forEach(btn => {
+
+        btn.addEventListener("click", () => validerAnnonce(btn.dataset.id, "rejete"));
+
+    });
+
+}
+
+async function validerAnnonce(id, statutValidation){
+
+    try{
+
+        await apiFetch("/admin/logements/" + id + "/valider", {
+
+            method: "PUT",
+
+            body: JSON.stringify({ statut_validation: statutValidation })
+
+        });
+
+        showToast(statutValidation === "approuve" ? "Annonce approuvée." : "Annonce rejetée.");
+
+        chargerAnnonces();
+
+    }catch(error){
+
+        showToast("Action impossible.", "error");
+
+    }
 
 }
 

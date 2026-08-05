@@ -218,12 +218,11 @@ tr:hover td{
 
 }
 
-.btn-supprimer-ligne{
+.btn-supprimer-ligne,
+.btn-approuver,
+.btn-rejeter{
 
     border:none;
-
-    background:#FEE2E2;
-    color:#DC2626;
 
     padding:8px 14px;
 
@@ -237,12 +236,84 @@ tr:hover td{
 
     transition:.3s;
 
+    margin-right:6px;
+
+}
+
+.btn-supprimer-ligne{
+
+    background:#FEE2E2;
+    color:#DC2626;
+
 }
 
 .btn-supprimer-ligne:hover{
 
     background:#DC2626;
     color:white;
+
+}
+
+.btn-approuver{
+
+    background:#DCFCE7;
+    color:#16A34A;
+
+}
+
+.btn-approuver:hover{
+
+    background:#16A34A;
+    color:white;
+
+}
+
+.btn-rejeter{
+
+    background:#FEF3C7;
+    color:#D97706;
+
+}
+
+.btn-rejeter:hover{
+
+    background:#D97706;
+    color:white;
+
+}
+
+.validation-badge{
+
+    display:inline-block;
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.validation-en_attente{
+
+    background:#FEF3C7;
+    color:#D97706;
+
+}
+
+.validation-approuve{
+
+    background:#DCFCE7;
+    color:#16A34A;
+
+}
+
+.validation-rejete{
+
+    background:#FEE2E2;
+    color:#DC2626;
 
 }
 

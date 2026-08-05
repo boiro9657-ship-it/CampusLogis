@@ -34,6 +34,11 @@ function handleAdminRoute(array $segments, string $method): void
         return;
     }
 
+    if ($resource === 'logements' && $method === 'PUT' && is_numeric($id) && ($segments[2] ?? null) === 'valider') {
+        validerLogementAdmin((int) $id);
+        return;
+    }
+
     if ($resource === 'reservations' && $method === 'GET' && $id === null) {
         listToutesReservations();
         return;
@@ -87,6 +92,20 @@ function supprimerLogementAdmin(int $id): void
     getPdo()->prepare('DELETE FROM logements WHERE id = ?')->execute([$id]);
 
     jsonResponse(['message' => 'Logement supprimé.']);
+}
+
+function validerLogementAdmin(int $id): void
+{
+    $body = getJsonBody();
+    $statut = $body['statut_validation'] ?? null;
+
+    if (!in_array($statut, ['approuve', 'rejete'], true)) {
+        jsonError('Statut de validation invalide.');
+    }
+
+    getPdo()->prepare('UPDATE logements SET statut_validation = ? WHERE id = ?')->execute([$statut, $id]);
+
+    jsonResponse(['message' => 'Statut de validation mis à jour.']);
 }
 
 function listToutesReservations(): void

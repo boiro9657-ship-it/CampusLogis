@@ -74,12 +74,81 @@ try {
             description TEXT,
             image_url VARCHAR(255),
             statut ENUM('disponible','reserve') DEFAULT 'disponible',
+            statut_validation ENUM('en_attente','approuve','rejete') NOT NULL DEFAULT 'en_attente',
             premium TINYINT(1) DEFAULT 0,
+            contact_telephone VARCHAR(30) NULL,
+            contact_whatsapp VARCHAR(30) NULL,
+            contact_email VARCHAR(150) NULL,
+            equip_wifi TINYINT(1) NOT NULL DEFAULT 0,
+            equip_parking TINYINT(1) NOT NULL DEFAULT 0,
+            equip_cuisine TINYINT(1) NOT NULL DEFAULT 0,
+            equip_douche TINYINT(1) NOT NULL DEFAULT 0,
+            equip_salon TINYINT(1) NOT NULL DEFAULT 0,
+            equip_balcon TINYINT(1) NOT NULL DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (owner_id) REFERENCES utilisateurs(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "logements" prête.';
+
+    // Colonnes de coordonnées de contact (facultatives, propres à
+    // chaque annonce) et d'équipements, ajoutées ici pour les
+    // bases déjà existantes avant cette fonctionnalité.
+    $colonnesAAjouter = [
+        'contact_telephone' => "VARCHAR(30) NULL",
+        'contact_whatsapp'  => "VARCHAR(30) NULL",
+        'contact_email'     => "VARCHAR(150) NULL",
+        'equip_wifi'        => "TINYINT(1) NOT NULL DEFAULT 0",
+        'equip_parking'     => "TINYINT(1) NOT NULL DEFAULT 0",
+        'equip_cuisine'     => "TINYINT(1) NOT NULL DEFAULT 0",
+        'equip_douche'      => "TINYINT(1) NOT NULL DEFAULT 0",
+        'equip_salon'       => "TINYINT(1) NOT NULL DEFAULT 0",
+        'equip_balcon'      => "TINYINT(1) NOT NULL DEFAULT 0",
+    ];
+
+    foreach ($colonnesAAjouter as $colonne => $definition) {
+
+        $existe = $pdo->query("
+            SELECT COUNT(*) FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+            AND TABLE_NAME = 'logements'
+            AND COLUMN_NAME = '$colonne'
+        ")->fetchColumn();
+
+        if ($existe == 0) {
+            $pdo->exec("ALTER TABLE logements ADD COLUMN $colonne $definition");
+            $etapes[] = "Colonne \"$colonne\" ajoutée.";
+        }
+
+    }
+
+    // Ajout de la colonne de validation admin sur une base déjà
+    // existante (avant cette fonctionnalité) : les annonces déjà
+    // publiées sont approuvées automatiquement pour ne pas les
+    // faire disparaître soudainement ; seules les nouvelles
+    // publications passeront par la validation.
+    $colonneExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'logements'
+        AND COLUMN_NAME = 'statut_validation'
+    ")->fetchColumn();
+
+    if ($colonneExiste == 0) {
+
+        $pdo->exec("
+            ALTER TABLE logements
+            ADD COLUMN statut_validation ENUM('en_attente','approuve','rejete') NOT NULL DEFAULT 'en_attente' AFTER statut
+        ");
+        $pdo->exec("UPDATE logements SET statut_validation = 'approuve'");
+
+        $etapes[] = 'Colonne "statut_validation" ajoutée (annonces existantes approuvées automatiquement).';
+
+    } else {
+
+        $etapes[] = 'Colonne "statut_validation" déjà présente.';
+
+    }
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS logement_medias (
@@ -141,15 +210,15 @@ try {
     if ($nbLogements == 0) {
 
         $stmt = $pdo->prepare('
-            INSERT INTO logements (titre, ville, type, prix, chambres, description, image_url, premium)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO logements (titre, ville, type, prix, chambres, description, image_url, premium, statut_validation)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
 
         $demo = [
-            ['Studio Moderne', 'Dakar - Point E', 'Studio', 95000, 1, 'Studio moderne, calme et bien situé.', null, 1],
-            ['Résidence Fann', 'Fann, Dakar', 'Appartement', 75000, 2, 'Appartement lumineux proche du centre.', null, 0],
-            ['Studio Ouakam', 'Ouakam, Dakar', 'Studio', 60000, 1, 'Studio avec wifi, idéal pour un début rapide.', null, 0],
-            ['Appartement Amitié', 'Amitié, Dakar', 'Appartement', 90000, 3, 'Grand appartement avec wifi.', null, 1],
+            ['Studio Moderne', 'Dakar - Point E', 'Studio', 95000, 1, 'Studio moderne, calme et bien situé.', null, 1, 'approuve'],
+            ['Résidence Fann', 'Fann, Dakar', 'Appartement', 75000, 2, 'Appartement lumineux proche du centre.', null, 0, 'approuve'],
+            ['Studio Ouakam', 'Ouakam, Dakar', 'Studio', 60000, 1, 'Studio avec wifi, idéal pour un début rapide.', null, 0, 'approuve'],
+            ['Appartement Amitié', 'Amitié, Dakar', 'Appartement', 90000, 3, 'Grand appartement avec wifi.', null, 1, 'approuve'],
         ];
 
         foreach ($demo as $logement) {

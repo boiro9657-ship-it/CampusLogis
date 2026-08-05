@@ -83,7 +83,12 @@ function listMesLogements(): void
     $userId = requireAuth();
 
     $stmt = getPdo()->prepare('
-        SELECT * FROM logements WHERE owner_id = ? ORDER BY created_at DESC
+        SELECT l.*,
+            (SELECT COUNT(*) FROM logement_medias m WHERE m.logement_id = l.id AND m.type = "image") AS nb_photos,
+            (SELECT COUNT(*) FROM logement_medias m WHERE m.logement_id = l.id AND m.type = "video") AS nb_videos
+        FROM logements l
+        WHERE l.owner_id = ?
+        ORDER BY l.created_at DESC
     ');
     $stmt->execute([$userId]);
 

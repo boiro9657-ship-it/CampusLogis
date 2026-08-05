@@ -41,14 +41,14 @@ function registerUser(): void
     $email = trim($body['email'] ?? '');
     $telephone = trim($body['telephone'] ?? '');
     $motDePasse = $body['mot_de_passe'] ?? '';
-    $role = $body['role'] ?? 'etudiant';
+    $role = $body['role'] ?? 'locataire';
 
     if (!$nom || !$email || !$motDePasse) {
         jsonError('Nom, email et mot de passe sont obligatoires.');
     }
 
-    if (!in_array($role, ['etudiant', 'proprietaire'], true)) {
-        $role = 'etudiant';
+    if (!in_array($role, ['locataire', 'proprietaire'], true)) {
+        $role = 'locataire';
     }
 
     $pdo = getPdo();

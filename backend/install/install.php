@@ -38,17 +38,28 @@ try {
             email VARCHAR(150) NOT NULL UNIQUE,
             telephone VARCHAR(30),
             mot_de_passe VARCHAR(255) NOT NULL,
-            role ENUM('etudiant','proprietaire') NOT NULL DEFAULT 'etudiant',
+            role ENUM('locataire','proprietaire') NOT NULL DEFAULT 'locataire',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "utilisateurs" prête.';
 
-    // Élargit la colonne role si elle a été créée avant l'ajout
-    // du rôle admin (sans danger à rejouer, même si déjà à jour).
+    // Le site n'est plus réservé aux étudiants : élargit la
+    // colonne pour accepter "locataire" et "admin", migre les
+    // anciens comptes "etudiant" vers "locataire", puis retire
+    // "etudiant" de la liste. Chaque étape est sans danger à
+    // rejouer (y compris si déjà à jour, ou si aucun compte
+    // "etudiant" n'existe encore).
     $pdo->exec("
         ALTER TABLE utilisateurs
-        MODIFY role ENUM('etudiant','proprietaire','admin') NOT NULL DEFAULT 'etudiant'
+        MODIFY role ENUM('etudiant','locataire','proprietaire','admin') NOT NULL DEFAULT 'locataire'
+    ");
+
+    $pdo->exec("UPDATE utilisateurs SET role = 'locataire' WHERE role = 'etudiant'");
+
+    $pdo->exec("
+        ALTER TABLE utilisateurs
+        MODIFY role ENUM('locataire','proprietaire','admin') NOT NULL DEFAULT 'locataire'
     ");
 
     $pdo->exec("

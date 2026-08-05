@@ -106,7 +106,12 @@ async function chargerAnnonces(){
     }
 
     container.innerHTML =
-    logements.map(logement => `
+    logements.map(logement => {
+
+        const nbPhotos = Number(logement.nb_photos || 0);
+        const nbVideos = Number(logement.nb_videos || 0);
+
+        return `
         <div class="property-card">
 
             ${
@@ -129,7 +134,20 @@ async function chargerAnnonces(){
 
                 <p>🛏 ${logement.chambres || 0} chambre(s)</p>
 
+                <div class="media-badges">
+                    <span class="media-badge">📷 ${nbPhotos} photo${nbPhotos > 1 ? "s" : ""}</span>
+                    ${
+                        nbVideos > 0
+                        ? `<span class="media-badge media-badge-video">🎥 ${nbVideos} vidéo${nbVideos > 1 ? "s" : ""}</span>`
+                        : ""
+                    }
+                </div>
+
                 <p>${logement.description || ""}</p>
+
+                <a href="../details-logement/details-logement.html?id=${logement.id}" class="btn-voir">
+                👁 Voir l'annonce
+                </a>
 
                 <button data-id="${logement.id}" class="btn-supprimer">
                 🗑 Supprimer
@@ -138,7 +156,9 @@ async function chargerAnnonces(){
             </div>
 
         </div>
-    `).join("");
+        `;
+
+    }).join("");
 
     container.querySelectorAll(".btn-supprimer").forEach(btn => {
 

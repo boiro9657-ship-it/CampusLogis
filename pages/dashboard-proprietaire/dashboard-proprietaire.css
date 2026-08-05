@@ -372,7 +372,43 @@ tr:hover td{
 
 }
 
-.property-content button{
+.media-badges{
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:10px 0;
+
+}
+
+.media-badge{
+
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+    padding:5px 12px;
+    border-radius:20px;
+
+    font-size:12px;
+    font-weight:600;
+
+}
+
+.media-badge-video{
+
+    background:#FEF3C7;
+    color:#D97706;
+
+}
+
+.property-content button,
+.property-content .btn-voir{
+
+    display:inline-block;
 
     border:none;
     padding:10px 18px;
@@ -384,32 +420,35 @@ tr:hover td{
     transition:0.3s;
     box-shadow:0 5px 15px rgba(0,0,0,0.1);
 
-}
-
-.property-content button:first-of-type{
-
-    background:#EF4444;
-    color:white;
+    text-decoration:none;
+    text-align:center;
 
 }
 
-.property-content button:first-of-type:hover{
-
-    background:#DC2626;
-    transform:translateY(-2px);
-
-}
-
-.property-content button:last-of-type{
+.property-content .btn-voir{
 
     background:var(--primary);
     color:white;
 
 }
 
-.property-content button:last-of-type:hover{
+.property-content .btn-voir:hover{
 
     background:var(--primary-dark);
+    transform:translateY(-2px);
+
+}
+
+.property-content .btn-supprimer{
+
+    background:#EF4444;
+    color:white;
+
+}
+
+.property-content .btn-supprimer:hover{
+
+    background:#DC2626;
     transform:translateY(-2px);
 
 }

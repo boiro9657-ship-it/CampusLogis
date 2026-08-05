@@ -6,8 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Inscription | TerangaHome</title>
-    <meta name="description" content="Créez votre compte TerangaHome et trouvez votre logement partout au Sénégal.">
+    <title>Réinitialiser mon mot de passe | TerangaHome</title>
+    <meta name="description" content="Choisissez un nouveau mot de passe pour votre compte TerangaHome.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
     <link rel="stylesheet" href="../../assets/css/global.css">
@@ -65,84 +65,35 @@
 
         <div class="auth-image">
 
-            <img src="../../images/login.jpg" alt="Inscription">
+            <img src="../../images/login.jpg" alt="TerangaHome">
 
         </div>
 
         <div class="auth-form">
 
-            <h2>Créer un compte 🚀</h2>
+            <h2>Nouveau mot de passe 🔒</h2>
 
-            <p>Rejoignez TerangaHome dès aujourd'hui.</p>
+            <p>
+                Choisissez un nouveau mot de passe pour votre compte.
+            </p>
 
-            <form id="registerForm">
-
-                <div class="input-group">
-                    <label>Nom complet</label>
-                    <input type="text" id="nom" placeholder="Votre nom complet">
-                </div>
+            <form id="resetForm">
 
                 <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="email" placeholder="Votre email">
-                </div>
-
-                <div class="input-group">
-                    <label>Téléphone</label>
-                    <input type="text" id="telephone" placeholder="+221 ...">
-                </div>
-
-                <div class="input-group">
-                    <label>Je suis :</label>
-
-                    <select id="role">
-
-                        <option value="">Choisir un rôle</option>
-                        <option value="locataire">Locataire</option>
-                        <option value="proprietaire">Propriétaire</option>
-
-                    </select>
-
-                </div>
-
-                <div class="input-group">
-                    <label>Mot de passe</label>
-                    <input type="password" id="password">
+                    <label>Nouveau mot de passe</label>
+                    <input type="password" id="password" placeholder="Au moins 8 caractères">
                 </div>
 
                 <div class="input-group">
                     <label>Confirmer le mot de passe</label>
-                    <input type="password" id="confirmPassword">
+                    <input type="password" id="confirmPassword" placeholder="Retapez le mot de passe">
                 </div>
 
                 <button class="login-btn">
-
-                    Créer un compte
-
+                    Réinitialiser mon mot de passe
                 </button>
 
             </form>
-
-            <div class="auth-separator">
-                <span>ou</span>
-            </div>
-
-            <a href="../../backend/api/auth/google" class="btn-google">
-                <i class="ph ph-google-logo"></i>
-                Continuer avec Google
-            </a>
-
-            <p>
-
-                Déjà un compte ?
-
-                <a href="../connexion/connexion.html">
-
-                    Se connecter
-
-                </a>
-
-            </p>
 
         </div>
 
@@ -175,7 +126,7 @@
                     <li><a href="../../index.html">Accueil</a></li>
                     <li><a href="../rechercher/rechercher.html">Rechercher</a></li>
                     <li><a href="../connexion/connexion.html">Connexion</a></li>
-                    <li><a href="./inscription.html">Inscription</a></li>
+                    <li><a href="../inscription/inscription.html">Inscription</a></li>
                 </ul>
             </div>
 
@@ -233,7 +184,7 @@
 <script>window.API_BASE = "../../backend/api";</script>
 <script src="../../assets/js/api.js"></script>
 <script src="../../assets/js/global.js"></script>
-<script src="./inscription.js"></script>
+<script src="./reinitialiser-mot-de-passe.js"></script>
 
 </body>
 

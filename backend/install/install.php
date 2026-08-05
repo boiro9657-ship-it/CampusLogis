@@ -62,6 +62,39 @@ try {
         MODIFY role ENUM('locataire','proprietaire','admin') NOT NULL DEFAULT 'locataire'
     ");
 
+    // Mot de passe désormais facultatif : un compte créé via
+    // Google Sign-In n'a pas de mot de passe local.
+    $pdo->exec("
+        ALTER TABLE utilisateurs
+        MODIFY mot_de_passe VARCHAR(255) NULL
+    ");
+
+    // Colonne d'identifiant Google, ajoutée une seule fois pour
+    // les bases déjà existantes avant cette fonctionnalité.
+    $colonneGoogleExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'utilisateurs'
+        AND COLUMN_NAME = 'google_id'
+    ")->fetchColumn();
+
+    if ($colonneGoogleExiste == 0) {
+        $pdo->exec("ALTER TABLE utilisateurs ADD COLUMN google_id VARCHAR(255) NULL UNIQUE AFTER mot_de_passe");
+        $etapes[] = 'Colonne "google_id" ajoutée.';
+    }
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS password_resets (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            token VARCHAR(255) NOT NULL UNIQUE,
+            expires_at DATETIME NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "password_resets" prête.';
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS logements (
             id INT AUTO_INCREMENT PRIMARY KEY,

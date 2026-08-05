@@ -171,6 +171,89 @@
 
 }
 
+.auth-separator{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin:25px 0;
+
+    color:#94A3B8;
+
+    font-size:14px;
+
+}
+
+.auth-separator::before,
+.auth-separator::after{
+
+    content:"";
+
+    flex:1;
+
+    height:1px;
+
+    background:#e2e8f0;
+
+}
+
+.btn-google{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:12px;
+
+    width:100%;
+
+    padding:16px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:14px;
+
+    background:white;
+
+    color:#1F2937;
+
+    font-weight:600;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+}
+
+.btn-google:hover{
+
+    border-color:var(--primary);
+
+    background:var(--primary-light);
+
+}
+
+.btn-google i{
+
+    font-size:20px;
+
+}
+
+.auth-message{
+
+    text-align:center;
+
+    padding:20px 0;
+
+    color:#64748B;
+
+}
+
 .input-group select{
 
     width:100%;

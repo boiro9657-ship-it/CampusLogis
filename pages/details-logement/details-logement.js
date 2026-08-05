@@ -48,18 +48,20 @@ async function chargerLogement(id){
     document.querySelector(".property-info .description").textContent =
     logement.description || "";
 
+    const descriptionCompleteEl =
+    document.getElementById("descriptionComplete");
+
+    if(descriptionCompleteEl){
+
+        descriptionCompleteEl.textContent =
+        logement.description || "Aucune description fournie par le propriétaire.";
+
+    }
+
     document.querySelector(".price-card h3").textContent =
     prix + " FCFA";
 
-    const chambresEl =
-    document.querySelector(".property-features span");
-
-    if(chambresEl){
-
-        chambresEl.innerHTML =
-        `<i class="ph ph-bed"></i> ${logement.chambres || 0} Chambre(s)`;
-
-    }
+    afficherCaracteristiques(logement);
 
     afficherGalerie(logement.medias || []);
 
@@ -265,6 +267,36 @@ function brancherBoutonContact(btn, telephone, construireHref, messageErreur){
     }
 
     btn.href = construireHref(formaterNumeroInternational(telephone));
+
+}
+
+/**
+ * Reconstruit les badges rapides (chambres + wifi/parking si
+ * présents) à partir des vraies données du logement. Le nombre
+ * de chambres est toujours affiché ; les autres badges
+ * n'apparaissent que si l'équipement correspondant est coché.
+ */
+function afficherCaracteristiques(logement){
+
+    const container =
+    document.getElementById("propertyFeatures");
+
+    if(!container) return;
+
+    const badges = [
+        `<span><i class="ph ph-bed"></i> ${logement.chambres || 0} Chambre(s)</span>`
+    ];
+
+    if(Number(logement.equip_wifi) === 1){
+        badges.push(`<span><i class="ph ph-wifi-high"></i> Wi-Fi</span>`);
+    }
+
+    if(Number(logement.equip_parking) === 1){
+        badges.push(`<span><i class="ph ph-car"></i> Parking</span>`);
+    }
+
+    container.innerHTML =
+    badges.join("");
 
 }
 

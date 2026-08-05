@@ -38,6 +38,16 @@ if(togglePassword && password){
 }
 
 /* ==========================
+    ERREUR GOOGLE (redirection depuis le callback OAuth)
+========================== */
+
+if(new URLSearchParams(window.location.search).get("erreur") === "google"){
+
+    showToast("La connexion avec Google a échoué. Réessayez ou utilisez votre email.", "error");
+
+}
+
+/* ==========================
     FORMULAIRE DE CONNEXION
 ========================== */
 

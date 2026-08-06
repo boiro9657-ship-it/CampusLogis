@@ -886,6 +886,8 @@
 
 .video-wrap{
 
+    position:relative;
+
     max-width:900px;
 
     margin:50px auto 0;
@@ -903,6 +905,51 @@
     width:100%;
 
     display:block;
+
+}
+
+/* Masque discret des logos d'export (CapCut / Gemini) laissés
+   par l'outil de montage en bas de la vidéo — placé au-dessus de
+   la barre de contrôle native, sans bloquer les boutons (play,
+   plein écran...) qui restent en dessous. */
+.video-watermark-mask{
+
+    position:absolute;
+
+    background:rgba(20,92,61,.5);
+
+    backdrop-filter:blur(7px);
+
+    -webkit-backdrop-filter:blur(7px);
+
+    border-radius:10px;
+
+    /* Laisse les clics traverser jusqu'aux vrais contrôles vidéo
+       en dessous (lecture, plein écran...) malgré le chevauchement
+       visuel avec la barre de contrôle native. */
+    pointer-events:none;
+
+}
+
+/* Logo d'export (bas gauche), au ras du bord. */
+.video-watermark-mask-left{
+
+    left:5px;
+    bottom:8px;
+
+    width:60px;
+    height:68px;
+
+}
+
+/* Logo Gemini (bas droit), un peu plus haut que le premier. */
+.video-watermark-mask-right{
+
+    right:0;
+    bottom:44px;
+
+    width:100px;
+    height:95px;
 
 }
 

@@ -172,13 +172,26 @@ if(typeof apiFetch !== "undefined"){
         navBtn.textContent = "Mon compte";
         navBtn.setAttribute("href", lienTableauDeBord);
 
-        // Le bouton "Déconnexion" du tableau de bord est dans la
-        // barre latérale, masquée sur mobile — sans ça, aucun
-        // moyen de se déconnecter depuis un téléphone. On ajoute
-        // donc un lien de déconnexion dans le menu mobile
-        // (hamburger), présent sur toutes les pages.
+        // "Mon profil" et "Déconnexion" ne vivaient que dans la
+        // barre latérale du tableau de bord, masquée sur mobile —
+        // sans ça, aucun moyen d'y accéder depuis un téléphone. On
+        // les ajoute donc dans le menu de navigation (hamburger
+        // sur mobile), présent sur toutes les pages, pour
+        // locataire comme propriétaire.
         const navLinks =
         document.querySelector(".nav-links");
+
+        if(navLinks && !document.getElementById("profilNavLink")){
+
+            const itemProfil =
+            document.createElement("li");
+
+            itemProfil.innerHTML =
+            `<a href="${racine}pages/profil/profil.html" id="profilNavLink"><i class="ph ph-user-circle"></i> Mon profil</a>`;
+
+            navLinks.appendChild(itemProfil);
+
+        }
 
         if(navLinks && !document.getElementById("logoutNavLink")){
 

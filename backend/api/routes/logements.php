@@ -64,15 +64,12 @@ function listLogements(): void
     // "owner_id IS NOT NULL" garantit que toute annonce publique
     // a un vrai propriétaire contactable — aucune annonce fictive
     // ou orpheline ne doit apparaître sur le site. Les logements
-    // déjà réservés sont exclus des résultats de recherche par
-    // défaut (ils restent consultables via leur lien direct) ;
-    // "tous=1" permet de les inclure quand même (ex. suggestions).
+    // déjà réservés restent affichés (avec un badge "Déjà réservé"
+    // côté client) plutôt que d'être masqués : le propriétaire ne
+    // perd pas la visibilité de son annonce, et un locataire tombant
+    // dessus comprend pourquoi il ne peut pas la réserver.
     $conditions = ["statut_validation = 'approuve'", "owner_id IS NOT NULL"];
     $params = [];
-
-    if (empty($_GET['tous'])) {
-        $conditions[] = "statut = 'disponible'";
-    }
 
     if (!empty($_GET['ville'])) {
         $conditions[] = 'ville LIKE ?';

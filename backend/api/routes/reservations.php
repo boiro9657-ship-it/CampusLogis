@@ -52,6 +52,18 @@ function creerReservation(): void
         jsonError('Vous devez accepter les conditions d\'utilisation pour réserver.');
     }
 
+    $stmt = getPdo()->prepare('SELECT statut FROM logements WHERE id = ?');
+    $stmt->execute([$logementId]);
+    $logement = $stmt->fetch();
+
+    if (!$logement) {
+        jsonError('Logement introuvable.', 404);
+    }
+
+    if ($logement['statut'] === 'reserve') {
+        jsonError('Ce logement est déjà réservé.', 409);
+    }
+
     $stmt = getPdo()->prepare('
         INSERT INTO reservations (logement_id, locataire_id, message, conditions_acceptees)
         VALUES (?, ?, ?, 1)

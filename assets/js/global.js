@@ -595,6 +595,13 @@ function attacherBoutonsReservation(container){
 
             e.preventDefault();
 
+            if(btn.dataset.statut === "reserve"){
+
+                showToast("Ce logement est déjà réservé.", "error");
+
+                return;
+            }
+
             reserverLogement(btn.dataset.id);
 
         });

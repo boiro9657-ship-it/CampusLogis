@@ -256,6 +256,9 @@ function carteLogementHTML(logement){
     const prix =
     Number(logement.prix).toLocaleString("fr-FR");
 
+    const estReserve =
+    logement.statut === "reserve";
+
     return `
     <div class="card ${estPremium ? "card-premium" : ""}">
 
@@ -265,7 +268,7 @@ function carteLogementHTML(logement){
 
             <div class="carousel-dots"></div>
 
-            <span class="badge-card">Disponible</span>
+            <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
 
             ${estPremium ? `
             <span class="badge-premium">
@@ -291,8 +294,8 @@ function carteLogementHTML(logement){
 
             <div class="bottom-card">
 
-                <button class="btn-reserver" data-id="${logement.id}">
-                    Réserver
+                <button class="btn-reserver ${estReserve ? "btn-reserver-reserve" : ""}" data-id="${logement.id}" data-statut="${logement.statut || "disponible"}">
+                    ${estReserve ? "Déjà réservé" : "Réserver"}
                 </button>
 
                 <a href="pages/details-logement/details-logement.html?id=${logement.id}">

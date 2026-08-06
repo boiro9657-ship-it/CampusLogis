@@ -17,6 +17,21 @@ const LIBELLES_DUREE = {
     "1_an": "par an"
 };
 
+/* ==========================
+    BOUTON "CONTACTER LE PROPRIÉTAIRE" EN HAUT
+    Descend directement vers les vraies coordonnées de contact
+    (appel, WhatsApp, message) tout en bas de la page, au lieu de
+    forcer le locataire à faire défiler pour les trouver.
+========================== */
+
+document.getElementById("contactTopBtn")?.addEventListener("click", (e) => {
+
+    e.preventDefault();
+
+    document.getElementById("owner-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+});
+
 const params =
 new URLSearchParams(window.location.search);
 
@@ -94,14 +109,26 @@ async function chargerLogement(id){
     const contactBtn =
     document.getElementById("contactOwnerBtn");
 
+    const estReserve =
+    logement.statut === "reserve";
+
     if(contactBtn){
 
         contactBtn.textContent =
-        "Réserver ce logement";
+        estReserve ? "Déjà réservé" : "Réserver ce logement";
+
+        contactBtn.classList.toggle("reserve-btn-indisponible", estReserve);
 
         contactBtn.addEventListener("click", (e) => {
 
             e.preventDefault();
+
+            if(estReserve){
+
+                showToast("Ce logement est déjà réservé.", "error");
+
+                return;
+            }
 
             reserverLogement(id);
 

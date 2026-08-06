@@ -690,6 +690,12 @@
 
 }
 
+.badge-card-reserve{
+
+    background:#D97706;
+
+}
+
 /* Badge "Premium" : empilé sous le badge Disponible, sur
    la même carte. */
 .badge-premium{

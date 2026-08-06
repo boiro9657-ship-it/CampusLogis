@@ -79,6 +79,42 @@
 
 }
 
+.btn-contact-top{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-top:10px;
+
+    padding:14px 28px;
+
+    background:white;
+
+    color:var(--primary);
+
+    text-decoration:none;
+
+    border-radius:15px;
+
+    font-weight:700;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+
+    transition:.3s;
+
+}
+
+.btn-contact-top:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 15px 30px rgba(0,0,0,.25);
+
+}
+
 /* ==========================
         GALERIE DETAILS
 ========================== */
@@ -273,6 +309,20 @@
     background:var(--primary-dark);
 
     transform:translateY(-3px);
+
+}
+
+.reserve-btn-indisponible{
+
+    background:#94A3B8;
+
+}
+
+.reserve-btn-indisponible:hover{
+
+    background:#64748B;
+
+    transform:none;
 
 }
 

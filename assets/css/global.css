@@ -184,6 +184,18 @@ h1, h2, h3, h4, h5, h6{
 
 }
 
+.btn-reserver-reserve{
+
+    color:var(--gray-500);
+
+}
+
+.btn-reserver-reserve:hover{
+
+    color:#D97706;
+
+}
+
 /* Texte "œillet" (ex. NOS LOGEMENTS, SIMPLE ET RAPIDE) : label
    court, majuscule, coloré, qui introduit un titre de section. */
 .eyebrow{

@@ -192,6 +192,9 @@ function carteRechercheHTML(logement){
     const prix =
     Number(logement.prix).toLocaleString("fr-FR");
 
+    const estReserve =
+    logement.statut === "reserve";
+
     return `
     <div class="housing-card ${estPremium ? "housing-card-premium" : ""}">
 
@@ -203,7 +206,7 @@ function carteRechercheHTML(logement){
 
         </div>
 
-        <span class="badge-card">Disponible</span>
+        <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
 
         ${estPremium ? `
         <span class="badge-premium">
@@ -240,8 +243,8 @@ function carteRechercheHTML(logement){
                     Voir plus
                 </a>
 
-                <button class="btn-reserver" data-id="${logement.id}">
-                    Réserver
+                <button class="btn-reserver ${estReserve ? "btn-reserver-reserve" : ""}" data-id="${logement.id}" data-statut="${logement.statut || "disponible"}">
+                    ${estReserve ? "Déjà réservé" : "Réserver"}
                 </button>
 
             </div>

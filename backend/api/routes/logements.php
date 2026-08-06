@@ -216,8 +216,8 @@ function createLogement(): void
         jsonError('Titre, ville et prix sont obligatoires.');
     }
 
-    if ((float) $prix < 20000) {
-        jsonError('Le prix minimum est de 20 000 FCFA.');
+    if ((float) $prix < 10000) {
+        jsonError('Le prix minimum est de 10 000 FCFA.');
     }
 
     $photos = extraireFichiers($_FILES['photos'] ?? null);
@@ -381,8 +381,8 @@ function updateLogement(int $id): void
         jsonError('Aucune donnée à mettre à jour.');
     }
 
-    if (array_key_exists('prix', $body) && (float) $body['prix'] < 20000) {
-        jsonError('Le prix minimum est de 20 000 FCFA.');
+    if (array_key_exists('prix', $body) && (float) $body['prix'] < 10000) {
+        jsonError('Le prix minimum est de 10 000 FCFA.');
     }
 
     $params[] = $id;

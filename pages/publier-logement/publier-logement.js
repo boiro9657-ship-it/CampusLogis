@@ -68,9 +68,9 @@ if(publishForm){
                 return;
             }
 
-            if(Number(prix) < 20000){
+            if(Number(prix) < 10000){
 
-                showToast("Le prix minimum est de 20 000 FCFA.", "error");
+                showToast("Le prix minimum est de 10 000 FCFA.", "error");
 
                 return;
             }

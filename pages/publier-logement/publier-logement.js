@@ -24,6 +24,45 @@ const publishForm =
 document.getElementById("publishForm");
 
 /* ==========================
+    PETIT MESSAGE AVANT LE CHOIX DE FORMULE
+    Une question rapide pour capter l'intérêt pour Premium avant
+    d'afficher les 3 formules — toujours possible à ignorer (X ou
+    "Non merci") pour continuer directement, le plan Gratuit reste
+    à un clic dans la section en dessous.
+========================== */
+
+const planTeaser =
+document.getElementById("planTeaser");
+
+function fermerTeaserPlan(){
+
+    if(planTeaser) planTeaser.style.display = "none";
+
+}
+
+document.getElementById("planTeaserClose")?.addEventListener("click", fermerTeaserPlan);
+document.getElementById("planTeaserNon")?.addEventListener("click", fermerTeaserPlan);
+
+document.getElementById("planTeaserOui")?.addEventListener("click", () => {
+
+    fermerTeaserPlan();
+
+    const cartePremium =
+    document.getElementById("cartePremium");
+
+    if(cartePremium){
+
+        cartePremium.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        cartePremium.classList.add("pricing-card-highlight");
+
+        setTimeout(() => cartePremium.classList.remove("pricing-card-highlight"), 2200);
+
+    }
+
+});
+
+/* ==========================
     CHOIX DE LA FORMULE
     Affichée avant le formulaire : le propriétaire peut l'ignorer
     et publier gratuitement (limité à 2 annonces/jour), ou être

@@ -31,6 +31,150 @@
 }
 
 /* ==========================
+    PETIT MESSAGE AVANT LE CHOIX DE FORMULE
+========================== */
+
+.plan-teaser{
+
+    position:relative;
+
+    max-width:640px;
+
+    margin:0 auto 35px;
+
+    padding:22px 50px 22px 26px;
+
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+
+    color:white;
+
+    border-radius:20px;
+
+    box-shadow:0 15px 35px rgba(20,92,61,.25);
+
+}
+
+.plan-teaser p{
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-weight:700;
+    font-size:16px;
+
+    margin-bottom:16px;
+
+}
+
+.plan-teaser p i{
+
+    color:var(--secondary);
+    font-size:22px;
+    flex-shrink:0;
+
+}
+
+.plan-teaser-actions{
+
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:18px;
+
+}
+
+.plan-teaser-actions .btn-primary{
+
+    background:var(--secondary);
+
+    padding:12px 22px;
+
+    border-radius:12px;
+
+    font-weight:700;
+
+    border:none;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.plan-teaser-actions .btn-primary:hover{
+
+    background:var(--secondary-dark);
+
+    transform:translateY(-2px);
+
+}
+
+.plan-teaser-non{
+
+    background:none;
+    border:none;
+
+    color:rgba(255,255,255,.8);
+
+    font-weight:600;
+    text-decoration:underline;
+
+    cursor:pointer;
+
+}
+
+.plan-teaser-non:hover{
+
+    color:white;
+
+}
+
+.plan-teaser-close{
+
+    position:absolute;
+
+    top:14px;
+    right:14px;
+
+    width:30px;
+    height:30px;
+
+    border-radius:50%;
+
+    border:none;
+
+    background:rgba(255,255,255,.15);
+
+    color:white;
+
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:.2s;
+
+}
+
+.plan-teaser-close:hover{
+
+    background:rgba(255,255,255,.3);
+
+}
+
+@media(max-width:600px){
+
+    .plan-teaser{
+
+        padding:20px 42px 20px 20px;
+
+    }
+
+}
+
+/* ==========================
     CHOIX DE LA FORMULE
     (réutilise .pricing-grid/.pricing-card de tarifs.css pour
     rester visuellement cohérent avec la page Tarifs)
@@ -43,6 +187,28 @@
     margin:0 auto 50px;
 
     padding:0 20px;
+
+}
+
+.pricing-card-highlight{
+
+    animation:pulseCartePremium 2.2s ease;
+
+}
+
+@keyframes pulseCartePremium{
+
+    0%, 100%{
+
+        box-shadow:var(--shadow-lg);
+
+    }
+
+    25%, 75%{
+
+        box-shadow:0 0 0 6px rgba(111,190,68,.5), var(--shadow-lg);
+
+    }
 
 }
 

@@ -1,0 +1,16 @@
+# Empêche les navigateurs de garder en cache une ancienne version
+# du site après chaque mise à jour : les pages (HTML) et le code
+# (CSS/JS) sont toujours revérifiés auprès du serveur avant
+# réutilisation (l'hébergeur envoyait jusqu'ici un cache de 30
+# jours sur les CSS/JS, d'où le besoin de changer d'appareil ou
+# d'attendre longtemps pour voir une modification). Les médias qui
+# changent rarement (photos, vidéos, polices) restent mis en cache
+# longtemps pour la performance.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|css|js)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+    <FilesMatch "\.(jpg|jpeg|png|webp|gif|svg|ico|mp4|webm|woff|woff2)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>

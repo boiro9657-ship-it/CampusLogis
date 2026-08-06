@@ -28,6 +28,34 @@ if(typeof apiFetch !== "undefined"){
 
 const siteHeader = document.querySelector("header");
 
+// Empêche la navbar fixe de cacher le haut de la page : mesure la
+// vraie hauteur de la navbar (au lieu d'un chiffre codé en dur, qui
+// se désynchronise dès que la navbar change de hauteur — mobile,
+// contenu, police...) et l'expose en variable CSS + en décalage
+// d'ancre. Fonction de haut niveau (pas limitée au bloc if ci-
+// dessous) pour pouvoir la rappeler plus tard, quand la navbar est
+// modifiée après coup par le bloc "état de connexion" (bouton
+// "Mon compte", cloche de notifications) — sans ça, la navbar
+// passait sur 2 lignes une fois connecté sans que le décalage soit
+// recalculé, et cachait le haut du contenu (dont la barre latérale
+// des tableaux de bord sur mobile).
+function setScrollOffset(){
+
+    if(!siteHeader) return;
+
+    const height =
+    siteHeader.getBoundingClientRect().height;
+
+    document.documentElement.style.setProperty(
+        "--header-height",
+        height + "px"
+    );
+
+    document.documentElement.style.scrollPaddingTop =
+    (height + 15) + "px";
+
+}
+
 if(siteHeader){
 
     window.addEventListener("scroll", () => {
@@ -35,26 +63,6 @@ if(siteHeader){
         siteHeader.classList.toggle("scrolled", window.scrollY > 20);
 
     });
-
-    // Empêche la navbar fixe de cacher le haut de la page :
-    // mesure la vraie hauteur de la navbar (au lieu d'un
-    // chiffre codé en dur, qui se désynchronise dès que la
-    // navbar change de hauteur — mobile, contenu, police...)
-    // et l'expose en variable CSS + en décalage d'ancre.
-    const setScrollOffset = () => {
-
-        const height =
-        siteHeader.getBoundingClientRect().height;
-
-        document.documentElement.style.setProperty(
-            "--header-height",
-            height + "px"
-        );
-
-        document.documentElement.style.scrollPaddingTop =
-        (height + 15) + "px";
-
-    };
 
     setScrollOffset();
 
@@ -172,50 +180,18 @@ if(typeof apiFetch !== "undefined"){
         navBtn.textContent = "Mon compte";
         navBtn.setAttribute("href", lienTableauDeBord);
 
-        // "Mon profil" et "Déconnexion" ne vivaient que dans la
-        // barre latérale du tableau de bord, masquée sur mobile —
-        // sans ça, aucun moyen d'y accéder depuis un téléphone. On
-        // les ajoute donc dans le menu de navigation (hamburger
-        // sur mobile), présent sur toutes les pages, pour
-        // locataire comme propriétaire.
-        const navLinks =
-        document.querySelector(".nav-links");
-
-        if(navLinks && !document.getElementById("profilNavLink")){
-
-            const itemProfil =
-            document.createElement("li");
-
-            itemProfil.innerHTML =
-            `<a href="${racine}pages/profil/profil.html" id="profilNavLink"><i class="ph ph-user-circle"></i> Mon profil</a>`;
-
-            navLinks.appendChild(itemProfil);
-
-        }
-
-        if(navLinks && !document.getElementById("logoutNavLink")){
-
-            const item =
-            document.createElement("li");
-
-            item.innerHTML =
-            `<a href="#" id="logoutNavLink"><i class="ph ph-sign-out"></i> Déconnexion</a>`;
-
-            navLinks.appendChild(item);
-
-            document.getElementById("logoutNavLink").addEventListener("click", async (e)=>{
-
-                e.preventDefault();
-
-                await apiFetch("/auth/logout", { method:"POST" });
-
-                window.location.href = racine + "index.html";
-
-            });
-
-        }
-
+        // "Mon profil" et "Déconnexion" ne vivent que dans la barre
+        // latérale du tableau de bord (pas dans la navbar, pour ne
+        // pas la surcharger) — cette barre reste joignable sur
+        // mobile car elle devient une bande horizontale défilable
+        // au lieu de disparaître (voir dashboard-*.css).
         initClocheNotifications(racine);
+
+        // La navbar vient de changer (bouton "Mon compte", cloche) :
+        // elle peut désormais passer sur 2 lignes sur mobile, donc
+        // on recalcule le décalage plutôt que de garder l'ancienne
+        // mesure prise avant la connexion.
+        setScrollOffset();
 
     }).catch(()=>{});
 

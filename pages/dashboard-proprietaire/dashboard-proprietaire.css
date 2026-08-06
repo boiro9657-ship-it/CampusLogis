@@ -622,9 +622,51 @@ tr:hover td{
 
     }
 
+    /* La sidebar reste le seul endroit où trouver "Mon profil" et
+       "Déconnexion" (pas dans la navbar, pour ne pas la
+       surcharger) : sur mobile elle devient une bande horizontale
+       défilable au lieu de disparaître complètement. */
     .sidebar{
 
+        padding:18px 20px;
+
+        display:flex;
+        align-items:center;
+
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+
+    }
+
+    .sidebar h2{
+
         display:none;
+
+    }
+
+    .sidebar ul{
+
+        display:flex;
+
+        gap:22px;
+
+        flex-shrink:0;
+
+    }
+
+    .sidebar li{
+
+        margin-bottom:0;
+
+        flex-shrink:0;
+
+    }
+
+    .sidebar a{
+
+        white-space:nowrap;
+
+        font-size:14px;
 
     }
 

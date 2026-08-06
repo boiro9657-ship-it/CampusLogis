@@ -86,3 +86,24 @@ function creerNotificationsNouveauLogement(int $logementId, int $ownerId, string
         $insert->execute([$destinataireId, $logementId, $message, $lien]);
     }
 }
+
+/**
+ * Notifie le locataire quand le propriétaire accepte ou refuse sa
+ * demande de réservation — contrairement aux notifications de
+ * nouvelle annonce, celle-ci concerne directement l'utilisateur et
+ * n'est donc pas soumise à la préférence "notifications_actives"
+ * (qui ne couvre que les annonces publiées par d'autres).
+ */
+function creerNotificationReservation(int $locataireId, int $logementId, string $titre, string $statut): void
+{
+    $message = $statut === 'confirmee'
+        ? "Votre réservation pour \"{$titre}\" a été acceptée par le propriétaire !"
+        : "Votre réservation pour \"{$titre}\" a été refusée par le propriétaire.";
+
+    $lien = 'pages/details-logement/details-logement.html?id=' . $logementId;
+
+    getPdo()->prepare('
+        INSERT INTO notifications (user_id, logement_id, message, lien)
+        VALUES (?, ?, ?, ?)
+    ')->execute([$locataireId, $logementId, $message, $lien]);
+}

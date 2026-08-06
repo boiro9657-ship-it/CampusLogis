@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/../../includes/session.php';
+require_once __DIR__ . '/notifications.php';
 
 function handleReservationsRoute(array $segments, string $method): void
 {
@@ -113,7 +114,7 @@ function modifierStatutReservation(int $id): void
     }
 
     $stmt = getPdo()->prepare('
-        SELECT r.id, l.id AS logement_id, l.owner_id
+        SELECT r.id, r.locataire_id, l.id AS logement_id, l.owner_id, l.titre
         FROM reservations r
         JOIN logements l ON l.id = r.logement_id
         WHERE r.id = ?
@@ -135,6 +136,13 @@ function modifierStatutReservation(int $id): void
         getPdo()->prepare("UPDATE logements SET statut = 'reserve' WHERE id = ?")
             ->execute([$reservation['logement_id']]);
     }
+
+    creerNotificationReservation(
+        (int) $reservation['locataire_id'],
+        (int) $reservation['logement_id'],
+        $reservation['titre'],
+        $statut
+    );
 
     jsonResponse(['message' => 'Statut de la réservation mis à jour.']);
 }

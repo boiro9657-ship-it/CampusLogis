@@ -195,9 +195,49 @@ function getLogement(int $id): void
 const MAX_PHOTOS = 8;
 const MAX_VIDEOS = 2;
 
+// Nombre maximum d'annonces qu'un compte au plan Gratuit peut
+// publier par jour calendaire — Premium et Pro n'ont pas cette
+// limite. Tant que les paiements ne sont pas branchés, tous les
+// comptes sont au plan Gratuit par défaut.
+const LIMITE_ANNONCES_GRATUIT_PAR_JOUR = 2;
+
+/**
+ * Bloque la publication si le compte est au plan Gratuit et a déjà
+ * atteint la limite du jour — Premium/Pro ne sont pas limités.
+ */
+function verifierLimitePlanGratuit(int $userId): void
+{
+    $pdo = getPdo();
+
+    $stmt = $pdo->prepare('SELECT plan FROM utilisateurs WHERE id = ?');
+    $stmt->execute([$userId]);
+    $plan = $stmt->fetchColumn() ?: 'gratuit';
+
+    if ($plan !== 'gratuit') {
+        return;
+    }
+
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) FROM logements
+        WHERE owner_id = ? AND DATE(created_at) = CURDATE()
+    ");
+    $stmt->execute([$userId]);
+    $nbAujourdhui = (int) $stmt->fetchColumn();
+
+    if ($nbAujourdhui >= LIMITE_ANNONCES_GRATUIT_PAR_JOUR) {
+        jsonError(
+            'Le plan Gratuit permet de publier ' . LIMITE_ANNONCES_GRATUIT_PAR_JOUR . ' annonces par jour maximum. ' .
+            'Passez au plan Premium ou Pro pour publier davantage, ou réessayez demain.',
+            403
+        );
+    }
+}
+
 function createLogement(): void
 {
     $userId = requireAuth();
+
+    verifierLimitePlanGratuit($userId);
 
     $titre = trim($_POST['titre'] ?? '');
     $ville = trim($_POST['ville'] ?? '');

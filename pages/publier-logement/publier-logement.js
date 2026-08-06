@@ -23,6 +23,56 @@
 const publishForm =
 document.getElementById("publishForm");
 
+/* ==========================
+    CHOIX DE LA FORMULE
+    Affichée avant le formulaire : le propriétaire peut l'ignorer
+    et publier gratuitement (limité à 2 annonces/jour), ou être
+    informé que Premium/Pro arrivent bientôt (paiement pas encore
+    branché).
+========================== */
+
+const planChoice =
+document.getElementById("planChoice");
+
+function afficherFormulairePublication(){
+
+    if(planChoice) planChoice.style.display = "none";
+
+    if(publishForm) publishForm.style.display = "";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+}
+
+document.getElementById("btnContinuerGratuit")?.addEventListener(
+    "click",
+    afficherFormulairePublication
+);
+
+document.getElementById("lienIgnorerPlan")?.addEventListener(
+    "click",
+    (e) => {
+
+        e.preventDefault();
+
+        afficherFormulairePublication();
+
+    }
+);
+
+document.querySelectorAll("#planChoice [data-plan]").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        showToast(
+            "Formule " + btn.dataset.plan + " bientôt disponible — " +
+            "paiement Wave / Orange Money en cours d'intégration."
+        );
+
+    });
+
+});
+
 if(publishForm){
 
     publishForm.addEventListener(
@@ -173,21 +223,27 @@ if(publishForm){
 }
 
 /**
- * Après publication, suggère le plan le mieux adapté en se
- * basant sur le vrai nombre d'annonces du propriétaire (pas une
- * estimation) : le plan Gratuit ne permet qu'1 annonce active,
- * Premium jusqu'à 5, Pro est illimité — cohérent avec tarifs.html.
+ * Après publication, indique où en est le propriétaire par rapport
+ * à la limite quotidienne du plan Gratuit (2 annonces/jour, la
+ * même limite que celle appliquée côté serveur) — pas une
+ * estimation sur le total d'annonces, mais sur celles du jour.
  */
 async function afficherSuggestionPlan(){
 
-    let nbAnnonces = 1;
+    const LIMITE_GRATUIT_PAR_JOUR = 2;
+
+    let nbAujourdhui = 1;
 
     try{
 
         const mesLogements =
         await apiFetch("/logements/mine");
 
-        nbAnnonces = mesLogements.length;
+        const aujourdhui =
+        new Date().toDateString();
+
+        nbAujourdhui =
+        mesLogements.filter(l => new Date(l.created_at).toDateString() === aujourdhui).length;
 
     }catch(error){
 
@@ -199,25 +255,18 @@ async function afficherSuggestionPlan(){
     const carte =
     document.getElementById("planSuggestionCard");
 
-    if(nbAnnonces <= 1){
+    if(nbAujourdhui < LIMITE_GRATUIT_PAR_JOUR){
 
         carte.innerHTML = `
             <h3><i class="ph ph-check-circle"></i> Le plan Gratuit vous convient</h3>
-            <p>Avec ${nbAnnonces} annonce active, vous êtes exactement dans les limites du plan Gratuit. Rien à faire de plus pour l'instant.</p>
-        `;
-
-    }else if(nbAnnonces <= 5){
-
-        carte.innerHTML = `
-            <h3><i class="ph ph-crown-simple"></i> Le plan Premium vous correspond mieux</h3>
-            <p>Vous avez maintenant ${nbAnnonces} annonces — au-delà d'une seule, le plan Gratuit ne couvre plus vos besoins. Premium permet jusqu'à 5 annonces actives avec une meilleure visibilité.</p>
+            <p>${nbAujourdhui} annonce${nbAujourdhui > 1 ? "s" : ""} publiée${nbAujourdhui > 1 ? "s" : ""} aujourd'hui sur ${LIMITE_GRATUIT_PAR_JOUR} possibles avec le plan Gratuit.</p>
         `;
 
     }else{
 
         carte.innerHTML = `
-            <h3><i class="ph ph-crown-simple"></i> Le plan Pro vous correspond mieux</h3>
-            <p>Avec ${nbAnnonces} annonces, le plan Pro (annonces illimitées, position prioritaire) est le plus adapté à votre activité.</p>
+            <h3><i class="ph ph-crown-simple"></i> Limite quotidienne atteinte</h3>
+            <p>Vous avez publié ${nbAujourdhui} annonces aujourd'hui, la limite du plan Gratuit. Passez au Premium ou au Pro pour publier davantage dès aujourd'hui, ou revenez demain.</p>
         `;
 
     }

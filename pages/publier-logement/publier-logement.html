@@ -8,6 +8,7 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
     <link rel="stylesheet" href="../../assets/css/global.css?v=20260806a">
+    <link rel="stylesheet" href="../tarifs/tarifs.css?v=20260806a">
     <link rel="stylesheet" href="./publier-logement.css?v=20260806a">
 
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -58,11 +59,103 @@
 
     <h1>Publier un logement</h1>
 
-    <p>Remplissez les informations ci-dessous pour mettre votre logement en ligne en quelques minutes.</p>
+    <p>Choisissez la formule qui vous convient, ou publiez gratuitement en quelques minutes.</p>
 
 </div>
 
-<form class="publish-card" id="publishForm">
+<section id="planChoice" class="plan-choice-section">
+
+    <div class="container">
+
+        <div class="pricing-grid">
+
+            <div class="pricing-card">
+
+                <div class="pricing-card-header">
+                    <h3>Gratuit</h3>
+                    <p>Pour publier sans engagement.</p>
+                </div>
+
+                <div class="pricing-price">
+                    <span class="pricing-amount">0 F</span>
+                    <span class="pricing-period">/ mois</span>
+                </div>
+
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check-circle"></i> 2 annonces par jour</li>
+                    <li><i class="ph ph-check-circle"></i> Visibilité standard dans les résultats</li>
+                    <li><i class="ph ph-check-circle"></i> Messagerie avec les locataires</li>
+                </ul>
+
+                <button type="button" class="pricing-btn pricing-btn-solid" id="btnContinuerGratuit">
+                    Continuer avec le Gratuit
+                </button>
+
+            </div>
+
+            <div class="pricing-card pricing-card-featured">
+
+                <span class="pricing-recommended">
+                    <i class="ph ph-crown-simple"></i> Recommandé
+                </span>
+
+                <div class="pricing-card-header">
+                    <h3>Premium</h3>
+                    <p>Pour louer plus vite grâce à une meilleure visibilité.</p>
+                </div>
+
+                <div class="pricing-price">
+                    <span class="pricing-amount">5 000 F</span>
+                    <span class="pricing-period">/ mois</span>
+                </div>
+
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check-circle"></i> Annonces illimitées</li>
+                    <li><i class="ph ph-check-circle"></i> Badge "Premium" sur vos annonces</li>
+                    <li><i class="ph ph-check-circle"></i> Mise en avant dans les résultats</li>
+                </ul>
+
+                <button type="button" class="pricing-btn pricing-btn-ghost" data-plan="Premium">
+                    Passer au Premium
+                </button>
+
+            </div>
+
+            <div class="pricing-card">
+
+                <div class="pricing-card-header">
+                    <h3>Pro</h3>
+                    <p>Pour les propriétaires et agences avec plusieurs biens.</p>
+                </div>
+
+                <div class="pricing-price">
+                    <span class="pricing-amount">15 000 F</span>
+                    <span class="pricing-period">/ mois</span>
+                </div>
+
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check-circle"></i> Annonces illimitées</li>
+                    <li><i class="ph ph-check-circle"></i> Position prioritaire</li>
+                    <li><i class="ph ph-check-circle"></i> Statistiques avancées</li>
+                </ul>
+
+                <button type="button" class="pricing-btn pricing-btn-ghost" data-plan="Pro">
+                    Contacter l'équipe
+                </button>
+
+            </div>
+
+        </div>
+
+        <p class="plan-choice-skip">
+            <a href="#" id="lienIgnorerPlan">Ignorer, publier gratuitement (2 annonces par jour) →</a>
+        </p>
+
+    </div>
+
+</section>
+
+<form class="publish-card" id="publishForm" style="display:none;">
 
     <div class="form-group">
 

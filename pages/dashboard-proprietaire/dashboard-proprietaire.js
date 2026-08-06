@@ -102,6 +102,14 @@ async function initDashboard(){
     const aDesAnnonces =
     logements.length > 0;
 
+    // Un locataire qui a publié une annonce (rien ne l'en empêche)
+    // doit pouvoir accepter/refuser les réservations reçues sur
+    // cette annonce comme un vrai propriétaire — le rôle du compte
+    // seul ne suffit pas à décider, sinon ces réservations
+    // n'affichaient jamais les boutons Accepter/Refuser pour lui.
+    const modeProprietaire =
+    aDesAnnonces || estProprietaire;
+
     const sectionAnnonces =
     document.getElementById("mes-annonces");
 
@@ -126,7 +134,7 @@ async function initDashboard(){
 
     let reservations = [];
 
-    if(estProprietaire){
+    if(modeProprietaire){
 
         titreReservations.textContent = "Réservations reçues";
 
@@ -162,12 +170,12 @@ async function initDashboard(){
     reservations.length;
 
     document.getElementById("statSecondaireLabel").textContent =
-    estProprietaire ? "Réservations reçues" : "Réservations effectuées";
+    modeProprietaire ? "Réservations reçues" : "Réservations effectuées";
 
     document.getElementById("statTertiaire").textContent =
     nbEnAttente;
 
-    afficherTableRecente(logements, reservations, aDesAnnonces || estProprietaire);
+    afficherTableRecente(logements, reservations, modeProprietaire);
 
 }
 

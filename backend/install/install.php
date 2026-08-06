@@ -111,6 +111,21 @@ try {
         $etapes[] = 'Colonne "notifications_actives" ajoutée.';
     }
 
+    // Formule d'abonnement du propriétaire (Gratuit par défaut tant
+    // que les paiements Wave/Orange Money ne sont pas branchés) :
+    // conditionne la limite de publications quotidiennes.
+    $colonnePlanExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'utilisateurs'
+        AND COLUMN_NAME = 'plan'
+    ")->fetchColumn();
+
+    if ($colonnePlanExiste == 0) {
+        $pdo->exec("ALTER TABLE utilisateurs ADD COLUMN plan ENUM('gratuit','premium','pro') NOT NULL DEFAULT 'gratuit'");
+        $etapes[] = 'Colonne "plan" ajoutée.';
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS password_resets (
             id INT AUTO_INCREMENT PRIMARY KEY,

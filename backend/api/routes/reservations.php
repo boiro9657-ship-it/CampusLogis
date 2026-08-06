@@ -26,6 +26,11 @@ function handleReservationsRoute(array $segments, string $method): void
         return;
     }
 
+    if ($method === 'PUT' && is_numeric($first)) {
+        modifierStatutReservation((int) $first);
+        return;
+    }
+
     jsonError('Route introuvable.', 404);
 }
 
@@ -82,4 +87,49 @@ function reservationsRecues(): void
     $stmt->execute([$userId]);
 
     jsonResponse($stmt->fetchAll());
+}
+
+/**
+ * Accepte ou refuse une demande de réservation — réservé au
+ * propriétaire du logement concerné (pas l'admin, ni un autre
+ * propriétaire). Une réservation confirmée marque automatiquement
+ * le logement comme "réservé" pour qu'il n'apparaisse plus comme
+ * disponible.
+ */
+function modifierStatutReservation(int $id): void
+{
+    $userId = requireAuth();
+
+    $body = getJsonBody();
+    $statut = $body['statut'] ?? null;
+
+    if (!in_array($statut, ['confirmee', 'annulee'], true)) {
+        jsonError('Statut invalide.');
+    }
+
+    $stmt = getPdo()->prepare('
+        SELECT r.id, l.id AS logement_id, l.owner_id
+        FROM reservations r
+        JOIN logements l ON l.id = r.logement_id
+        WHERE r.id = ?
+    ');
+    $stmt->execute([$id]);
+    $reservation = $stmt->fetch();
+
+    if (!$reservation) {
+        jsonError('Réservation introuvable.', 404);
+    }
+
+    if ((int) $reservation['owner_id'] !== $userId) {
+        jsonError('Vous ne pouvez modifier que les réservations de vos propres logements.', 403);
+    }
+
+    getPdo()->prepare('UPDATE reservations SET statut = ? WHERE id = ?')->execute([$statut, $id]);
+
+    if ($statut === 'confirmee') {
+        getPdo()->prepare("UPDATE logements SET statut = 'reserve' WHERE id = ?")
+            ->execute([$reservation['logement_id']]);
+    }
+
+    jsonResponse(['message' => 'Statut de la réservation mis à jour.']);
 }

@@ -348,14 +348,65 @@ function afficherReservations(reservations, mode){
                     : ""
                 }
 
+                ${
+                    mode === "owner" && reservation.statut === "en_attente"
+                    ? `
+                    <div class="reservation-actions">
+                        <button class="btn-accepter-reservation" data-id="${reservation.id}">Accepter</button>
+                        <button class="btn-refuser-reservation" data-id="${reservation.id}">Refuser</button>
+                    </div>
+                    `
+                    : ""
+                }
+
             </div>
 
-            <span class="reservation-statut">
+            <span class="reservation-statut reservation-statut-${reservation.statut}">
                 ${libellesStatut[reservation.statut] || reservation.statut}
             </span>
 
         </div>
     `).join("");
+
+    if(mode === "owner"){
+
+        reservationsContainer.querySelectorAll(".btn-accepter-reservation").forEach(btn => {
+
+            btn.addEventListener("click", () => modifierStatutReservation(btn.dataset.id, "confirmee"));
+
+        });
+
+        reservationsContainer.querySelectorAll(".btn-refuser-reservation").forEach(btn => {
+
+            btn.addEventListener("click", () => modifierStatutReservation(btn.dataset.id, "annulee"));
+
+        });
+
+    }
+
+}
+
+async function modifierStatutReservation(id, statut){
+
+    try{
+
+        await apiFetch("/reservations/" + id, {
+
+            method: "PUT",
+
+            body: JSON.stringify({ statut })
+
+        });
+
+        showToast(statut === "confirmee" ? "Réservation acceptée." : "Réservation refusée.");
+
+        initDashboard();
+
+    }catch(error){
+
+        showToast(error.message, "error");
+
+    }
 
 }
 

@@ -377,6 +377,69 @@ tr:hover td{
 
 }
 
+.reservation-statut-confirmee{
+
+    background:#DCFCE7;
+    color:#16A34A;
+
+}
+
+.reservation-statut-annulee{
+
+    background:#FEE2E2;
+    color:#DC2626;
+
+}
+
+.reservation-actions{
+
+    display:flex;
+    gap:10px;
+    margin-top:12px;
+
+}
+
+.btn-accepter-reservation,
+.btn-refuser-reservation{
+
+    border:none;
+    padding:8px 16px;
+    border-radius:10px;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    transition:.2s;
+
+}
+
+.btn-accepter-reservation{
+
+    background:#DCFCE7;
+    color:#16A34A;
+
+}
+
+.btn-accepter-reservation:hover{
+
+    background:#16A34A;
+    color:white;
+
+}
+
+.btn-refuser-reservation{
+
+    background:#FEE2E2;
+    color:#DC2626;
+
+}
+
+.btn-refuser-reservation:hover{
+
+    background:#DC2626;
+    color:white;
+
+}
+
 .property-card{
 
     background:white;

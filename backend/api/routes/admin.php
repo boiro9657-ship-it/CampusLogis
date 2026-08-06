@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/../../includes/session.php';
+require_once __DIR__ . '/notifications.php';
 
 function handleAdminRoute(array $segments, string $method): void
 {
@@ -118,7 +119,24 @@ function validerLogementAdmin(int $id): void
         jsonError('Statut de validation invalide.');
     }
 
-    getPdo()->prepare('UPDATE logements SET statut_validation = ? WHERE id = ?')->execute([$statut, $id]);
+    $pdo = getPdo();
+
+    $stmt = $pdo->prepare('SELECT statut_validation, owner_id, titre, ville FROM logements WHERE id = ?');
+    $stmt->execute([$id]);
+    $logement = $stmt->fetch();
+
+    if (!$logement) {
+        jsonError('Logement introuvable.', 404);
+    }
+
+    $pdo->prepare('UPDATE logements SET statut_validation = ? WHERE id = ?')->execute([$statut, $id]);
+
+    // Notifie les utilisateurs uniquement au moment où l'annonce
+    // devient réellement publique (pas si elle l'était déjà, pour
+    // éviter les doublons si l'admin rejoue l'action).
+    if ($statut === 'approuve' && $logement['statut_validation'] !== 'approuve' && $logement['owner_id']) {
+        creerNotificationsNouveauLogement((int) $id, (int) $logement['owner_id'], $logement['titre'], $logement['ville']);
+    }
 
     jsonResponse(['message' => 'Statut de validation mis à jour.']);
 }

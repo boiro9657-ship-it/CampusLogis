@@ -46,6 +46,12 @@ if(publishForm){
             const chambres =
             document.getElementById("chambres").value;
 
+            const dureeLocation =
+            document.getElementById("duree_location").value;
+
+            const caution =
+            document.getElementById("caution").value;
+
             const description =
             document.getElementById("description").value.trim();
 
@@ -109,6 +115,8 @@ if(publishForm){
             formData.append("type", type);
             formData.append("prix", prix);
             formData.append("chambres", chambres);
+            formData.append("duree_location", dureeLocation);
+            formData.append("caution", caution);
             formData.append("description", description);
 
             const contactTelephone = document.getElementById("contact_telephone").value.trim();

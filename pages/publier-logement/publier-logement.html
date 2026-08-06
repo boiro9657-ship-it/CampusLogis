@@ -104,12 +104,48 @@
 
     <div class="form-group">
 
-        <label>Prix mensuel (minimum 10 000 FCFA)</label>
+        <label>Prix (minimum 10 000 FCFA)</label>
         <input
             type="number"
             id="prix"
             min="10000"
-            placeholder="Prix mensuel">
+            placeholder="Montant du prix">
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Durée de location</label>
+
+        <select id="duree_location">
+            <optgroup label="Courte durée">
+                <option value="24h">24 heures</option>
+                <option value="nuit">À la nuitée</option>
+                <option value="journee">À la journée</option>
+                <option value="semaine">À la semaine</option>
+            </optgroup>
+            <optgroup label="Longue durée">
+                <option value="1_mois" selected>Au mois</option>
+                <option value="3_mois">3 mois (minimum)</option>
+                <option value="6_mois">6 mois (minimum)</option>
+                <option value="1_an">À l'année</option>
+            </optgroup>
+        </select>
+
+        <p class="form-hint">Indique la période à laquelle correspond le prix saisi ci-dessus.</p>
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Caution demandée (facultatif)</label>
+        <input
+            type="number"
+            id="caution"
+            min="0"
+            placeholder="Ex : 100 000">
+
+        <p class="form-hint">Laissez vide si aucune caution n'est exigée.</p>
 
     </div>
 
@@ -215,6 +251,21 @@
             <label class="checkbox-choix">
                 <input type="checkbox" name="equipements[]" value="balcon">
                 <i class="ph ph-door-open"></i> Balcon
+            </label>
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="equipements[]" value="eau">
+                <i class="ph ph-drop-half-bottom"></i> Eau
+            </label>
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="equipements[]" value="electricite">
+                <i class="ph ph-lightning"></i> Électricité
+            </label>
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="equipements[]" value="climatisation">
+                <i class="ph ph-snowflake"></i> Climatisation
             </label>
 
         </div>

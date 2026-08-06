@@ -31,6 +31,44 @@
 
     afficherAvatar(utilisateur.photo_url);
 
+    const notifCheckbox =
+    document.getElementById("notificationsActives");
+
+    if(notifCheckbox){
+
+        notifCheckbox.checked =
+        Number(utilisateur.notifications_actives) !== 0;
+
+        notifCheckbox.addEventListener("change", async () => {
+
+            try{
+
+                await apiFetch("/auth/notifications", {
+
+                    method: "PUT",
+
+                    body: JSON.stringify({ actives: notifCheckbox.checked })
+
+                });
+
+                showToast(
+                    notifCheckbox.checked
+                    ? "Notifications activées."
+                    : "Notifications désactivées."
+                );
+
+            }catch(error){
+
+                notifCheckbox.checked = !notifCheckbox.checked;
+
+                showToast("Impossible de modifier cette préférence.", "error");
+
+            }
+
+        });
+
+    }
+
 })();
 
 function afficherAvatar(photoUrl){

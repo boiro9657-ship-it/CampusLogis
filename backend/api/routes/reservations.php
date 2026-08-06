@@ -41,14 +41,19 @@ function creerReservation(): void
     $body = getJsonBody();
     $logementId = $body['logement_id'] ?? null;
     $message = trim($body['message'] ?? '');
+    $conditionsAcceptees = !empty($body['conditions_acceptees']);
 
     if (!$logementId) {
         jsonError('logement_id est obligatoire.');
     }
 
+    if (!$conditionsAcceptees) {
+        jsonError('Vous devez accepter les conditions d\'utilisation pour réserver.');
+    }
+
     $stmt = getPdo()->prepare('
-        INSERT INTO reservations (logement_id, locataire_id, message)
-        VALUES (?, ?, ?)
+        INSERT INTO reservations (logement_id, locataire_id, message, conditions_acceptees)
+        VALUES (?, ?, ?, 1)
     ');
     $stmt->execute([$logementId, $userId, $message]);
 

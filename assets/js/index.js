@@ -281,7 +281,7 @@ function carteLogementHTML(logement){
 
             <h3>${logement.titre}</h3>
 
-            <p class="price">${prix} FCFA / mois</p>
+            <p class="price">${prix} FCFA${libelleCourtDuree(logement.duree_location)}</p>
 
             <p class="location">📍 ${logement.ville || ""}</p>
 

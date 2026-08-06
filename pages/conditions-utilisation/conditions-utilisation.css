@@ -1,0 +1,93 @@
+/* ==========================================================
+   CONDITIONS-UTILISATION.CSS — page conditions d'utilisation
+   ========================================================== */
+
+.conditions-section{
+
+    margin-top:var(--header-height, 84px);
+
+    padding:60px 20px 80px;
+
+}
+
+.conditions-container{
+
+    max-width:800px;
+
+    margin:auto;
+
+}
+
+.conditions-container h1{
+
+    color:var(--primary);
+
+    font-family:var(--font-heading);
+
+    margin-bottom:14px;
+
+}
+
+.conditions-intro{
+
+    color:#64748B;
+
+    margin-bottom:35px;
+
+}
+
+.conditions-card{
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:25px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.06);
+
+}
+
+.conditions-card h2{
+
+    color:var(--primary);
+
+    font-size:19px;
+
+    margin-top:28px;
+
+    margin-bottom:10px;
+
+}
+
+.conditions-card h2:first-child{
+
+    margin-top:0;
+
+}
+
+.conditions-card p{
+
+    color:#334155;
+
+    line-height:1.7;
+
+}
+
+.conditions-card a{
+
+    color:var(--primary);
+
+    font-weight:600;
+
+}
+
+@media(max-width:600px){
+
+    .conditions-card{
+
+        padding:28px 22px;
+
+    }
+
+}

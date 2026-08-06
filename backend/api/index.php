@@ -61,6 +61,11 @@ try {
             handleVisitesRoute($rest, $method);
             break;
 
+        case 'notifications':
+            require __DIR__ . '/routes/notifications.php';
+            handleNotificationsRoute($rest, $method);
+            break;
+
         default:
             jsonError('Route introuvable.', 404);
 

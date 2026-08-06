@@ -97,6 +97,20 @@ try {
         $etapes[] = 'Colonne "photo_url" ajoutée.';
     }
 
+    // Préférence de notifications (nouvelles annonces publiées) :
+    // activée par défaut, désactivable depuis la page profil.
+    $colonneNotifExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'utilisateurs'
+        AND COLUMN_NAME = 'notifications_actives'
+    ")->fetchColumn();
+
+    if ($colonneNotifExiste == 0) {
+        $pdo->exec("ALTER TABLE utilisateurs ADD COLUMN notifications_actives TINYINT(1) NOT NULL DEFAULT 1");
+        $etapes[] = 'Colonne "notifications_actives" ajoutée.';
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS password_resets (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -151,6 +165,11 @@ try {
         'equip_douche'      => "TINYINT(1) NOT NULL DEFAULT 0",
         'equip_salon'       => "TINYINT(1) NOT NULL DEFAULT 0",
         'equip_balcon'      => "TINYINT(1) NOT NULL DEFAULT 0",
+        'equip_eau'          => "TINYINT(1) NOT NULL DEFAULT 0",
+        'equip_electricite'  => "TINYINT(1) NOT NULL DEFAULT 0",
+        'equip_climatisation' => "TINYINT(1) NOT NULL DEFAULT 0",
+        'duree_location'     => "ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an') NOT NULL DEFAULT '1_mois'",
+        'caution'            => "DECIMAL(10,2) NULL",
     ];
 
     foreach ($colonnesAAjouter as $colonne => $definition) {
@@ -229,6 +248,7 @@ try {
             logement_id INT NOT NULL,
             locataire_id INT NOT NULL,
             message TEXT,
+            conditions_acceptees TINYINT(1) NOT NULL DEFAULT 0,
             statut ENUM('en_attente','confirmee','annulee') DEFAULT 'en_attente',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (logement_id) REFERENCES logements(id) ON DELETE CASCADE,
@@ -236,6 +256,18 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "reservations" prête.';
+
+    $colonneConditionsExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'reservations'
+        AND COLUMN_NAME = 'conditions_acceptees'
+    ")->fetchColumn();
+
+    if ($colonneConditionsExiste == 0) {
+        $pdo->exec("ALTER TABLE reservations ADD COLUMN conditions_acceptees TINYINT(1) NOT NULL DEFAULT 0 AFTER message");
+        $etapes[] = 'Colonne "conditions_acceptees" ajoutée.';
+    }
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS messages_contact (
@@ -261,6 +293,22 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "commentaires" prête.';
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            logement_id INT NULL,
+            message VARCHAR(255) NOT NULL,
+            lien VARCHAR(255) NULL,
+            lu TINYINT(1) NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
+            FOREIGN KEY (logement_id) REFERENCES logements(id) ON DELETE CASCADE,
+            INDEX idx_user_lu (user_id, lu)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "notifications" prête.';
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS visites (

@@ -141,6 +141,16 @@ h1, h2, h3, h4, h5, h6{
 
 }
 
+.cards-empty-suggestions{
+
+    padding:20px 20px 30px;
+
+    font-weight:600;
+
+    color:var(--primary);
+
+}
+
 /* Bouton "Réserver" inline sur les cartes de logement (accueil
    et recherche) : même poids visuel qu'un lien texte, pas un
    bouton par défaut du navigateur. */
@@ -483,6 +493,219 @@ header.scrolled{
     transform:translateY(-2px);
 
     box-shadow:0 10px 24px rgba(20,92,61,.3);
+
+}
+
+/* ===========================
+   CLOCHE DE NOTIFICATIONS (NAVBAR)
+=========================== */
+
+.notif-bell-wrap{
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+
+}
+
+.notif-bell{
+
+    position:relative;
+
+    width:44px;
+    height:44px;
+
+    border-radius:50%;
+
+    border:1px solid #E2E8F0;
+
+    background:white;
+
+    color:var(--primary);
+
+    font-size:19px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.notif-bell:hover{
+
+    background:var(--primary-light);
+
+}
+
+.notif-badge{
+
+    position:absolute;
+
+    top:-4px;
+    right:-4px;
+
+    background:#DC2626;
+
+    color:white;
+
+    font-size:10.5px;
+    font-weight:700;
+
+    min-width:18px;
+    height:18px;
+
+    border-radius:9px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0 4px;
+
+    border:2px solid white;
+
+}
+
+.notif-dropdown{
+
+    position:absolute;
+
+    top:calc(100% + 12px);
+    right:0;
+
+    width:340px;
+    max-width:88vw;
+
+    background:white;
+
+    border-radius:18px;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.18);
+
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(8px);
+
+    transition:.2s;
+
+    z-index:500;
+
+    overflow:hidden;
+
+}
+
+.notif-dropdown.show{
+
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+
+}
+
+.notif-dropdown-header{
+
+    padding:16px 20px;
+
+    font-weight:700;
+
+    color:var(--primary);
+
+    border-bottom:1px solid #F1F5F9;
+
+}
+
+.notif-dropdown-list{
+
+    max-height:360px;
+
+    overflow-y:auto;
+
+}
+
+.notif-item{
+
+    display:block;
+
+    padding:14px 20px;
+
+    border-bottom:1px solid #F1F5F9;
+
+    text-decoration:none;
+
+    transition:.2s;
+
+}
+
+.notif-item:last-child{
+
+    border-bottom:none;
+
+}
+
+.notif-item:hover{
+
+    background:#F8FAFC;
+
+}
+
+.notif-item p{
+
+    color:#1E293B;
+    font-size:13.5px;
+    margin-bottom:4px;
+
+}
+
+.notif-item span{
+
+    color:var(--gray-500);
+    font-size:12px;
+
+}
+
+.notif-item-non-lu{
+
+    background:var(--primary-light);
+
+}
+
+.notif-item-non-lu:hover{
+
+    background:var(--primary-light);
+
+}
+
+.notif-empty{
+
+    padding:24px 20px;
+
+    text-align:center;
+
+    color:var(--gray-500);
+
+    font-size:13.5px;
+
+}
+
+@media(max-width:480px){
+
+    .notif-dropdown{
+
+        position:fixed;
+
+        top:var(--header-height, 84px);
+        right:10px;
+        left:10px;
+
+        width:auto;
+        max-width:none;
+
+    }
 
 }
 
@@ -1007,6 +1230,262 @@ header.scrolled{
 #scrollTop:hover{
 
     transform:translateY(-5px);
+
+}
+
+/* ==========================
+    MODALE DE RÉSERVATION
+========================== */
+
+.reservation-modal-overlay{
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(15,23,42,.55);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+
+    opacity:0;
+    visibility:hidden;
+
+    transition:.25s;
+
+    z-index:10000;
+
+}
+
+.reservation-modal-overlay.show{
+
+    opacity:1;
+    visibility:visible;
+
+}
+
+.reservation-modal{
+
+    background:white;
+
+    width:100%;
+    max-width:480px;
+
+    padding:35px;
+
+    border-radius:25px;
+
+    position:relative;
+
+    box-shadow:0 25px 60px rgba(0,0,0,.3);
+
+    transform:translateY(20px);
+
+    transition:.25s;
+
+}
+
+.reservation-modal-overlay.show .reservation-modal{
+
+    transform:translateY(0);
+
+}
+
+.reservation-modal-close{
+
+    position:absolute;
+
+    top:20px;
+    right:20px;
+
+    border:none;
+    background:#F1F5F9;
+    color:#475569;
+
+    width:34px;
+    height:34px;
+
+    border-radius:50%;
+
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:16px;
+
+    transition:.2s;
+
+}
+
+.reservation-modal-close:hover{
+
+    background:#E2E8F0;
+
+}
+
+.reservation-modal h3{
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    color:var(--primary);
+
+    margin-bottom:8px;
+
+    padding-right:30px;
+
+}
+
+.reservation-modal-hint{
+
+    color:var(--gray-500);
+
+    font-size:14px;
+
+    margin-bottom:20px;
+
+}
+
+.reservation-modal textarea{
+
+    width:100%;
+
+    height:120px;
+
+    padding:16px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:14px;
+
+    resize:none;
+
+    font-family:inherit;
+
+    font-size:14px;
+
+    outline:none;
+
+    transition:border-color .2s, box-shadow .2s;
+
+}
+
+.reservation-modal textarea:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(20,92,61,.12);
+
+}
+
+.reservation-modal-terms{
+
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+
+    margin-top:18px;
+
+    font-size:13.5px;
+
+    color:#334155;
+
+    cursor:pointer;
+
+}
+
+.reservation-modal-terms input{
+
+    margin-top:3px;
+
+    accent-color:var(--primary);
+
+}
+
+.reservation-modal-terms a{
+
+    color:var(--primary);
+
+    font-weight:600;
+
+}
+
+.reservation-modal-actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:12px;
+
+    margin-top:26px;
+
+}
+
+.reservation-modal-actions button{
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.reservation-modal-actions .btn-secondary{
+
+    background:#F1F5F9;
+
+    color:#475569;
+
+}
+
+.reservation-modal-actions .btn-secondary:hover{
+
+    background:#E2E8F0;
+
+}
+
+.reservation-modal-actions .btn-primary{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+.reservation-modal-actions .btn-primary:hover{
+
+    background:var(--primary-dark);
+
+}
+
+.reservation-modal-actions .btn-primary:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+}
+
+@media(max-width:480px){
+
+    .reservation-modal{
+
+        padding:28px 22px;
+
+    }
 
 }
 

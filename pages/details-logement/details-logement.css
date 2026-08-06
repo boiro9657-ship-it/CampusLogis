@@ -219,6 +219,24 @@
 
 }
 
+.caution-info{
+
+    margin-top:14px;
+
+    padding:10px 14px;
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+    border-radius:10px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
 .reserve-btn{
 
     display:block;

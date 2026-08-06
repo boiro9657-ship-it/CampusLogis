@@ -112,14 +112,65 @@ async function rechercherLogements(){
 
     if(!logements || logements.length === 0){
 
-        resultsContainer.innerHTML =
-        '<p class="cards-empty">Aucun logement ne correspond à votre recherche.</p>';
+        await afficherSuggestions(ville, type);
 
         return;
     }
 
     resultsContainer.innerHTML =
     logements.map(carteRechercheHTML).join("");
+
+    attacherBoutonsFavoris(resultsContainer);
+    attacherBoutonsReservation(resultsContainer);
+    demarrerCarrousels(resultsContainer);
+
+}
+
+/**
+ * Aucun logement ne correspond exactement aux filtres : plutôt
+ * qu'un simple message, on relâche progressivement les critères
+ * (budget puis type puis ville) pour proposer de vraies annonces
+ * disponibles proches de la recherche, avec un message clair sur
+ * le fait qu'il s'agit de suggestions et non de résultats exacts.
+ */
+async function afficherSuggestions(ville, type){
+
+    const tentatives = [];
+
+    if(ville) tentatives.push(new URLSearchParams({ ville }));
+    tentatives.push(new URLSearchParams());
+
+    let suggestions = [];
+
+    for(const tentative of tentatives){
+
+        try{
+
+            suggestions =
+            await apiFetch("/logements?" + tentative.toString());
+
+        }catch(error){
+
+            suggestions = [];
+        }
+
+        if(suggestions && suggestions.length > 0) break;
+
+    }
+
+    if(!suggestions || suggestions.length === 0){
+
+        resultsContainer.innerHTML =
+        '<p class="cards-empty">Aucun logement disponible pour le moment. Revenez bientôt, de nouvelles annonces sont publiées régulièrement !</p>';
+
+        return;
+    }
+
+    resultsContainer.innerHTML = `
+        <p class="cards-empty cards-empty-suggestions">
+            Aucun logement ne correspond exactement à votre recherche. Voici des logements similaires :
+        </p>
+    ` + suggestions.slice(0, 6).map(carteRechercheHTML).join("");
 
     attacherBoutonsFavoris(resultsContainer);
     attacherBoutonsReservation(resultsContainer);
@@ -173,7 +224,7 @@ function carteRechercheHTML(logement){
                 ${logement.ville || ""}
             </p>
 
-            <h4>${prix} FCFA/mois</h4>
+            <h4>${prix} FCFA${libelleCourtDuree(logement.duree_location)}</h4>
 
             <div class="housing-info">
                 <span>

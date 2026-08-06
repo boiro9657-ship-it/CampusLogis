@@ -63,9 +63,16 @@ function listLogements(): void
 {
     // "owner_id IS NOT NULL" garantit que toute annonce publique
     // a un vrai propriétaire contactable — aucune annonce fictive
-    // ou orpheline ne doit apparaître sur le site.
+    // ou orpheline ne doit apparaître sur le site. Les logements
+    // déjà réservés sont exclus des résultats de recherche par
+    // défaut (ils restent consultables via leur lien direct) ;
+    // "tous=1" permet de les inclure quand même (ex. suggestions).
     $conditions = ["statut_validation = 'approuve'", "owner_id IS NOT NULL"];
     $params = [];
+
+    if (empty($_GET['tous'])) {
+        $conditions[] = "statut = 'disponible'";
+    }
 
     if (!empty($_GET['ville'])) {
         $conditions[] = 'ville LIKE ?';
@@ -212,6 +219,27 @@ function createLogement(): void
 
     $equipements = extraireEquipements($_POST['equipements'] ?? []);
 
+    // Durée de location : détermine à quelle période correspond le
+    // prix saisi (à la nuitée, à la semaine, au mois, à l'année...).
+    $dureeLocation = $_POST['duree_location'] ?? '1_mois';
+
+    if (!in_array($dureeLocation, DUREES_LOCATION_VALIDES, true)) {
+        jsonError('Durée de location invalide.');
+    }
+
+    // Caution facultative : vide = pas de caution demandée.
+    $cautionBrute = trim($_POST['caution'] ?? '');
+    $caution = null;
+
+    if ($cautionBrute !== '') {
+
+        if (!is_numeric($cautionBrute) || (float) $cautionBrute < 0) {
+            jsonError('La caution doit être un montant valide.');
+        }
+
+        $caution = (float) $cautionBrute;
+    }
+
     if (!$titre || !$ville || !$prix) {
         jsonError('Titre, ville et prix sont obligatoires.');
     }
@@ -271,15 +299,19 @@ function createLogement(): void
             INSERT INTO logements (
                 owner_id, titre, ville, type, prix, chambres, description, image_url,
                 contact_telephone, contact_whatsapp, contact_email,
-                equip_wifi, equip_parking, equip_cuisine, equip_douche, equip_salon, equip_balcon
+                duree_location, caution,
+                equip_wifi, equip_parking, equip_cuisine, equip_douche, equip_salon, equip_balcon,
+                equip_eau, equip_electricite, equip_climatisation
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
             $userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl,
             $contactTelephone, $contactWhatsapp, $contactEmail,
+            $dureeLocation, $caution,
             $equipements['wifi'], $equipements['parking'], $equipements['cuisine'],
             $equipements['douche'], $equipements['salon'], $equipements['balcon'],
+            $equipements['eau'], $equipements['electricite'], $equipements['climatisation'],
         ]);
 
         $logementId = $pdo->lastInsertId();
@@ -345,7 +377,7 @@ function extraireEquipements($equipementsBruts): array
 {
     $liste = is_array($equipementsBruts) ? $equipementsBruts : [];
 
-    $disponibles = ['wifi', 'parking', 'cuisine', 'douche', 'salon', 'balcon'];
+    $disponibles = ['wifi', 'parking', 'cuisine', 'douche', 'salon', 'balcon', 'eau', 'electricite', 'climatisation'];
     $resultat = [];
 
     foreach ($disponibles as $cle) {
@@ -354,6 +386,8 @@ function extraireEquipements($equipementsBruts): array
 
     return $resultat;
 }
+
+const DUREES_LOCATION_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an'];
 
 function updateLogement(int $id): void
 {
@@ -367,7 +401,9 @@ function updateLogement(int $id): void
     $champsAutorises = [
         'titre', 'ville', 'type', 'prix', 'chambres', 'description', 'statut',
         'contact_telephone', 'contact_whatsapp', 'contact_email',
+        'duree_location', 'caution',
         'equip_wifi', 'equip_parking', 'equip_cuisine', 'equip_douche', 'equip_salon', 'equip_balcon',
+        'equip_eau', 'equip_electricite', 'equip_climatisation',
     ];
 
     foreach ($champsAutorises as $champ) {
@@ -383,6 +419,14 @@ function updateLogement(int $id): void
 
     if (array_key_exists('prix', $body) && (float) $body['prix'] < 10000) {
         jsonError('Le prix minimum est de 10 000 FCFA.');
+    }
+
+    if (array_key_exists('duree_location', $body) && !in_array($body['duree_location'], DUREES_LOCATION_VALIDES, true)) {
+        jsonError('Durée de location invalide.');
+    }
+
+    if (array_key_exists('caution', $body) && $body['caution'] !== null && (!is_numeric($body['caution']) || (float) $body['caution'] < 0)) {
+        jsonError('La caution doit être un montant valide.');
     }
 
     $params[] = $id;

@@ -6,6 +6,17 @@
    page), le contenu de démonstration reste affiché tel quel.
    ========================================================== */
 
+const LIBELLES_DUREE = {
+    "24h": "pour 24 heures",
+    nuit: "par nuitée",
+    journee: "par jour",
+    semaine: "par semaine",
+    "1_mois": "par mois",
+    "3_mois": "par tranche de 3 mois",
+    "6_mois": "par tranche de 6 mois",
+    "1_an": "par an"
+};
+
 const params =
 new URLSearchParams(window.location.search);
 
@@ -57,6 +68,18 @@ async function chargerLogement(id){
 
     document.querySelector(".price-card h3").textContent =
     prix + " FCFA";
+
+    const periodeEl =
+    document.querySelector(".price-card p");
+
+    if(periodeEl){
+
+        periodeEl.textContent =
+        LIBELLES_DUREE[logement.duree_location] || "par mois";
+
+    }
+
+    afficherCaution(logement.caution);
 
     afficherLocalisation(logement.ville);
 
@@ -357,7 +380,7 @@ async function chargerLogementsSimilaires(logement){
 
                 <p>📍 ${l.ville || ""}</p>
 
-                <h4>${Number(l.prix).toLocaleString("fr-FR")} FCFA / mois</h4>
+                <h4>${Number(l.prix).toLocaleString("fr-FR")} FCFA${libelleCourtDuree(l.duree_location)}</h4>
 
                 <a href="details-logement.html?id=${l.id}">Voir les détails</a>
 
@@ -480,6 +503,31 @@ function afficherLocalisation(ville){
 }
 
 /**
+ * Affiche le montant de la caution demandée par le propriétaire,
+ * si renseigné. Masque la ligne si aucune caution n'est exigée.
+ */
+function afficherCaution(caution){
+
+    const cautionEl =
+    document.getElementById("cautionInfo");
+
+    if(!cautionEl) return;
+
+    if(caution === null || caution === undefined || caution === ""){
+
+        cautionEl.style.display = "none";
+
+        return;
+    }
+
+    cautionEl.textContent =
+    "Caution : " + Number(caution).toLocaleString("fr-FR") + " FCFA";
+
+    cautionEl.style.display = "";
+
+}
+
+/**
  * Reconstruit les badges rapides (chambres + wifi/parking si
  * présents) à partir des vraies données du logement. Le nombre
  * de chambres est toujours affiché ; les autres badges
@@ -524,6 +572,9 @@ function afficherEquipements(logement){
         { cle: "equip_douche", icone: "ph-drop", libelle: "Douche" },
         { cle: "equip_salon", icone: "ph-armchair", libelle: "Salon" },
         { cle: "equip_balcon", icone: "ph-door-open", libelle: "Balcon" },
+        { cle: "equip_eau", icone: "ph-drop-half-bottom", libelle: "Eau" },
+        { cle: "equip_electricite", icone: "ph-lightning", libelle: "Électricité" },
+        { cle: "equip_climatisation", icone: "ph-snowflake", libelle: "Climatisation" },
     ];
 
     const equipementsActifs =

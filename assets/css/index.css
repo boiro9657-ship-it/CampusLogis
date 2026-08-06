@@ -13,6 +13,8 @@
        passer derrière elle. */
     margin-top:var(--header-height, 84px);
 
+    position:relative;
+
     display:flex;
     align-items:center;
 
@@ -51,6 +53,122 @@
 .hero-right{
 
     display:none;
+
+}
+
+/* ===========================
+   BADGES FLOTTANTS DU HERO
+=========================== */
+
+.hero-floating-badges{
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    z-index:2;
+
+    display:none;
+
+}
+
+.floating-badge{
+
+    position:absolute;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    background:rgba(255,255,255,.95);
+
+    color:var(--primary);
+
+    font-weight:700;
+    font-size:13.5px;
+
+    padding:12px 18px;
+
+    border-radius:50px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+
+    opacity:0;
+
+    animation: flottement 5s ease-in-out infinite;
+
+}
+
+.floating-badge i{
+
+    color:var(--secondary);
+
+    font-size:16px;
+
+}
+
+.floating-badge-1{
+
+    top:14%;
+    right:9%;
+
+    animation-delay:.2s;
+
+}
+
+.floating-badge-2{
+
+    top:48%;
+    right:2%;
+
+    animation-delay:1s;
+
+}
+
+.floating-badge-3{
+
+    bottom:16%;
+    right:14%;
+
+    animation-delay:1.8s;
+
+}
+
+/* Une seule animation par badge : apparition (fondu + léger
+   glissement) puis flottement continu, sans faire concurrencer
+   deux animations sur la même propriété "transform". */
+@keyframes flottement{
+
+    0%{
+        opacity:0;
+        transform:translateY(18px);
+    }
+
+    12%{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-12px);
+    }
+
+    100%{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+@media(min-width:1050px){
+
+    .hero-floating-badges{
+
+        display:block;
+
+    }
 
 }
 

@@ -61,6 +61,11 @@ function handleAuthRoute(array $segments, string $method): void
         return;
     }
 
+    if ($action === 'notifications' && $method === 'PUT') {
+        modifierPreferenceNotifications();
+        return;
+    }
+
     jsonError('Route introuvable.', 404);
 }
 
@@ -237,7 +242,7 @@ function currentUser(): void
     }
 
     $stmt = getPdo()->prepare('
-        SELECT id, nom_complet, email, telephone, photo_url, role
+        SELECT id, nom_complet, email, telephone, photo_url, role, notifications_actives
         FROM utilisateurs WHERE id = ?
     ');
     $stmt->execute([$_SESSION['user_id']]);
@@ -322,6 +327,23 @@ function modifierPhotoProfil(): void
         ->execute([$url, $userId]);
 
     jsonResponse(['message' => 'Photo de profil mise à jour.', 'photo_url' => $url]);
+}
+
+/**
+ * Active ou désactive les notifications (nouveaux logements
+ * publiés) pour le compte connecté.
+ */
+function modifierPreferenceNotifications(): void
+{
+    $userId = requireAuth();
+
+    $body = getJsonBody();
+    $actives = !empty($body['actives']) ? 1 : 0;
+
+    getPdo()->prepare('UPDATE utilisateurs SET notifications_actives = ? WHERE id = ?')
+        ->execute([$actives, $userId]);
+
+    jsonResponse(['message' => 'Préférence de notifications mise à jour.']);
 }
 
 /**

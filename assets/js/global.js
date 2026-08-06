@@ -215,7 +215,163 @@ if(typeof apiFetch !== "undefined"){
 
         }
 
+        initClocheNotifications(racine);
+
     }).catch(()=>{});
+
+}
+
+/* ==========================
+    NOTIFICATIONS (CLOCHE NAVBAR)
+    Affiche une cloche avec le nombre de notifications non lues
+    (nouveaux logements publiés) dans les boutons de navbar,
+    présente sur toutes les pages pour tout utilisateur connecté.
+========================== */
+
+function initClocheNotifications(racine){
+
+    const navButtons =
+    document.querySelector(".nav-buttons");
+
+    if(!navButtons || document.getElementById("notifBellWrap")) return;
+
+    const wrap =
+    document.createElement("div");
+
+    wrap.id = "notifBellWrap";
+    wrap.className = "notif-bell-wrap";
+
+    wrap.innerHTML = `
+        <button type="button" class="notif-bell" id="notifBellBtn">
+            <i class="ph ph-bell"></i>
+            <span class="notif-badge" id="notifBadge" style="display:none;"></span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-dropdown-header">Notifications</div>
+            <div class="notif-dropdown-list" id="notifList">
+                <p class="notif-empty">Chargement...</p>
+            </div>
+        </div>
+    `;
+
+    navButtons.insertBefore(wrap, navButtons.firstChild);
+
+    const bellBtn =
+    document.getElementById("notifBellBtn");
+
+    const dropdown =
+    document.getElementById("notifDropdown");
+
+    bellBtn.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+        const ouverte =
+        dropdown.classList.toggle("show");
+
+        if(ouverte){
+
+            marquerNotificationsCommeLues();
+
+        }
+
+    });
+
+    document.addEventListener("click", (e) => {
+
+        if(!wrap.contains(e.target)){
+
+            dropdown.classList.remove("show");
+
+        }
+
+    });
+
+    chargerNotifications(racine);
+
+}
+
+async function chargerNotifications(racine){
+
+    let notifications;
+
+    try{
+
+        notifications = await apiFetch("/notifications");
+
+    }catch(error){
+
+        return;
+    }
+
+    const badge =
+    document.getElementById("notifBadge");
+
+    const nbNonLues =
+    notifications.filter(n => !Number(n.lu)).length;
+
+    if(badge){
+
+        if(nbNonLues > 0){
+
+            badge.textContent = nbNonLues > 9 ? "9+" : nbNonLues;
+            badge.style.display = "";
+
+        }else{
+
+            badge.style.display = "none";
+
+        }
+
+    }
+
+    const list =
+    document.getElementById("notifList");
+
+    if(!list) return;
+
+    if(notifications.length === 0){
+
+        list.innerHTML =
+        `<p class="notif-empty">Aucune notification pour le moment.</p>`;
+
+        return;
+    }
+
+    list.innerHTML =
+    notifications.map(n => {
+
+        const date =
+        new Date(n.created_at).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" });
+
+        return `
+        <a href="${n.lien ? racine + n.lien : "#"}" class="notif-item${Number(n.lu) ? "" : " notif-item-non-lu"}">
+            <p>${n.message}</p>
+            <span>${date}</span>
+        </a>
+        `;
+
+    }).join("");
+
+}
+
+async function marquerNotificationsCommeLues(){
+
+    const badge =
+    document.getElementById("notifBadge");
+
+    if(badge) badge.style.display = "none";
+
+    try{
+
+        await apiFetch("/notifications/lu", { method:"PUT" });
+
+    }catch(error){
+
+        // Pas grave si ça échoue : la cloche réaffichera juste le
+        // compteur au prochain chargement de page.
+
+    }
 
 }
 
@@ -295,16 +451,111 @@ function attacherBoutonsFavoris(container){
 
 /* ==========================
     RÉSERVATIONS (API)
-    Réutilisé par l'accueil et la recherche pour tout bouton
-    .btn-reserver portant un data-id.
+    Réutilisé par l'accueil, la recherche et la page détails pour
+    tout bouton .btn-reserver (ou #contactOwnerBtn) portant un
+    data-id. Ouvre une vraie modale (message + acceptation des
+    conditions d'utilisation) plutôt qu'un prompt() du navigateur.
 ========================== */
 
-async function reserverLogement(logementId){
+function creerModaleReservation(){
+
+    if(document.getElementById("reservationModalOverlay")) return;
+
+    const racine =
+    window.API_BASE ? window.API_BASE.replace("backend/api", "") : "";
+
+    const overlay =
+    document.createElement("div");
+
+    overlay.id = "reservationModalOverlay";
+    overlay.className = "reservation-modal-overlay";
+
+    overlay.innerHTML = `
+        <div class="reservation-modal">
+
+            <button type="button" class="reservation-modal-close" id="reservationModalClose">
+                <i class="ph ph-x"></i>
+            </button>
+
+            <h3><i class="ph ph-calendar-check"></i> Demande de réservation</h3>
+
+            <p class="reservation-modal-hint">
+                Laissez un message au propriétaire (facultatif), puis confirmez votre demande.
+            </p>
+
+            <textarea id="reservationMessage" maxlength="500" placeholder="Ex : Bonjour, je suis intéressé(e) par ce logement, serait-il possible de le visiter cette semaine ?"></textarea>
+
+            <label class="reservation-modal-terms">
+                <input type="checkbox" id="reservationTerms">
+                J'accepte les <a href="${racine}pages/conditions-utilisation/conditions-utilisation.html" target="_blank" rel="noopener">conditions d'utilisation</a>
+            </label>
+
+            <div class="reservation-modal-actions">
+                <button type="button" class="btn-secondary" id="reservationModalCancel">Annuler</button>
+                <button type="button" class="btn-primary" id="reservationModalSubmit">Envoyer la demande</button>
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById("reservationModalClose").addEventListener("click", fermerModaleReservation);
+    document.getElementById("reservationModalCancel").addEventListener("click", fermerModaleReservation);
+
+    overlay.addEventListener("click", (e) => {
+
+        if(e.target === overlay) fermerModaleReservation();
+
+    });
+
+}
+
+function fermerModaleReservation(){
+
+    const overlay =
+    document.getElementById("reservationModalOverlay");
+
+    if(overlay) overlay.classList.remove("show");
+
+}
+
+function reserverLogement(logementId){
+
+    creerModaleReservation();
+
+    const overlay =
+    document.getElementById("reservationModalOverlay");
+
+    document.getElementById("reservationMessage").value = "";
+    document.getElementById("reservationTerms").checked = false;
+
+    overlay.classList.add("show");
+
+    document.getElementById("reservationModalSubmit").onclick =
+    () => envoyerReservation(logementId);
+
+}
+
+async function envoyerReservation(logementId){
 
     const message =
-    prompt("Un message pour le propriétaire ? (facultatif)");
+    document.getElementById("reservationMessage").value.trim();
 
-    if(message === null) return;
+    const accepte =
+    document.getElementById("reservationTerms").checked;
+
+    if(!accepte){
+
+        showToast("Vous devez accepter les conditions d'utilisation pour réserver.", "error");
+
+        return;
+    }
+
+    const submitBtn =
+    document.getElementById("reservationModalSubmit");
+
+    submitBtn.disabled = true;
 
     try{
 
@@ -314,18 +565,23 @@ async function reserverLogement(logementId){
 
             body: JSON.stringify({
                 logement_id: logementId,
-                message
+                message,
+                conditions_acceptees: true
             })
 
         });
 
         showToast("Demande de réservation envoyée !");
 
+        fermerModaleReservation();
+
     }catch(error){
 
         if(error.status === 401){
 
             showToast("Connectez-vous pour réserver un logement — redirection...", "error");
+
+            fermerModaleReservation();
 
             const lienConnexion =
             document.querySelector(".btn-nav-link");
@@ -343,9 +599,13 @@ async function reserverLogement(logementId){
 
         }else{
 
-            showToast("Impossible d'envoyer la demande de réservation.", "error");
+            showToast(error.message || "Impossible d'envoyer la demande de réservation.", "error");
 
         }
+
+    }finally{
+
+        submitBtn.disabled = false;
 
     }
 
@@ -364,6 +624,31 @@ function attacherBoutonsReservation(container){
         });
 
     });
+
+}
+
+/* ==========================
+    DURÉE DE LOCATION
+    Réutilisé par toutes les cartes de logement (accueil,
+    recherche, similaires) pour afficher le prix avec la bonne
+    période ("/mois", "/nuit", "/semaine"...) au lieu d'un "/mois"
+    fixe qui serait faux pour une annonce en courte durée.
+========================== */
+
+const LIBELLES_COURTS_DUREE = {
+    "24h": "/24h",
+    nuit: "/nuitée",
+    journee: "/jour",
+    semaine: "/semaine",
+    "1_mois": "/mois",
+    "3_mois": "/3 mois",
+    "6_mois": "/6 mois",
+    "1_an": "/an"
+};
+
+function libelleCourtDuree(duree){
+
+    return LIBELLES_COURTS_DUREE[duree] || "/mois";
 
 }
 

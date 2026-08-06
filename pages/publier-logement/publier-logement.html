@@ -191,6 +191,8 @@
             <option value="Appartement">Appartement</option>
             <option value="Villa">Villa</option>
             <option value="Bureau">Bureau</option>
+            <option value="Immeuble">Immeuble</option>
+            <option value="Passe-temps">Passe-temps</option>
         </select>
 
     </div>
@@ -244,11 +246,91 @@
 
     <div class="form-group">
 
-        <label>Nombre de chambres</label>
+        <label>Nombre de chambres / bureaux</label>
         <input
             type="number"
             id="chambres"
-            placeholder="Nombre de chambres">
+            placeholder="Nombre de chambres ou de bureaux">
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Nombre de personnes (capacité)</label>
+        <input
+            type="number"
+            id="nombre_personnes"
+            min="1"
+            placeholder="Ex : 2">
+
+        <p class="form-hint">Nombre de personnes que le logement peut accueillir.</p>
+
+    </div>
+
+    <div class="form-group" id="groupeNombreEtages" style="display:none;">
+
+        <label>Nombre d'étages de l'immeuble</label>
+        <input
+            type="number"
+            id="nombre_etages"
+            min="1"
+            placeholder="Ex : 4">
+
+    </div>
+
+    <div class="form-group" id="groupeNiveauEtage">
+
+        <label>Niveau d'étage du logement</label>
+        <select id="niveau_etage">
+            <option value="">Non précisé</option>
+            <option value="rdc">Rez-de-chaussée</option>
+            <option value="1">1er étage</option>
+            <option value="2">2e étage</option>
+            <option value="3">3e étage</option>
+            <option value="4_plus">4e étage et plus</option>
+        </select>
+
+    </div>
+
+    <div class="form-section">
+
+        <h3>Profil de locataire recherché (facultatif)</h3>
+
+        <p class="form-hint">Aide les locataires à savoir si ce logement leur correspond.</p>
+
+        <div class="equipements-choix">
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="profils[]" value="celibataire">
+                <i class="ph ph-user"></i> Célibataire
+            </label>
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="profils[]" value="marie">
+                <i class="ph ph-users"></i> Marié(e)
+            </label>
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="profils[]" value="etudiant">
+                <i class="ph ph-graduation-cap"></i> Étudiant(e)
+            </label>
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="profils[]" value="travailleur">
+                <i class="ph ph-briefcase"></i> Travailleur(se)
+            </label>
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="profils[]" value="senegalais">
+                <i class="ph ph-flag"></i> Sénégalais(e)
+            </label>
+
+            <label class="checkbox-choix">
+                <input type="checkbox" name="profils[]" value="etranger">
+                <i class="ph ph-globe"></i> Étranger(ère)
+            </label>
+
+        </div>
 
     </div>
 

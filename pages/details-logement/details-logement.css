@@ -951,6 +951,20 @@
 
     }
 
+    /* Le bouton de réservation ne doit pas être noyé tout en bas
+       de la page une fois la mise en page repassée sur une seule
+       colonne : la carte prix + "Contacter le propriétaire" passe
+       en premier, avant la description et les caractéristiques. */
+    .price-card{
+
+        order:-1;
+
+        position:static;
+
+        margin-bottom:10px;
+
+    }
+
     .owner-card{
 
         flex-wrap:wrap;

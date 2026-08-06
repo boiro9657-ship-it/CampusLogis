@@ -73,6 +73,39 @@ document.querySelectorAll("#planChoice [data-plan]").forEach(btn => {
 
 });
 
+/* ==========================
+    TYPE DE LOGEMENT : ÉTAGES
+    Un immeuble se décrit par son nombre total d'étages ; les
+    autres types se décrivent par le niveau d'étage du logement.
+========================== */
+
+const typeSelect =
+document.getElementById("type");
+
+const groupeNombreEtages =
+document.getElementById("groupeNombreEtages");
+
+const groupeNiveauEtage =
+document.getElementById("groupeNiveauEtage");
+
+function basculerChampsEtage(){
+
+    const estImmeuble =
+    typeSelect.value === "Immeuble";
+
+    if(groupeNombreEtages) groupeNombreEtages.style.display = estImmeuble ? "" : "none";
+    if(groupeNiveauEtage) groupeNiveauEtage.style.display = estImmeuble ? "none" : "";
+
+}
+
+if(typeSelect){
+
+    typeSelect.addEventListener("change", basculerChampsEtage);
+
+    basculerChampsEtage();
+
+}
+
 if(publishForm){
 
     publishForm.addEventListener(
@@ -101,6 +134,15 @@ if(publishForm){
 
             const caution =
             document.getElementById("caution").value;
+
+            const nombrePersonnes =
+            document.getElementById("nombre_personnes").value;
+
+            const nombreEtages =
+            document.getElementById("nombre_etages").value;
+
+            const niveauEtage =
+            document.getElementById("niveau_etage").value;
 
             const description =
             document.getElementById("description").value.trim();
@@ -167,6 +209,9 @@ if(publishForm){
             formData.append("chambres", chambres);
             formData.append("duree_location", dureeLocation);
             formData.append("caution", caution);
+            formData.append("nombre_personnes", nombrePersonnes);
+            formData.append("nombre_etages", nombreEtages);
+            formData.append("niveau_etage", niveauEtage);
             formData.append("description", description);
 
             const contactTelephone = document.getElementById("contact_telephone").value.trim();
@@ -180,6 +225,12 @@ if(publishForm){
             document.querySelectorAll('input[name="equipements[]"]:checked').forEach(checkbox => {
 
                 formData.append("equipements[]", checkbox.value);
+
+            });
+
+            document.querySelectorAll('input[name="profils[]"]:checked').forEach(checkbox => {
+
+                formData.append("profils[]", checkbox.value);
 
             });
 

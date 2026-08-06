@@ -144,7 +144,7 @@ try {
             owner_id INT NULL,
             titre VARCHAR(150) NOT NULL,
             ville VARCHAR(100),
-            type ENUM('Chambre','Studio','Appartement','Villa','Bureau'),
+            type ENUM('Chambre','Studio','Appartement','Villa','Bureau','Immeuble','Passe-temps'),
             prix DECIMAL(10,2),
             chambres INT,
             description TEXT,
@@ -167,6 +167,14 @@ try {
     ");
     $etapes[] = 'Table "logements" prête.';
 
+    // Élargit la liste des types de logement (Immeuble, Passe-temps)
+    // sur une base déjà existante — sans danger à rejouer.
+    $pdo->exec("
+        ALTER TABLE logements
+        MODIFY type ENUM('Chambre','Studio','Appartement','Villa','Bureau','Immeuble','Passe-temps') NULL
+    ");
+    $etapes[] = 'Types de logement "Immeuble" et "Passe-temps" disponibles.';
+
     // Colonnes de coordonnées de contact (facultatives, propres à
     // chaque annonce) et d'équipements, ajoutées ici pour les
     // bases déjà existantes avant cette fonctionnalité.
@@ -185,6 +193,15 @@ try {
         'equip_climatisation' => "TINYINT(1) NOT NULL DEFAULT 0",
         'duree_location'     => "ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an') NOT NULL DEFAULT '1_mois'",
         'caution'            => "DECIMAL(10,2) NULL",
+        'nombre_personnes'   => "INT NULL",
+        'nombre_etages'      => "INT NULL",
+        'niveau_etage'       => "VARCHAR(30) NULL",
+        'profil_celibataire' => "TINYINT(1) NOT NULL DEFAULT 0",
+        'profil_marie'       => "TINYINT(1) NOT NULL DEFAULT 0",
+        'profil_etudiant'    => "TINYINT(1) NOT NULL DEFAULT 0",
+        'profil_travailleur' => "TINYINT(1) NOT NULL DEFAULT 0",
+        'profil_senegalais'  => "TINYINT(1) NOT NULL DEFAULT 0",
+        'profil_etranger'    => "TINYINT(1) NOT NULL DEFAULT 0",
     ];
 
     foreach ($colonnesAAjouter as $colonne => $definition) {

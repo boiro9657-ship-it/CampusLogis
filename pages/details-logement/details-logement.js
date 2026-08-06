@@ -89,6 +89,8 @@ async function chargerLogement(id){
 
     afficherEquipements(logement);
 
+    afficherProfilRecherche(logement);
+
     const contactBtn =
     document.getElementById("contactOwnerBtn");
 
@@ -527,11 +529,19 @@ function afficherCaution(caution){
 
 }
 
+const LIBELLES_NIVEAU_ETAGE = {
+    rdc: "Rez-de-chaussée",
+    "1": "1er étage",
+    "2": "2e étage",
+    "3": "3e étage",
+    "4_plus": "4e étage et plus"
+};
+
 /**
- * Reconstruit les badges rapides (chambres + wifi/parking si
- * présents) à partir des vraies données du logement. Le nombre
- * de chambres est toujours affiché ; les autres badges
- * n'apparaissent que si l'équipement correspondant est coché.
+ * Reconstruit les badges rapides (chambres, capacité, étage) à
+ * partir des vraies données du logement. Les équipements (dont
+ * Wi-Fi) ne sont volontairement pas répétés ici : ils n'apparaissent
+ * que dans la section "Équipements" plus bas, pour éviter le doublon.
  */
 function afficherCaracteristiques(logement){
 
@@ -541,15 +551,17 @@ function afficherCaracteristiques(logement){
     if(!container) return;
 
     const badges = [
-        `<span><i class="ph ph-bed"></i> ${logement.chambres || 0} Chambre(s)</span>`
+        `<span><i class="ph ph-bed"></i> ${logement.chambres || 0} Chambre(s)/Bureau(x)</span>`
     ];
 
-    if(Number(logement.equip_wifi) === 1){
-        badges.push(`<span><i class="ph ph-wifi-high"></i> Wi-Fi</span>`);
+    if(logement.nombre_personnes){
+        badges.push(`<span><i class="ph ph-users-three"></i> ${logement.nombre_personnes} personne(s)</span>`);
     }
 
-    if(Number(logement.equip_parking) === 1){
-        badges.push(`<span><i class="ph ph-car"></i> Parking</span>`);
+    if(logement.type === "Immeuble" && logement.nombre_etages){
+        badges.push(`<span><i class="ph ph-buildings"></i> ${logement.nombre_etages} étage(s)</span>`);
+    }else if(logement.niveau_etage && LIBELLES_NIVEAU_ETAGE[logement.niveau_etage]){
+        badges.push(`<span><i class="ph ph-stairs"></i> ${LIBELLES_NIVEAU_ETAGE[logement.niveau_etage]}</span>`);
     }
 
     container.innerHTML =
@@ -599,6 +611,49 @@ function afficherEquipements(logement){
     equipementsActifs.map(e => `
         <span><i class="ph ${e.icone}"></i> ${e.libelle}</span>
     `).join("");
+
+}
+
+/**
+ * Affiche le profil de locataire recherché par le propriétaire
+ * (célibataire, marié, étudiant...), si renseigné. Masque toute la
+ * section si aucun profil n'a été coché.
+ */
+function afficherProfilRecherche(logement){
+
+    const profilsDisponibles = [
+        { cle: "profil_celibataire", icone: "ph-user", libelle: "Célibataire" },
+        { cle: "profil_marie", icone: "ph-users", libelle: "Marié(e)" },
+        { cle: "profil_etudiant", icone: "ph-graduation-cap", libelle: "Étudiant(e)" },
+        { cle: "profil_travailleur", icone: "ph-briefcase", libelle: "Travailleur(se)" },
+        { cle: "profil_senegalais", icone: "ph-flag", libelle: "Sénégalais(e)" },
+        { cle: "profil_etranger", icone: "ph-globe", libelle: "Étranger(ère)" },
+    ];
+
+    const profilsActifs =
+    profilsDisponibles.filter(p => Number(logement[p.cle]) === 1);
+
+    const profilCard =
+    document.getElementById("profilCard");
+
+    const profilGrid =
+    document.getElementById("profilGrid");
+
+    if(!profilCard || !profilGrid) return;
+
+    if(profilsActifs.length === 0){
+
+        profilCard.style.display = "none";
+
+        return;
+    }
+
+    profilGrid.innerHTML =
+    profilsActifs.map(p => `
+        <span><i class="ph ${p.icone}"></i> ${p.libelle}</span>
+    `).join("");
+
+    profilCard.style.display = "";
 
 }
 

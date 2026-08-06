@@ -258,6 +258,7 @@ function createLogement(): void
     }
 
     $equipements = extraireEquipements($_POST['equipements'] ?? []);
+    $profils = extraireProfils($_POST['profils'] ?? []);
 
     // Durée de location : détermine à quelle période correspond le
     // prix saisi (à la nuitée, à la semaine, au mois, à l'année...).
@@ -278,6 +279,53 @@ function createLogement(): void
         }
 
         $caution = (float) $cautionBrute;
+    }
+
+    // Capacité facultative (nombre de personnes que le logement
+    // peut accueillir).
+    $nombrePersonnesBrute = trim($_POST['nombre_personnes'] ?? '');
+    $nombrePersonnes = null;
+
+    if ($nombrePersonnesBrute !== '') {
+
+        if (!ctype_digit($nombrePersonnesBrute) || (int) $nombrePersonnesBrute < 1) {
+            jsonError('Le nombre de personnes doit être un nombre valide.');
+        }
+
+        $nombrePersonnes = (int) $nombrePersonnesBrute;
+    }
+
+    // Un immeuble se décrit par son nombre total d'étages ; les
+    // autres types de logement se décrivent par le niveau d'étage
+    // auquel se trouve le logement (rez-de-chaussée, 1er...).
+    $nombreEtages = null;
+    $niveauEtage = null;
+
+    if ($type === 'Immeuble') {
+
+        $nombreEtagesBrute = trim($_POST['nombre_etages'] ?? '');
+
+        if ($nombreEtagesBrute !== '') {
+
+            if (!ctype_digit($nombreEtagesBrute) || (int) $nombreEtagesBrute < 1) {
+                jsonError('Le nombre d\'étages doit être un nombre valide.');
+            }
+
+            $nombreEtages = (int) $nombreEtagesBrute;
+        }
+
+    } else {
+
+        $niveauEtageBrute = $_POST['niveau_etage'] ?? '';
+
+        if ($niveauEtageBrute !== '') {
+
+            if (!in_array($niveauEtageBrute, NIVEAUX_ETAGE_VALIDES, true)) {
+                jsonError('Niveau d\'étage invalide.');
+            }
+
+            $niveauEtage = $niveauEtageBrute;
+        }
     }
 
     if (!$titre || !$ville || !$prix) {
@@ -339,19 +387,23 @@ function createLogement(): void
             INSERT INTO logements (
                 owner_id, titre, ville, type, prix, chambres, description, image_url,
                 contact_telephone, contact_whatsapp, contact_email,
-                duree_location, caution,
+                duree_location, caution, nombre_personnes, nombre_etages, niveau_etage,
                 equip_wifi, equip_parking, equip_cuisine, equip_douche, equip_salon, equip_balcon,
-                equip_eau, equip_electricite, equip_climatisation
+                equip_eau, equip_electricite, equip_climatisation,
+                profil_celibataire, profil_marie, profil_etudiant, profil_travailleur,
+                profil_senegalais, profil_etranger
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
             $userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl,
             $contactTelephone, $contactWhatsapp, $contactEmail,
-            $dureeLocation, $caution,
+            $dureeLocation, $caution, $nombrePersonnes, $nombreEtages, $niveauEtage,
             $equipements['wifi'], $equipements['parking'], $equipements['cuisine'],
             $equipements['douche'], $equipements['salon'], $equipements['balcon'],
             $equipements['eau'], $equipements['electricite'], $equipements['climatisation'],
+            $profils['celibataire'], $profils['marie'], $profils['etudiant'], $profils['travailleur'],
+            $profils['senegalais'], $profils['etranger'],
         ]);
 
         $logementId = $pdo->lastInsertId();
@@ -428,6 +480,26 @@ function extraireEquipements($equipementsBruts): array
 }
 
 const DUREES_LOCATION_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an'];
+const NIVEAUX_ETAGE_VALIDES = ['rdc', '1', '2', '3', '4_plus'];
+
+/**
+ * Normalise le "profil recherché" coché par le propriétaire
+ * (equipements[] côté HTML, mais un champ indépendant) — même
+ * logique que extraireEquipements().
+ */
+function extraireProfils($profilsBruts): array
+{
+    $liste = is_array($profilsBruts) ? $profilsBruts : [];
+
+    $disponibles = ['celibataire', 'marie', 'etudiant', 'travailleur', 'senegalais', 'etranger'];
+    $resultat = [];
+
+    foreach ($disponibles as $cle) {
+        $resultat[$cle] = in_array($cle, $liste, true) ? 1 : 0;
+    }
+
+    return $resultat;
+}
 
 function updateLogement(int $id): void
 {
@@ -441,9 +513,11 @@ function updateLogement(int $id): void
     $champsAutorises = [
         'titre', 'ville', 'type', 'prix', 'chambres', 'description', 'statut',
         'contact_telephone', 'contact_whatsapp', 'contact_email',
-        'duree_location', 'caution',
+        'duree_location', 'caution', 'nombre_personnes', 'nombre_etages', 'niveau_etage',
         'equip_wifi', 'equip_parking', 'equip_cuisine', 'equip_douche', 'equip_salon', 'equip_balcon',
         'equip_eau', 'equip_electricite', 'equip_climatisation',
+        'profil_celibataire', 'profil_marie', 'profil_etudiant', 'profil_travailleur',
+        'profil_senegalais', 'profil_etranger',
     ];
 
     foreach ($champsAutorises as $champ) {

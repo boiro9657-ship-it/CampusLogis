@@ -356,16 +356,22 @@ function afficherReservations(reservations, mode){
                     : ""
                 }
 
-                ${
-                    mode === "owner" && reservation.statut === "en_attente"
-                    ? `
-                    <div class="reservation-actions">
+                <div class="reservation-actions">
+
+                    ${
+                        mode === "owner" && reservation.statut === "en_attente"
+                        ? `
                         <button class="btn-accepter-reservation" data-id="${reservation.id}">Accepter</button>
                         <button class="btn-refuser-reservation" data-id="${reservation.id}">Refuser</button>
-                    </div>
-                    `
-                    : ""
-                }
+                        `
+                        : ""
+                    }
+
+                    <button class="btn-discuter" data-id="${reservation.id}">
+                        <i class="ph ph-chat-circle-dots"></i> Discuter
+                    </button>
+
+                </div>
 
             </div>
 
@@ -391,6 +397,12 @@ function afficherReservations(reservations, mode){
         });
 
     }
+
+    reservationsContainer.querySelectorAll(".btn-discuter").forEach(btn => {
+
+        btn.addEventListener("click", () => ouvrirChat(btn.dataset.id));
+
+    });
 
 }
 
@@ -495,5 +507,258 @@ function afficherTableRecente(logements, reservations, afficherAnnoncesRecentes)
         `).join("");
 
     }
+
+}
+
+/* ==========================
+    ESPACE DE DISCUSSION
+    Une conversation par réservation. Basé sur des requêtes
+    répétées (pas de websocket disponible sur cet hébergement) :
+    tant que la fenêtre est ouverte, on revérifie les nouveaux
+    messages toutes les 4 secondes. L'appel se fait via un vrai
+    lien tel:/wa.me vers le numéro du correspondant — pas d'appel
+    vocal directement dans le navigateur (non fiable sur cet
+    hébergement partagé, on ne simule pas une fonctionnalité qui
+    ne marcherait pas réellement).
+========================== */
+
+let chatReservationId = null;
+let chatIntervalle = null;
+
+const chatOverlay =
+document.getElementById("chatModalOverlay");
+
+async function ouvrirChat(reservationId){
+
+    chatReservationId = reservationId;
+
+    chatOverlay.classList.add("show");
+
+    await rafraichirChat();
+
+    apiFetch("/messagerie/" + reservationId + "/lu", { method: "PUT" }).catch(()=>{});
+
+    if(chatIntervalle) clearInterval(chatIntervalle);
+
+    chatIntervalle = setInterval(rafraichirChat, 4000);
+
+}
+
+function fermerChat(){
+
+    chatOverlay.classList.remove("show");
+
+    chatReservationId = null;
+
+    if(chatIntervalle){
+
+        clearInterval(chatIntervalle);
+        chatIntervalle = null;
+
+    }
+
+}
+
+document.getElementById("chatCloseBtn").addEventListener("click", fermerChat);
+
+chatOverlay.addEventListener("click", (e) => {
+
+    if(e.target === chatOverlay) fermerChat();
+
+});
+
+async function rafraichirChat(){
+
+    if(!chatReservationId) return;
+
+    let donnees;
+
+    try{
+
+        donnees = await apiFetch("/messagerie/" + chatReservationId);
+
+    }catch(error){
+
+        return;
+    }
+
+    afficherParticipantChat(donnees.participant);
+    afficherMessagesChat(donnees.messages);
+
+}
+
+function afficherParticipantChat(participant){
+
+    const nomEl =
+    document.getElementById("chatParticipantNom");
+
+    const statutEl =
+    document.getElementById("chatParticipantStatut");
+
+    const avatarEl =
+    document.getElementById("chatAvatar");
+
+    const callBtn =
+    document.getElementById("chatCallBtn");
+
+    const whatsappBtn =
+    document.getElementById("chatWhatsappBtn");
+
+    if(!participant){
+
+        if(nomEl) nomEl.textContent = "Discussion";
+        if(statutEl) statutEl.textContent = "";
+
+        return;
+    }
+
+    if(nomEl) nomEl.textContent = participant.nom_complet;
+
+    if(statutEl){
+
+        statutEl.innerHTML =
+        participant.en_ligne
+        ? `<span class="chat-dot chat-dot-en-ligne"></span> En ligne`
+        : `<span class="chat-dot"></span> Hors ligne`;
+
+    }
+
+    if(avatarEl){
+
+        avatarEl.innerHTML =
+        participant.photo_url
+        ? `<img src="${participant.photo_url}" alt="${participant.nom_complet}">`
+        : `<i class="ph ph-user"></i>`;
+
+    }
+
+    const numero =
+    participant.telephone ? formaterNumeroInternationalChat(participant.telephone) : null;
+
+    if(callBtn){
+
+        if(numero){
+            callBtn.href = "tel:+" + numero;
+            callBtn.classList.remove("chat-icon-btn-desactive");
+        }else{
+            callBtn.href = "#";
+            callBtn.classList.add("chat-icon-btn-desactive");
+        }
+
+    }
+
+    if(whatsappBtn){
+
+        if(numero){
+            whatsappBtn.href = "https://wa.me/" + numero;
+            whatsappBtn.classList.remove("chat-icon-btn-desactive");
+        }else{
+            whatsappBtn.href = "#";
+            whatsappBtn.classList.add("chat-icon-btn-desactive");
+        }
+
+    }
+
+}
+
+let dernierAffichageMessagesChat = "";
+
+function afficherMessagesChat(messages){
+
+    const container =
+    document.getElementById("chatMessages");
+
+    if(!container) return;
+
+    // Évite de reconstruire/re-scroller le fil à chaque poll si
+    // rien n'a changé depuis la dernière vérification.
+    const signature =
+    JSON.stringify(messages.map(m => m.id));
+
+    if(signature === dernierAffichageMessagesChat) return;
+
+    dernierAffichageMessagesChat = signature;
+
+    if(messages.length === 0){
+
+        container.innerHTML =
+        `<p class="chat-vide">Aucun message pour l'instant. Lancez la discussion !</p>`;
+
+        return;
+    }
+
+    container.innerHTML =
+    messages.map(m => `
+        <div class="chat-bulle ${m.est_moi ? "chat-bulle-moi" : "chat-bulle-autre"}">
+            <p>${m.message}</p>
+            <span>${new Date(m.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
+        </div>
+    `).join("");
+
+    container.scrollTop = container.scrollHeight;
+
+}
+
+const chatForm =
+document.getElementById("chatForm");
+
+if(chatForm){
+
+    chatForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const input =
+        document.getElementById("chatInput");
+
+        const message =
+        input.value.trim();
+
+        if(!message || !chatReservationId) return;
+
+        input.value = "";
+
+        try{
+
+            await apiFetch("/messagerie/" + chatReservationId, {
+
+                method: "POST",
+
+                body: JSON.stringify({ message })
+
+            });
+
+            dernierAffichageMessagesChat = "";
+
+            await rafraichirChat();
+
+        }catch(error){
+
+            showToast(error.message, "error");
+
+        }
+
+    });
+
+}
+
+function formaterNumeroInternationalChat(telephone){
+
+    let chiffres =
+    telephone.replace(/\D/g, "");
+
+    if(chiffres.startsWith("00")){
+        chiffres = chiffres.slice(2);
+    }
+
+    if(chiffres.startsWith("221")){
+        return chiffres;
+    }
+
+    if(chiffres.startsWith("0")){
+        chiffres = chiffres.slice(1);
+    }
+
+    return "221" + chiffres;
 
 }

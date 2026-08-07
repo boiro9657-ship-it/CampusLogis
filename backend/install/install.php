@@ -126,6 +126,22 @@ try {
         $etapes[] = 'Colonne "plan" ajoutée.';
     }
 
+    // Horodatage de dernière activité, mis à jour par un signal
+    // régulier envoyé par le navigateur (voir global.js) tant que
+    // l'utilisateur est connecté et a la page ouverte — sert à
+    // déterminer qui est "en ligne" dans l'espace de discussion.
+    $colonneActiviteExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'utilisateurs'
+        AND COLUMN_NAME = 'derniere_activite'
+    ")->fetchColumn();
+
+    if ($colonneActiviteExiste == 0) {
+        $pdo->exec("ALTER TABLE utilisateurs ADD COLUMN derniere_activite TIMESTAMP NULL");
+        $etapes[] = 'Colonne "derniere_activite" ajoutée.';
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS password_resets (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -301,6 +317,24 @@ try {
         $pdo->exec("ALTER TABLE reservations ADD COLUMN conditions_acceptees TINYINT(1) NOT NULL DEFAULT 0 AFTER message");
         $etapes[] = 'Colonne "conditions_acceptees" ajoutée.';
     }
+
+    // Espace de discussion propriétaire/locataire : une conversation
+    // par réservation (les deux seuls participants sont déterminés
+    // via la réservation elle-même, pas besoin de les stocker ici).
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS messages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            reservation_id INT NOT NULL,
+            sender_id INT NOT NULL,
+            message TEXT NOT NULL,
+            lu TINYINT(1) NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE,
+            FOREIGN KEY (sender_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
+            INDEX idx_reservation (reservation_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "messages" prête.';
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS messages_contact (

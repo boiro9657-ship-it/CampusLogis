@@ -160,6 +160,19 @@ if(typeof apiFetch !== "undefined"){
 
     apiFetch("/auth/me").then((utilisateur)=>{
 
+        // Signal de présence : indique que ce compte a une page du
+        // site ouverte, pour le statut "En ligne" de l'espace de
+        // discussion. Répété pendant que la page reste ouverte —
+        // sans ça, un utilisateur resterait "en ligne" indéfiniment
+        // après avoir fermé son onglet.
+        apiFetch("/auth/presence", { method: "POST" }).catch(()=>{});
+
+        setInterval(() => {
+
+            apiFetch("/auth/presence", { method: "POST" }).catch(()=>{});
+
+        }, 25000);
+
         const navBtn =
         document.querySelector(".btn-nav-link");
 

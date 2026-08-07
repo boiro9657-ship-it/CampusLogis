@@ -218,6 +218,61 @@
 
 </section>
 
+<!-- ===========================
+        ESPACE DE DISCUSSION
+=========================== -->
+
+<div class="chat-modal-overlay" id="chatModalOverlay">
+
+    <div class="chat-modal">
+
+        <div class="chat-modal-header">
+
+            <div class="chat-modal-participant">
+
+                <div class="chat-avatar" id="chatAvatar"><i class="ph ph-user"></i></div>
+
+                <div>
+                    <h3 id="chatParticipantNom">—</h3>
+                    <span class="chat-statut" id="chatParticipantStatut">—</span>
+                </div>
+
+            </div>
+
+            <div class="chat-modal-actions">
+
+                <a href="#" id="chatCallBtn" class="chat-icon-btn" title="Appeler">
+                    <i class="ph ph-phone"></i>
+                </a>
+
+                <a href="#" id="chatWhatsappBtn" class="chat-icon-btn" title="WhatsApp" target="_blank" rel="noopener">
+                    <i class="ph ph-whatsapp-logo"></i>
+                </a>
+
+                <button type="button" class="chat-icon-btn" id="chatCloseBtn" title="Fermer">
+                    <i class="ph ph-x"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="chat-modal-body" id="chatMessages"></div>
+
+        <form class="chat-modal-input" id="chatForm">
+
+            <textarea id="chatInput" placeholder="Écrivez un message..." maxlength="1000"></textarea>
+
+            <button type="submit" title="Envoyer">
+                <i class="ph ph-paper-plane-tilt"></i>
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
 <footer class="footer">
 
     <div class="container">

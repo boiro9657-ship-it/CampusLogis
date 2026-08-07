@@ -66,6 +66,11 @@ function handleAuthRoute(array $segments, string $method): void
         return;
     }
 
+    if ($action === 'presence' && $method === 'POST') {
+        enregistrerActivite();
+        return;
+    }
+
     jsonError('Route introuvable.', 404);
 }
 
@@ -344,6 +349,21 @@ function modifierPreferenceNotifications(): void
         ->execute([$actives, $userId]);
 
     jsonResponse(['message' => 'Préférence de notifications mise à jour.']);
+}
+
+/**
+ * Signal d'activité envoyé périodiquement par le navigateur tant
+ * que l'utilisateur connecté a une page du site ouverte — sert à
+ * déterminer qui est "en ligne" dans l'espace de discussion.
+ */
+function enregistrerActivite(): void
+{
+    $userId = requireAuth();
+
+    getPdo()->prepare('UPDATE utilisateurs SET derniere_activite = NOW() WHERE id = ?')
+        ->execute([$userId]);
+
+    jsonResponse(['message' => 'ok']);
 }
 
 /**

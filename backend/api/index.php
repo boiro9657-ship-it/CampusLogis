@@ -71,6 +71,11 @@ try {
             handleColocationsRoute($rest, $method);
             break;
 
+        case 'messagerie':
+            require __DIR__ . '/routes/messagerie.php';
+            handleMessagerieRoute($rest, $method);
+            break;
+
         default:
             jsonError('Route introuvable.', 404);
 

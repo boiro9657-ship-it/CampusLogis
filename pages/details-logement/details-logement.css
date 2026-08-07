@@ -141,14 +141,7 @@
 
     height:500px;
 
-    /* "cover" recadrait fortement les photos qui ne font pas
-       exactement le ratio de la grande vignette (surtout sur
-       grand écran, où elle est très large) — une partie de la
-       photo n'était donc jamais visible. "contain" affiche
-       toujours la photo entière, sur un fond neutre. */
-    object-fit:contain;
-
-    background:#F1F5F9;
+    object-fit:cover;
 
     border-radius:25px;
 

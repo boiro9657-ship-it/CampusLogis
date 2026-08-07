@@ -1,8 +1,12 @@
 <?php
 /**
- * Espace de discussion entre le propriétaire et le locataire d'une
- * réservation donnée — chaque réservation est sa propre
- * conversation (ses deux seuls participants se déduisent d'elle).
+ * Espace de discussion entre un propriétaire et un locataire —
+ * une conversation par binôme d'utilisateurs (pas par réservation
+ * individuelle) : si un locataire réserve plusieurs fois le même
+ * logement, ou plusieurs logements du même propriétaire, tous les
+ * messages restent dans un seul fil continu. L'accès à la
+ * discussion reste conditionné à l'existence d'au moins une vraie
+ * réservation entre les deux personnes ("après réservation").
  * Basé sur des requêtes courtes (pas de websocket, non disponible
  * sur cet hébergement) : le frontend interroge à intervalle
  * régulier pendant que la discussion est ouverte.
@@ -17,21 +21,21 @@ const SECONDES_EN_LIGNE = 60;
 
 function handleMessagerieRoute(array $segments, string $method): void
 {
-    $reservationId = $segments[0] ?? null;
+    $autreUserId = $segments[0] ?? null;
     $action = $segments[1] ?? null;
 
-    if ($method === 'GET' && is_numeric($reservationId) && $action === null) {
-        listerMessages((int) $reservationId);
+    if ($method === 'GET' && is_numeric($autreUserId) && $action === null) {
+        listerMessages((int) $autreUserId);
         return;
     }
 
-    if ($method === 'POST' && is_numeric($reservationId) && $action === null) {
-        envoyerMessage((int) $reservationId);
+    if ($method === 'POST' && is_numeric($autreUserId) && $action === null) {
+        envoyerMessage((int) $autreUserId);
         return;
     }
 
-    if ($method === 'PUT' && is_numeric($reservationId) && $action === 'lu') {
-        marquerMessagesLus((int) $reservationId);
+    if ($method === 'PUT' && is_numeric($autreUserId) && $action === 'lu') {
+        marquerMessagesLus((int) $autreUserId);
         return;
     }
 
@@ -39,42 +43,34 @@ function handleMessagerieRoute(array $segments, string $method): void
 }
 
 /**
- * Vérifie que l'utilisateur connecté est bien le propriétaire ou
- * le locataire de cette réservation, et renvoie les deux
- * identifiants ainsi que l'id de l'autre participant.
+ * Vérifie qu'une vraie réservation lie ces deux utilisateurs (dans
+ * un sens ou dans l'autre) avant d'autoriser la discussion —
+ * n'importe qui ne peut pas juste écrire à n'importe qui.
  */
-function verifierParticipant(int $reservationId, int $userId): array
+function verifierRelationReservation(int $userId, int $autreUserId): void
 {
-    $stmt = getPdo()->prepare('
-        SELECT r.id, r.locataire_id, l.owner_id
-        FROM reservations r
-        JOIN logements l ON l.id = r.logement_id
-        WHERE r.id = ?
-    ');
-    $stmt->execute([$reservationId]);
-    $reservation = $stmt->fetch();
-
-    if (!$reservation) {
+    if ($userId === $autreUserId) {
         jsonError('Réservation introuvable.', 404);
     }
 
-    $locataireId = (int) $reservation['locataire_id'];
-    $ownerId = (int) $reservation['owner_id'];
+    $stmt = getPdo()->prepare('
+        SELECT COUNT(*) FROM reservations r
+        JOIN logements l ON l.id = r.logement_id
+        WHERE (r.locataire_id = ? AND l.owner_id = ?)
+           OR (r.locataire_id = ? AND l.owner_id = ?)
+    ');
+    $stmt->execute([$userId, $autreUserId, $autreUserId, $userId]);
 
-    if ($userId !== $locataireId && $userId !== $ownerId) {
-        jsonError('Vous ne faites pas partie de cette discussion.', 403);
+    if ((int) $stmt->fetchColumn() === 0) {
+        jsonError('Aucune réservation ne vous lie à cet utilisateur.', 403);
     }
-
-    $autreId = $userId === $locataireId ? $ownerId : $locataireId;
-
-    return ['locataire_id' => $locataireId, 'owner_id' => $ownerId, 'autre_id' => $autreId];
 }
 
-function listerMessages(int $reservationId): void
+function listerMessages(int $autreUserId): void
 {
     $userId = requireAuth();
 
-    $participants = verifierParticipant($reservationId, $userId);
+    verifierRelationReservation($userId, $autreUserId);
 
     $stmt = getPdo()->prepare("
         SELECT id, nom_complet, photo_url, telephone,
@@ -82,16 +78,21 @@ function listerMessages(int $reservationId): void
         FROM utilisateurs
         WHERE id = ?
     ");
-    $stmt->execute([$participants['autre_id']]);
+    $stmt->execute([$autreUserId]);
     $autreParticipant = $stmt->fetch();
+
+    if (!$autreParticipant) {
+        jsonError('Utilisateur introuvable.', 404);
+    }
 
     $stmt = getPdo()->prepare('
         SELECT id, sender_id, message, created_at
         FROM messages
-        WHERE reservation_id = ?
+        WHERE (sender_id = ? AND destinataire_id = ?)
+           OR (sender_id = ? AND destinataire_id = ?)
         ORDER BY created_at ASC
     ');
-    $stmt->execute([$reservationId]);
+    $stmt->execute([$userId, $autreUserId, $autreUserId, $userId]);
     $messages = $stmt->fetchAll();
 
     foreach ($messages as &$message) {
@@ -99,22 +100,22 @@ function listerMessages(int $reservationId): void
     }
 
     jsonResponse([
-        'participant' => $autreParticipant ? [
+        'participant' => [
             'id'          => (int) $autreParticipant['id'],
             'nom_complet' => $autreParticipant['nom_complet'],
             'photo_url'   => $autreParticipant['photo_url'],
             'telephone'   => $autreParticipant['telephone'],
             'en_ligne'    => (bool) $autreParticipant['en_ligne'],
-        ] : null,
+        ],
         'messages' => $messages,
     ]);
 }
 
-function envoyerMessage(int $reservationId): void
+function envoyerMessage(int $autreUserId): void
 {
     $userId = requireAuth();
 
-    verifierParticipant($reservationId, $userId);
+    verifierRelationReservation($userId, $autreUserId);
 
     $body = getJsonBody();
     $message = trim($body['message'] ?? '');
@@ -128,23 +129,23 @@ function envoyerMessage(int $reservationId): void
     }
 
     getPdo()->prepare('
-        INSERT INTO messages (reservation_id, sender_id, message)
+        INSERT INTO messages (sender_id, destinataire_id, message)
         VALUES (?, ?, ?)
-    ')->execute([$reservationId, $userId, $message]);
+    ')->execute([$userId, $autreUserId, $message]);
 
     jsonResponse(['message' => 'Message envoyé.'], 201);
 }
 
-function marquerMessagesLus(int $reservationId): void
+function marquerMessagesLus(int $autreUserId): void
 {
     $userId = requireAuth();
 
-    verifierParticipant($reservationId, $userId);
+    verifierRelationReservation($userId, $autreUserId);
 
     getPdo()->prepare('
         UPDATE messages SET lu = 1
-        WHERE reservation_id = ? AND sender_id != ? AND lu = 0
-    ')->execute([$reservationId, $userId]);
+        WHERE sender_id = ? AND destinataire_id = ? AND lu = 0
+    ')->execute([$autreUserId, $userId]);
 
     jsonResponse(['message' => 'Messages marqués comme lus.']);
 }

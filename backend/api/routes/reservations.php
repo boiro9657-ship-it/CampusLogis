@@ -78,7 +78,7 @@ function mesReservations(): void
     $userId = requireAuth();
 
     $stmt = getPdo()->prepare('
-        SELECT r.*, l.titre, l.ville, l.image_url
+        SELECT r.*, l.titre, l.ville, l.image_url, l.owner_id
         FROM reservations r
         JOIN logements l ON l.id = r.logement_id
         WHERE r.locataire_id = ?

@@ -319,22 +319,57 @@ try {
     }
 
     // Espace de discussion propriétaire/locataire : une conversation
-    // par réservation (les deux seuls participants sont déterminés
-    // via la réservation elle-même, pas besoin de les stocker ici).
+    // par binôme d'utilisateurs (pas par réservation individuelle) —
+    // si un locataire réserve plusieurs fois le même logement, ou
+    // plusieurs logements du même propriétaire, tous les messages
+    // restent dans un seul fil continu au lieu d'être éclatés entre
+    // plusieurs conversations vides selon la réservation ouverte de
+    // chaque côté.
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS messages (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            reservation_id INT NOT NULL,
             sender_id INT NOT NULL,
+            destinataire_id INT NOT NULL,
             message TEXT NOT NULL,
             lu TINYINT(1) NOT NULL DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE,
             FOREIGN KEY (sender_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
-            INDEX idx_reservation (reservation_id)
+            FOREIGN KEY (destinataire_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
+            INDEX idx_paire (sender_id, destinataire_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "messages" prête.';
+
+    // Migration depuis l'ancien schéma (une conversation par
+    // réservation) vers le nouveau (une conversation par binôme).
+    $colonneDestinataireExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'messages'
+        AND COLUMN_NAME = 'destinataire_id'
+    ")->fetchColumn();
+
+    if ($colonneDestinataireExiste == 0) {
+
+        $pdo->exec("ALTER TABLE messages ADD COLUMN destinataire_id INT NULL AFTER sender_id");
+
+        // Déduit le destinataire de chaque ancien message à partir
+        // de la réservation à laquelle il était rattaché (l'autre
+        // participant que l'expéditeur).
+        $pdo->exec("
+            UPDATE messages m
+            JOIN reservations r ON r.id = m.reservation_id
+            JOIN logements l ON l.id = r.logement_id
+            SET m.destinataire_id = IF(m.sender_id = r.locataire_id, l.owner_id, r.locataire_id)
+            WHERE m.destinataire_id IS NULL
+        ");
+
+        $pdo->exec("ALTER TABLE messages ADD CONSTRAINT fk_messages_destinataire FOREIGN KEY (destinataire_id) REFERENCES utilisateurs(id) ON DELETE CASCADE");
+        $pdo->exec("ALTER TABLE messages ADD INDEX idx_paire (sender_id, destinataire_id)");
+        $pdo->exec("ALTER TABLE messages MODIFY reservation_id INT NULL");
+
+        $etapes[] = 'Table "messages" migrée vers une conversation par binôme d\'utilisateurs.';
+    }
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS messages_contact (

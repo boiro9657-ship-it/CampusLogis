@@ -341,7 +341,15 @@ function afficherReservations(reservations, mode){
     };
 
     reservationsContainer.innerHTML =
-    reservations.map(reservation => `
+    reservations.map(reservation => {
+
+        // La discussion se fait avec la personne, pas avec "cette
+        // réservation précise" : sinon, réserver plusieurs fois
+        // éclaterait la conversation en plusieurs fils séparés.
+        const autreUserId =
+        mode === "owner" ? reservation.locataire_id : reservation.owner_id;
+
+        return `
         <div class="reservation-card">
 
             <div>
@@ -367,7 +375,7 @@ function afficherReservations(reservations, mode){
                         : ""
                     }
 
-                    <button class="btn-discuter" data-id="${reservation.id}">
+                    <button class="btn-discuter" data-id="${autreUserId}">
                         <i class="ph ph-chat-circle-dots"></i> Discuter
                     </button>
 
@@ -380,7 +388,9 @@ function afficherReservations(reservations, mode){
             </span>
 
         </div>
-    `).join("");
+        `;
+
+    }).join("");
 
     if(mode === "owner"){
 
@@ -512,31 +522,33 @@ function afficherTableRecente(logements, reservations, afficherAnnoncesRecentes)
 
 /* ==========================
     ESPACE DE DISCUSSION
-    Une conversation par réservation. Basé sur des requêtes
-    répétées (pas de websocket disponible sur cet hébergement) :
-    tant que la fenêtre est ouverte, on revérifie les nouveaux
-    messages toutes les 4 secondes. L'appel se fait via un vrai
-    lien tel:/wa.me vers le numéro du correspondant — pas d'appel
-    vocal directement dans le navigateur (non fiable sur cet
-    hébergement partagé, on ne simule pas une fonctionnalité qui
-    ne marcherait pas réellement).
+    Une conversation par binôme d'utilisateurs (pas par réservation
+    individuelle) : tous les messages entre un propriétaire et un
+    locataire restent dans un seul fil, même s'il y a eu plusieurs
+    réservations entre eux. Basé sur des requêtes répétées (pas de
+    websocket disponible sur cet hébergement) : tant que la fenêtre
+    est ouverte, on revérifie les nouveaux messages toutes les 4
+    secondes. L'appel se fait via un vrai lien tel:/wa.me vers le
+    numéro du correspondant — pas d'appel vocal directement dans le
+    navigateur (non fiable sur cet hébergement partagé, on ne simule
+    pas une fonctionnalité qui ne marcherait pas réellement).
 ========================== */
 
-let chatReservationId = null;
+let chatAutreUserId = null;
 let chatIntervalle = null;
 
 const chatOverlay =
 document.getElementById("chatModalOverlay");
 
-async function ouvrirChat(reservationId){
+async function ouvrirChat(autreUserId){
 
-    chatReservationId = reservationId;
+    chatAutreUserId = autreUserId;
 
     chatOverlay.classList.add("show");
 
     await rafraichirChat();
 
-    apiFetch("/messagerie/" + reservationId + "/lu", { method: "PUT" }).catch(()=>{});
+    apiFetch("/messagerie/" + autreUserId + "/lu", { method: "PUT" }).catch(()=>{});
 
     if(chatIntervalle) clearInterval(chatIntervalle);
 
@@ -548,7 +560,7 @@ function fermerChat(){
 
     chatOverlay.classList.remove("show");
 
-    chatReservationId = null;
+    chatAutreUserId = null;
 
     if(chatIntervalle){
 
@@ -569,13 +581,13 @@ chatOverlay.addEventListener("click", (e) => {
 
 async function rafraichirChat(){
 
-    if(!chatReservationId) return;
+    if(!chatAutreUserId) return;
 
     let donnees;
 
     try{
 
-        donnees = await apiFetch("/messagerie/" + chatReservationId);
+        donnees = await apiFetch("/messagerie/" + chatAutreUserId);
 
     }catch(error){
 
@@ -714,13 +726,13 @@ if(chatForm){
         const message =
         input.value.trim();
 
-        if(!message || !chatReservationId) return;
+        if(!message || !chatAutreUserId) return;
 
         input.value = "";
 
         try{
 
-            await apiFetch("/messagerie/" + chatReservationId, {
+            await apiFetch("/messagerie/" + chatAutreUserId, {
 
                 method: "POST",
 

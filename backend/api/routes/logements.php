@@ -179,6 +179,12 @@ function getLogement(int $id): void
         jsonError('Logement introuvable.', 404);
     }
 
+    // Compteur de consultations, affiché au propriétaire dans son
+    // tableau de bord (argument réel derrière "Statistiques de
+    // consultation", vendu comme avantage Premium/Pro).
+    getPdo()->prepare('UPDATE logements SET vues = vues + 1 WHERE id = ?')->execute([$id]);
+    $logement['vues'] = (int) $logement['vues'] + 1;
+
     $stmt = getPdo()->prepare('
         SELECT type, url FROM logement_medias
         WHERE logement_id = ?
@@ -194,7 +200,8 @@ function getLogement(int $id): void
 // simplement ignorés (le client valide déjà ces mêmes bornes
 // avant l'envoi pour prévenir l'utilisateur).
 const MAX_PHOTOS = 8;
-const MAX_VIDEOS = 2;
+const MAX_VIDEOS_GRATUIT = 2;
+const MAX_VIDEOS_PREMIUM = 5;
 
 // Nombre maximum d'annonces qu'un compte au plan Gratuit peut
 // publier par jour calendaire — Premium et Pro n'ont pas cette
@@ -340,6 +347,10 @@ function createLogement(): void
     $photos = extraireFichiers($_FILES['photos'] ?? null);
     $videos = extraireFichiers($_FILES['videos'] ?? null);
 
+    $stmt = getPdo()->prepare('SELECT plan FROM utilisateurs WHERE id = ?');
+    $stmt->execute([$userId]);
+    $planActuel = $stmt->fetchColumn() ?: 'gratuit';
+
     // Publicité vocale : réservée aux plans Premium et Pro. Le
     // champ est masqué/désactivé côté client pour un compte
     // Gratuit, mais revérifié ici pour ne pas dépendre uniquement
@@ -348,10 +359,6 @@ function createLogement(): void
     $fichierAudio = $_FILES['audio'] ?? null;
 
     if ($fichierAudio && ($fichierAudio['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
-
-        $stmt = getPdo()->prepare('SELECT plan FROM utilisateurs WHERE id = ?');
-        $stmt->execute([$userId]);
-        $planActuel = $stmt->fetchColumn() ?: 'gratuit';
 
         if ($planActuel === 'gratuit') {
             jsonError('La publicité vocale est réservée aux plans Premium et Pro.', 403);
@@ -375,8 +382,10 @@ function createLogement(): void
         jsonError('Au moins une photo est obligatoire.');
     }
 
+    $maxVideos = $planActuel === 'gratuit' ? MAX_VIDEOS_GRATUIT : MAX_VIDEOS_PREMIUM;
+
     $photos = array_slice($photos, 0, MAX_PHOTOS);
-    $videos = array_slice($videos, 0, MAX_VIDEOS);
+    $videos = array_slice($videos, 0, $maxVideos);
 
     $medias = [];
     $imageUrl = null;

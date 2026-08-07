@@ -219,6 +219,7 @@ try {
         'profil_senegalais'  => "TINYINT(1) NOT NULL DEFAULT 0",
         'profil_etranger'    => "TINYINT(1) NOT NULL DEFAULT 0",
         'audio_url'          => "VARCHAR(255) NULL",
+        'vues'               => "INT NOT NULL DEFAULT 0",
     ];
 
     foreach ($colonnesAAjouter as $colonne => $definition) {

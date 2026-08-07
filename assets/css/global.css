@@ -419,6 +419,15 @@ header.scrolled{
 
 }
 
+/* Sur le menu horizontal du bureau, les icônes n'apparaissent
+   qu'à partir du menu mobile (déroulant) ci-dessous, pour ne pas
+   changer l'aspect de la navbar bureau. */
+.nav-links a i{
+
+    display:none;
+
+}
+
 .nav-buttons{
 
     display:flex;
@@ -1283,13 +1292,83 @@ header.scrolled{
 
     .nav-links.active{
 
-        max-height:500px;
+        max-height:600px;
 
-        padding:20px 0 10px;
+        padding:8px 0;
 
-        gap:20px;
+        gap:0;
 
-        box-shadow:0 10px 30px rgba(0,0,0,.08);
+        box-shadow:0 16px 30px rgba(0,0,0,.1);
+
+        border-radius:0 0 16px 16px;
+
+    }
+
+    /* Icônes du menu déroulant mobile : cachées sur le bureau
+       (règle par défaut), affichées ici dans un petit badge
+       coloré pour un rendu plus professionnel. */
+    .nav-links a i{
+
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+
+        width:34px;
+        height:34px;
+
+        margin-right:14px;
+
+        border-radius:10px;
+
+        background:rgba(20,92,61,.08);
+
+        color:var(--primary);
+
+        font-size:17px;
+
+        flex-shrink:0;
+
+    }
+
+    .nav-links li{
+
+        border-bottom:1px solid #F1F5F9;
+
+    }
+
+    .nav-links li:last-child{
+
+        border-bottom:none;
+
+    }
+
+    .nav-links a{
+
+        display:flex;
+        align-items:center;
+
+        padding:13px 24px;
+
+        font-size:.98rem;
+
+    }
+
+    .nav-links a:hover{
+
+        background:#F8FAF9;
+
+    }
+
+    .nav-links a.active{
+
+        background:rgba(20,92,61,.06);
+
+    }
+
+    .nav-links a.active i{
+
+        background:var(--primary);
+        color:white;
 
     }
 
@@ -1297,10 +1376,65 @@ header.scrolled{
 
 @media(max-width:420px){
 
+    /* Sur petit mobile, la navbar (logo + cloches + bouton compte
+       + hamburger) débordait facilement sur 2 lignes une fois
+       connecté. Tout est resserré pour rester sur une seule ligne,
+       propre et dégagée. */
+    .navbar{
+
+        padding:12px 10px;
+        gap:5px;
+
+    }
+
+    .logo-word{
+
+        font-size:.92rem;
+
+    }
+
+    .logo::after{
+
+        width:22px;
+
+    }
+
+    .nav-buttons{
+
+        gap:5px;
+
+    }
+
+    .notif-bell{
+
+        width:31px;
+        height:31px;
+
+        font-size:14px;
+
+    }
+
+    .notif-badge{
+
+        top:-3px;
+        right:-3px;
+
+        min-width:15px;
+        height:15px;
+        font-size:.62rem;
+
+    }
+
     .btn-nav-link{
 
-        padding:9px 14px;
-        font-size:.9rem;
+        padding:8px 9px;
+        font-size:.74rem;
+
+    }
+
+    .menu-toggle{
+
+        font-size:21px;
 
     }
 

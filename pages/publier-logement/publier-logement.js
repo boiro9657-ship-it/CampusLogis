@@ -5,6 +5,11 @@
    de bord propriétaire.
    ========================================================== */
 
+// Plan de l'utilisateur connecté, utilisé à la fois pour débloquer
+// la publicité vocale et pour la limite de vidéos par annonce plus
+// bas dans ce fichier — renseigné dès que "/auth/me" répond ci-dessous.
+let planActuel = "gratuit";
+
 (async () => {
 
     let utilisateur;
@@ -23,10 +28,19 @@
 
     // Publicité vocale réservée aux plans Premium/Pro : débloque
     // l'enregistrement uniquement si le compte a réellement ce plan.
-    const planActuel =
+    planActuel =
     utilisateur.plan || "gratuit";
 
     if(planActuel !== "gratuit"){
+
+        const labelVideos =
+        document.getElementById("labelVideos");
+
+        const hintVideosPlan =
+        document.getElementById("hintVideosPlan");
+
+        if(labelVideos) labelVideos.textContent = "Vidéos (facultatif, jusqu'à 5)";
+        if(hintVideosPlan) hintVideosPlan.style.display = "";
 
         const btnRecord =
         document.getElementById("btnAudioRecord");
@@ -381,9 +395,12 @@ if(publishForm){
                 return;
             }
 
-            if(videos.length > 2){
+            const maxVideosPlan =
+            planActuel === "gratuit" ? 2 : 5;
 
-                showToast("2 vidéos maximum par annonce.", "error");
+            if(videos.length > maxVideosPlan){
+
+                showToast(maxVideosPlan + " vidéos maximum avec votre plan actuel.", "error");
 
                 return;
             }

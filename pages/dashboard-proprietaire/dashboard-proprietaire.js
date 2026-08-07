@@ -272,6 +272,11 @@ function afficherAnnonces(logements){
                         ? `<span class="media-badge media-badge-audio">🎙️ Publicité vocale</span>`
                         : ""
                     }
+                    ${
+                        utilisateurConnecte && utilisateurConnecte.plan !== "gratuit"
+                        ? `<span class="media-badge media-badge-vues">👁 ${Number(logement.vues || 0)} consultation${Number(logement.vues || 0) > 1 ? "s" : ""}</span>`
+                        : `<span class="media-badge media-badge-vues-verrou"><i class="ph ph-lock-simple"></i> Statistiques Premium/Pro</span>`
+                    }
                 </div>
 
                 <p>${logement.description || ""}</p>

@@ -256,6 +256,27 @@
 
 }
 
+/* Fonctionnalités que le plan Gratuit ne permet pas : mises en
+   évidence par une barre rouge pour inciter clairement à
+   passer au Premium ou au Pro. */
+.pricing-features li.feature-denied{
+
+    color:var(--gray-500);
+
+    border-left:3px solid #DC2626;
+
+    padding-left:10px;
+
+    margin-left:-13px;
+
+}
+
+.pricing-features li.feature-denied i{
+
+    color:#DC2626;
+
+}
+
 .pricing-btn{
 
     display:block;

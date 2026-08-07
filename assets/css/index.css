@@ -25,7 +25,7 @@
        la photo. */
     background:
         linear-gradient(90deg, rgba(8,46,30,.92) 0%, rgba(11,61,40,.72) 35%, rgba(11,61,40,.28) 70%, rgba(11,61,40,.08) 100%),
-        url("../../images/hero.jpg") center/cover no-repeat;
+        url("../../images/hero.jpg?v=20260807b") center/cover no-repeat;
 
     color:white;
 
@@ -1738,7 +1738,7 @@
            illisible. Un voile uniforme couvre tout le texte. */
         background:
             linear-gradient(180deg, rgba(8,46,30,.82), rgba(11,61,40,.72)),
-            url("../../images/hero.jpg") center/cover no-repeat;
+            url("../../images/hero.jpg?v=20260807b") center/cover no-repeat;
 
     }
 

@@ -21,25 +21,142 @@ const SECONDES_EN_LIGNE = 60;
 
 function handleMessagerieRoute(array $segments, string $method): void
 {
-    $autreUserId = $segments[0] ?? null;
+    $premier = $segments[0] ?? null;
     $action = $segments[1] ?? null;
 
-    if ($method === 'GET' && is_numeric($autreUserId) && $action === null) {
-        listerMessages((int) $autreUserId);
+    if ($method === 'GET' && $premier === null) {
+        listerConversations();
         return;
     }
 
-    if ($method === 'POST' && is_numeric($autreUserId) && $action === null) {
-        envoyerMessage((int) $autreUserId);
+    if ($method === 'GET' && $premier === 'non-lus') {
+        compterMessagesNonLus();
         return;
     }
 
-    if ($method === 'PUT' && is_numeric($autreUserId) && $action === 'lu') {
-        marquerMessagesLus((int) $autreUserId);
+    if ($method === 'DELETE' && $premier === 'message' && is_numeric($action)) {
+        supprimerMessage((int) $action);
+        return;
+    }
+
+    if ($method === 'GET' && is_numeric($premier) && $action === null) {
+        listerMessages((int) $premier);
+        return;
+    }
+
+    if ($method === 'POST' && is_numeric($premier) && $action === null) {
+        envoyerMessage((int) $premier);
+        return;
+    }
+
+    if ($method === 'PUT' && is_numeric($premier) && $action === 'lu') {
+        marquerMessagesLus((int) $premier);
         return;
     }
 
     jsonError('Route introuvable.', 404);
+}
+
+/**
+ * Liste toutes les conversations de l'utilisateur connecté (une
+ * par personne avec qui une réservation le lie), avec le dernier
+ * message et le nombre de messages non lus — pour le menu
+ * déroulant de l'icône de messagerie et éventuellement une future
+ * page dédiée.
+ */
+function listerConversations(): void
+{
+    $userId = requireAuth();
+
+    $stmt = getPdo()->prepare('
+        SELECT DISTINCT autre_id FROM (
+            SELECT l.owner_id AS autre_id
+            FROM reservations r
+            JOIN logements l ON l.id = r.logement_id
+            WHERE r.locataire_id = ?
+            UNION
+            SELECT r.locataire_id AS autre_id
+            FROM reservations r
+            JOIN logements l ON l.id = r.logement_id
+            WHERE l.owner_id = ?
+        ) t
+    ');
+    $stmt->execute([$userId, $userId]);
+    $autresIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    $conversations = [];
+
+    $stmtParticipant = getPdo()->prepare('SELECT id, nom_complet, photo_url FROM utilisateurs WHERE id = ?');
+    $stmtDernier = getPdo()->prepare('
+        SELECT message, created_at FROM messages
+        WHERE (sender_id = ? AND destinataire_id = ?) OR (sender_id = ? AND destinataire_id = ?)
+        ORDER BY created_at DESC LIMIT 1
+    ');
+    $stmtNonLus = getPdo()->prepare('
+        SELECT COUNT(*) FROM messages WHERE sender_id = ? AND destinataire_id = ? AND lu = 0
+    ');
+
+    foreach ($autresIds as $autreId) {
+
+        $stmtParticipant->execute([$autreId]);
+        $participant = $stmtParticipant->fetch();
+
+        if (!$participant) {
+            continue;
+        }
+
+        $stmtDernier->execute([$userId, $autreId, $autreId, $userId]);
+        $dernier = $stmtDernier->fetch();
+
+        $stmtNonLus->execute([$autreId, $userId]);
+        $nonLus = (int) $stmtNonLus->fetchColumn();
+
+        $conversations[] = [
+            'id'                 => (int) $participant['id'],
+            'nom_complet'        => $participant['nom_complet'],
+            'photo_url'          => $participant['photo_url'],
+            'dernier_message'    => $dernier['message'] ?? null,
+            'dernier_message_le' => $dernier['created_at'] ?? null,
+            'non_lus'            => $nonLus,
+        ];
+    }
+
+    usort($conversations, function ($a, $b) {
+        return strcmp($b['dernier_message_le'] ?? '', $a['dernier_message_le'] ?? '');
+    });
+
+    jsonResponse($conversations);
+}
+
+function compterMessagesNonLus(): void
+{
+    $userId = requireAuth();
+
+    $stmt = getPdo()->prepare('SELECT COUNT(*) FROM messages WHERE destinataire_id = ? AND lu = 0');
+    $stmt->execute([$userId]);
+
+    jsonResponse(['non_lus' => (int) $stmt->fetchColumn()]);
+}
+
+function supprimerMessage(int $messageId): void
+{
+    $userId = requireAuth();
+
+    $stmt = getPdo()->prepare('SELECT sender_id FROM messages WHERE id = ?');
+    $stmt->execute([$messageId]);
+    $message = $stmt->fetch();
+
+    if (!$message) {
+        jsonError('Message introuvable.', 404);
+    }
+
+    if ((int) $message['sender_id'] !== $userId) {
+        jsonError('Vous ne pouvez supprimer que vos propres messages.', 403);
+    }
+
+    getPdo()->prepare('DELETE FROM messages WHERE id = ?')->execute([$messageId]);
+
+    jsonResponse(['message' => 'Message supprimé.']);
 }
 
 /**

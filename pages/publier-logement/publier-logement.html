@@ -392,15 +392,27 @@
             <span class="badge-plan-requis" id="badgePlanAudio">Premium / Pro</span>
         </label>
 
-        <input type="file"
-        id="audio"
-        name="audio"
-        accept="audio/*"
-        disabled>
+        <div class="audio-recorder">
+
+            <button type="button" class="btn-audio-record" id="btnAudioRecord" disabled>
+                <i class="ph ph-microphone"></i> Enregistrer
+            </button>
+
+            <button type="button" class="btn-audio-stop" id="btnAudioStop" style="display:none;">
+                <i class="ph ph-stop-circle"></i> Arrêter <span id="audioTimer">0:00</span>
+            </button>
+
+            <audio id="audioPreview" controls style="display:none;"></audio>
+
+            <button type="button" class="btn-audio-supprimer" id="btnAudioSupprimer" style="display:none;" title="Supprimer l'enregistrement">
+                <i class="ph ph-trash"></i>
+            </button>
+
+        </div>
 
         <p class="form-hint" id="hintAudio">
-            Enregistrez un message vocal pour présenter votre logement — réservé aux plans Premium et Pro.
-            <a href="../tarifs/tarifs.html">Voir les formules</a>.
+            Enregistrez un message vocal directement depuis votre micro pour présenter votre logement —
+            réservé aux plans Premium et Pro. <a href="../tarifs/tarifs.html">Voir les formules</a>.
         </p>
 
     </div>

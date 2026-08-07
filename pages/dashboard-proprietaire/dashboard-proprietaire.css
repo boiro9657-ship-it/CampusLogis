@@ -716,12 +716,44 @@ tr:hover td{
 
 .chat-bulle span{
 
-    display:block;
+    display:flex;
+
+    align-items:center;
+    gap:6px;
 
     margin-top:4px;
 
     font-size:10.5px;
     opacity:.7;
+
+}
+
+.btn-supprimer-message{
+
+    border:none;
+    background:none;
+
+    color:inherit;
+
+    cursor:pointer;
+
+    padding:0;
+
+    font-size:11px;
+
+    display:inline-flex;
+    align-items:center;
+
+    opacity:.8;
+
+    transition:.2s;
+
+}
+
+.btn-supprimer-message:hover{
+
+    opacity:1;
+    color:#DC2626;
 
 }
 
@@ -961,6 +993,13 @@ tr:hover td{
 
 }
 
+.media-badge-audio{
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+}
+
 .property-content button,
 .property-content .btn-voir{
 
@@ -1005,6 +1044,21 @@ tr:hover td{
 .property-content .btn-supprimer:hover{
 
     background:#DC2626;
+    transform:translateY(-2px);
+
+}
+
+.property-content .btn-supprimer-audio{
+
+    background:#FEF3C7;
+    color:#D97706;
+
+}
+
+.property-content .btn-supprimer-audio:hover{
+
+    background:#D97706;
+    color:white;
     transform:translateY(-2px);
 
 }

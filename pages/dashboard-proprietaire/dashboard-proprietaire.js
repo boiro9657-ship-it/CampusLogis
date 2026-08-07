@@ -27,6 +27,19 @@ let utilisateurConnecte = null;
 
     initDashboard();
 
+    // Arrivée depuis l'icône de messagerie (ou juste après une
+    // réservation) : ouvre directement la discussion avec la
+    // personne indiquée dans l'URL, sans avoir à chercher la bonne
+    // carte de réservation.
+    const discuterAvec =
+    new URLSearchParams(window.location.search).get("discuter");
+
+    if(discuterAvec){
+
+        ouvrirChat(discuterAvec);
+
+    }
+
 })();
 
 /* ==========================
@@ -254,6 +267,11 @@ function afficherAnnonces(logements){
                         ? `<span class="media-badge media-badge-video">🎥 ${nbVideos} vidéo${nbVideos > 1 ? "s" : ""}</span>`
                         : ""
                     }
+                    ${
+                        logement.audio_url
+                        ? `<span class="media-badge media-badge-audio">🎙️ Publicité vocale</span>`
+                        : ""
+                    }
                 </div>
 
                 <p>${logement.description || ""}</p>
@@ -261,6 +279,12 @@ function afficherAnnonces(logements){
                 <a href="../details-logement/details-logement.html?id=${logement.id}" class="btn-voir">
                 👁 Voir l'annonce
                 </a>
+
+                ${
+                    logement.audio_url
+                    ? `<button data-id="${logement.id}" class="btn-supprimer-audio">🗑 Retirer la publicité vocale</button>`
+                    : ""
+                }
 
                 <button data-id="${logement.id}" class="btn-supprimer">
                 🗑 Supprimer
@@ -282,6 +306,42 @@ function afficherAnnonces(logements){
         });
 
     });
+
+    container.querySelectorAll(".btn-supprimer-audio").forEach(btn => {
+
+        btn.addEventListener("click", () => {
+
+            supprimerAudioLogement(btn.dataset.id);
+
+        });
+
+    });
+
+}
+
+async function supprimerAudioLogement(id){
+
+    if(!confirm("Retirer la publicité vocale de cette annonce ?")) return;
+
+    try{
+
+        await apiFetch("/logements/" + id, {
+
+            method: "PUT",
+
+            body: JSON.stringify({ audio_url: null })
+
+        });
+
+        showToast("Publicité vocale retirée.");
+
+        initDashboard();
+
+    }catch(error){
+
+        showToast(error.message, "error");
+
+    }
 
 }
 
@@ -703,11 +763,46 @@ function afficherMessagesChat(messages){
     messages.map(m => `
         <div class="chat-bulle ${m.est_moi ? "chat-bulle-moi" : "chat-bulle-autre"}">
             <p>${m.message}</p>
-            <span>${new Date(m.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
+            <span>
+                ${new Date(m.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                ${m.est_moi ? `<button type="button" class="btn-supprimer-message" data-id="${m.id}" title="Supprimer"><i class="ph ph-trash"></i></button>` : ""}
+            </span>
         </div>
     `).join("");
 
+    container.querySelectorAll(".btn-supprimer-message").forEach(btn => {
+
+        btn.addEventListener("click", (e) => {
+
+            e.stopPropagation();
+
+            supprimerMessageChat(btn.dataset.id);
+
+        });
+
+    });
+
     container.scrollTop = container.scrollHeight;
+
+}
+
+async function supprimerMessageChat(messageId){
+
+    if(!confirm("Supprimer ce message ?")) return;
+
+    try{
+
+        await apiFetch("/messagerie/message/" + messageId, { method: "DELETE" });
+
+        dernierAffichageMessagesChat = "";
+
+        await rafraichirChat();
+
+    }catch(error){
+
+        showToast(error.message, "error");
+
+    }
 
 }
 

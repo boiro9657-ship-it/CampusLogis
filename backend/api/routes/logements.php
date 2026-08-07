@@ -99,7 +99,9 @@ function listLogements(): void
         $sql .= ' WHERE ' . implode(' AND ', $conditions);
     }
 
-    $sql .= ' ORDER BY premium DESC, created_at DESC';
+    // Les logements encore disponibles passent toujours avant les
+    // déjà réservés, indépendamment de la date de publication.
+    $sql .= " ORDER BY (statut = 'disponible') DESC, premium DESC, created_at DESC";
 
     $stmt = getPdo()->prepare($sql);
     $stmt->execute($params);
@@ -355,13 +357,17 @@ function createLogement(): void
             jsonError('La publicité vocale est réservée aux plans Premium et Pro.', 403);
         }
 
+        // "webm" et "mp4" en plus des formats classiques : ce sont
+        // les formats produits par l'enregistrement vocal directement
+        // dans le navigateur (MediaRecorder), qui remplace l'upload
+        // d'un fichier audio existant.
         $audioUrl = enregistrerMedia(
             ['name' => $fichierAudio['name'], 'tmp_name' => $fichierAudio['tmp_name']],
-            ['mp3', 'wav', 'm4a', 'ogg']
+            ['mp3', 'wav', 'm4a', 'ogg', 'webm', 'mp4']
         );
 
         if (!$audioUrl) {
-            jsonError('Le fichier audio fourni est invalide (formats acceptés : mp3, wav, m4a, ogg).');
+            jsonError('L\'enregistrement audio fourni est invalide.');
         }
     }
 
@@ -543,7 +549,7 @@ function updateLogement(int $id): void
         'equip_wifi', 'equip_parking', 'equip_cuisine', 'equip_douche', 'equip_salon', 'equip_balcon',
         'equip_eau', 'equip_electricite', 'equip_climatisation',
         'profil_celibataire', 'profil_marie', 'profil_etudiant', 'profil_travailleur',
-        'profil_senegalais', 'profil_etranger',
+        'profil_senegalais', 'profil_etranger', 'audio_url',
     ];
 
     foreach ($champsAutorises as $champ) {

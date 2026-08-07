@@ -199,6 +199,7 @@ if(typeof apiFetch !== "undefined"){
         // mobile car elle devient une bande horizontale défilable
         // au lieu de disparaître (voir dashboard-*.css).
         initClocheNotifications(racine);
+        initMessagerieIcone(racine);
 
         // La navbar vient de changer (bouton "Mon compte", cloche) :
         // elle peut désormais passer sur 2 lignes sur mobile, donc
@@ -361,6 +362,150 @@ async function marquerNotificationsCommeLues(){
         // compteur au prochain chargement de page.
 
     }
+
+}
+
+/* ==========================
+    MESSAGERIE (ICÔNE NAVBAR)
+    Icône dédiée (distincte de la cloche de notifications) montrant
+    le nombre de messages non lus dans l'espace de discussion, avec
+    un aperçu des conversations. Se met à jour périodiquement pour
+    que l'utilisateur soit averti sans avoir à recharger la page.
+========================== */
+
+function initMessagerieIcone(racine){
+
+    const navButtons =
+    document.querySelector(".nav-buttons");
+
+    if(!navButtons || document.getElementById("msgBellWrap")) return;
+
+    const wrap =
+    document.createElement("div");
+
+    wrap.id = "msgBellWrap";
+    wrap.className = "notif-bell-wrap";
+
+    wrap.innerHTML = `
+        <button type="button" class="notif-bell" id="msgBellBtn" title="Messages">
+            <i class="ph ph-chat-circle-dots"></i>
+            <span class="notif-badge" id="msgBadge" style="display:none;"></span>
+        </button>
+        <div class="notif-dropdown" id="msgDropdown">
+            <div class="notif-dropdown-header">Messages</div>
+            <div class="notif-dropdown-list" id="msgList">
+                <p class="notif-empty">Chargement...</p>
+            </div>
+        </div>
+    `;
+
+    navButtons.insertBefore(wrap, navButtons.firstChild);
+
+    const btn =
+    document.getElementById("msgBellBtn");
+
+    const dropdown =
+    document.getElementById("msgDropdown");
+
+    btn.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+        dropdown.classList.toggle("show");
+
+    });
+
+    document.addEventListener("click", (e) => {
+
+        if(!wrap.contains(e.target)){
+
+            dropdown.classList.remove("show");
+
+        }
+
+    });
+
+    chargerConversations(racine);
+
+    setInterval(() => chargerConversations(racine), 20000);
+
+}
+
+async function chargerConversations(racine){
+
+    let conversations;
+
+    try{
+
+        conversations = await apiFetch("/messagerie");
+
+    }catch(error){
+
+        return;
+    }
+
+    const badge =
+    document.getElementById("msgBadge");
+
+    const totalNonLus =
+    conversations.reduce((somme, c) => somme + Number(c.non_lus || 0), 0);
+
+    if(badge){
+
+        if(totalNonLus > 0){
+
+            badge.textContent = totalNonLus > 9 ? "9+" : totalNonLus;
+            badge.style.display = "";
+
+        }else{
+
+            badge.style.display = "none";
+
+        }
+
+    }
+
+    const list =
+    document.getElementById("msgList");
+
+    if(!list) return;
+
+    if(conversations.length === 0){
+
+        list.innerHTML =
+        `<p class="notif-empty">Aucune discussion pour le moment. Réservez un logement pour échanger avec le propriétaire.</p>`;
+
+        return;
+    }
+
+    list.innerHTML =
+    conversations.map(c => {
+
+        const avatar =
+        c.photo_url
+        ? `<img src="${c.photo_url}" alt="${c.nom_complet}">`
+        : `<i class="ph ph-user"></i>`;
+
+        const dernierMessage =
+        c.dernier_message || "Aucun message pour l'instant";
+
+        const nonLus =
+        Number(c.non_lus || 0);
+
+        return `
+        <a href="${racine}pages/dashboard-proprietaire/dashboard-proprietaire.html?discuter=${c.id}" class="msg-item${nonLus > 0 ? " notif-item-non-lu" : ""}">
+            <div class="msg-item-avatar">${avatar}</div>
+            <div class="msg-item-content">
+                <p>
+                    <strong>${c.nom_complet}</strong>
+                    ${nonLus > 0 ? `<span class="msg-item-badge">${nonLus}</span>` : ""}
+                </p>
+                <span>${dernierMessage}</span>
+            </div>
+        </a>
+        `;
+
+    }).join("");
 
 }
 
@@ -548,6 +693,7 @@ async function envoyerReservation(logementId){
 
     try{
 
+        const resultat =
         await apiFetch("/reservations", {
 
             method: "POST",
@@ -560,9 +706,22 @@ async function envoyerReservation(logementId){
 
         });
 
-        showToast("Demande de réservation envoyée !");
+        showToast("Demande de réservation envoyée ! Direction la discussion avec le propriétaire...");
 
         fermerModaleReservation();
+
+        // Emmène directement le locataire dans l'espace de
+        // discussion avec ce propriétaire, pour qu'il puisse
+        // échanger sans devoir chercher où cliquer ensuite.
+        const racine =
+        window.API_BASE ? window.API_BASE.replace("backend/api", "") : "";
+
+        setTimeout(() => {
+
+            window.location.href =
+            racine + "pages/dashboard-proprietaire/dashboard-proprietaire.html?discuter=" + resultat.owner_id;
+
+        }, 1200);
 
     }catch(error){
 

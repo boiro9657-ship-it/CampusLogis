@@ -22,14 +22,14 @@
     }
 
     // Publicité vocale réservée aux plans Premium/Pro : débloque
-    // le champ uniquement si le compte a réellement ce plan.
+    // l'enregistrement uniquement si le compte a réellement ce plan.
     const planActuel =
     utilisateur.plan || "gratuit";
 
     if(planActuel !== "gratuit"){
 
-        const audioInput =
-        document.getElementById("audio");
+        const btnRecord =
+        document.getElementById("btnAudioRecord");
 
         const badgePlan =
         document.getElementById("badgePlanAudio");
@@ -37,11 +37,11 @@
         const hintAudio =
         document.getElementById("hintAudio");
 
-        if(audioInput) audioInput.disabled = false;
+        if(btnRecord) btnRecord.disabled = false;
         if(badgePlan) badgePlan.style.display = "none";
 
         if(hintAudio){
-            hintAudio.textContent = "Enregistrez un message vocal pour présenter votre logement.";
+            hintAudio.textContent = "Enregistrez un message vocal directement depuis votre micro pour présenter votre logement.";
         }
 
     }
@@ -50,6 +50,133 @@
 
 const publishForm =
 document.getElementById("publishForm");
+
+/* ==========================
+    PUBLICITÉ VOCALE : ENREGISTREMENT MICRO
+    Remplace un champ de fichier à choisir par un vrai
+    enregistrement depuis le micro du navigateur (MediaRecorder) —
+    le propriétaire enregistre directement sur la plateforme au
+    lieu d'avoir à préparer un fichier audio à part.
+========================== */
+
+let mediaRecorder = null;
+let audioChunks = [];
+let audioBlobEnregistre = null;
+let audioChronoIntervalle = null;
+let audioSecondes = 0;
+
+const btnAudioRecord =
+document.getElementById("btnAudioRecord");
+
+const btnAudioStop =
+document.getElementById("btnAudioStop");
+
+const btnAudioSupprimer =
+document.getElementById("btnAudioSupprimer");
+
+const audioPreview =
+document.getElementById("audioPreview");
+
+const audioTimer =
+document.getElementById("audioTimer");
+
+btnAudioRecord?.addEventListener("click", async () => {
+
+    let stream;
+
+    try{
+
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    }catch(error){
+
+        showToast("Impossible d'accéder au micro. Vérifiez les autorisations de votre navigateur.", "error");
+
+        return;
+    }
+
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.addEventListener("dataavailable", (e) => {
+
+        if(e.data.size > 0) audioChunks.push(e.data);
+
+    });
+
+    mediaRecorder.addEventListener("stop", () => {
+
+        audioBlobEnregistre = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+
+        audioPreview.src = URL.createObjectURL(audioBlobEnregistre);
+        audioPreview.style.display = "";
+
+        btnAudioSupprimer.style.display = "";
+
+        stream.getTracks().forEach(track => track.stop());
+
+    });
+
+    mediaRecorder.start();
+
+    audioSecondes = 0;
+    audioTimer.textContent = "0:00";
+
+    audioChronoIntervalle = setInterval(() => {
+
+        audioSecondes++;
+
+        const minutes = Math.floor(audioSecondes / 60);
+        const secondes = String(audioSecondes % 60).padStart(2, "0");
+
+        audioTimer.textContent = minutes + ":" + secondes;
+
+    }, 1000);
+
+    btnAudioRecord.style.display = "none";
+    btnAudioStop.style.display = "";
+    audioPreview.style.display = "none";
+    btnAudioSupprimer.style.display = "none";
+
+});
+
+btnAudioStop?.addEventListener("click", () => {
+
+    if(mediaRecorder && mediaRecorder.state !== "inactive"){
+
+        mediaRecorder.stop();
+
+    }
+
+    clearInterval(audioChronoIntervalle);
+
+    btnAudioStop.style.display = "none";
+    btnAudioRecord.style.display = "";
+
+});
+
+btnAudioSupprimer?.addEventListener("click", () => {
+
+    audioBlobEnregistre = null;
+
+    audioPreview.removeAttribute("src");
+    audioPreview.style.display = "none";
+
+    btnAudioSupprimer.style.display = "none";
+
+});
+
+function extensionAudioDepuisType(mimeType){
+
+    if(!mimeType) return "webm";
+
+    if(mimeType.includes("mp4")) return "mp4";
+    if(mimeType.includes("ogg")) return "ogg";
+    if(mimeType.includes("wav")) return "wav";
+
+    return "webm";
+
+}
 
 /* ==========================
     PETIT MESSAGE AVANT LE CHOIX DE FORMULE
@@ -313,12 +440,12 @@ if(publishForm){
 
             }
 
-            const audioInput =
-            document.getElementById("audio");
+            if(audioBlobEnregistre){
 
-            if(audioInput && !audioInput.disabled && audioInput.files[0]){
+                const extension =
+                extensionAudioDepuisType(audioBlobEnregistre.type);
 
-                formData.append("audio", audioInput.files[0]);
+                formData.append("audio", audioBlobEnregistre, "publicite-vocale." + extension);
 
             }
 

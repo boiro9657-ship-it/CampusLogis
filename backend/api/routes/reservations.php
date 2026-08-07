@@ -52,7 +52,7 @@ function creerReservation(): void
         jsonError('Vous devez accepter les conditions d\'utilisation pour réserver.');
     }
 
-    $stmt = getPdo()->prepare('SELECT statut FROM logements WHERE id = ?');
+    $stmt = getPdo()->prepare('SELECT statut, owner_id FROM logements WHERE id = ?');
     $stmt->execute([$logementId]);
     $logement = $stmt->fetch();
 
@@ -70,7 +70,12 @@ function creerReservation(): void
     ');
     $stmt->execute([$logementId, $userId, $message]);
 
-    jsonResponse(['message' => 'Demande de réservation envoyée.'], 201);
+    // Renvoyé pour que le frontend puisse emmener directement le
+    // locataire dans l'espace de discussion avec ce propriétaire.
+    jsonResponse([
+        'message'  => 'Demande de réservation envoyée.',
+        'owner_id' => (int) $logement['owner_id'],
+    ], 201);
 }
 
 function mesReservations(): void

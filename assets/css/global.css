@@ -704,6 +704,114 @@ header.scrolled{
 
 }
 
+/* ==========================
+    MESSAGERIE (aperçu des conversations)
+========================== */
+
+.msg-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:14px 20px;
+
+    border-bottom:1px solid #F1F5F9;
+
+    text-decoration:none;
+
+    transition:.2s;
+
+}
+
+.msg-item:last-child{
+
+    border-bottom:none;
+
+}
+
+.msg-item:hover{
+
+    background:#F8FAFC;
+
+}
+
+.msg-item-avatar{
+
+    width:38px;
+    height:38px;
+    flex-shrink:0;
+
+    border-radius:50%;
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    font-size:18px;
+
+}
+
+.msg-item-avatar img{
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
+
+}
+
+.msg-item-content{
+
+    min-width:0;
+
+}
+
+.msg-item-content p{
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    color:#1E293B;
+    font-size:13.5px;
+    margin-bottom:3px;
+
+}
+
+.msg-item-content span{
+
+    display:block;
+
+    color:var(--gray-500);
+    font-size:12px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+}
+
+.msg-item-badge{
+
+    background:#DC2626;
+    color:white;
+
+    font-size:10.5px;
+    font-weight:700;
+
+    padding:1px 7px;
+
+    border-radius:10px;
+
+}
+
 @media(max-width:480px){
 
     .notif-dropdown{

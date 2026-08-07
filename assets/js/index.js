@@ -250,6 +250,9 @@ function carteLogementHTML(logement){
     const photos =
     (logement.photos ? logement.photos.split("|") : [logement.image_url]).filter(Boolean);
 
+    const videos =
+    (logement.videos ? logement.videos.split("|") : []).filter(Boolean);
+
     const image =
     photos[0] || "images/logement1.jpg";
 
@@ -264,9 +267,13 @@ function carteLogementHTML(logement){
 
         <div class="card-image">
 
-            <img src="${image}" data-photos="${photos.join("|")}" class="carousel-img" loading="lazy" alt="${logement.titre}">
+            <img src="${image}" data-photos="${photos.join("|")}" data-videos="${videos.join("|")}" class="carousel-img" loading="lazy" alt="${logement.titre}">
+
+            <video class="carousel-video" muted loop playsinline style="display:none;"></video>
 
             <div class="carousel-dots"></div>
+
+            ${videos.length > 0 ? `<span class="badge-video-card"><i class="ph ph-play-circle"></i> Vidéo</span>` : ""}
 
             <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
 

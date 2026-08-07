@@ -7,14 +7,42 @@
 
 (async () => {
 
+    let utilisateur;
+
     try{
 
-        await apiFetch("/auth/me");
+        utilisateur = await apiFetch("/auth/me");
 
     }catch(error){
 
         window.location.href =
         "../connexion/connexion.html";
+
+        return;
+    }
+
+    // Publicité vocale réservée aux plans Premium/Pro : débloque
+    // le champ uniquement si le compte a réellement ce plan.
+    const planActuel =
+    utilisateur.plan || "gratuit";
+
+    if(planActuel !== "gratuit"){
+
+        const audioInput =
+        document.getElementById("audio");
+
+        const badgePlan =
+        document.getElementById("badgePlanAudio");
+
+        const hintAudio =
+        document.getElementById("hintAudio");
+
+        if(audioInput) audioInput.disabled = false;
+        if(badgePlan) badgePlan.style.display = "none";
+
+        if(hintAudio){
+            hintAudio.textContent = "Enregistrez un message vocal pour présenter votre logement.";
+        }
 
     }
 
@@ -282,6 +310,15 @@ if(publishForm){
             for(const fichier of videos){
 
                 formData.append("videos[]", fichier);
+
+            }
+
+            const audioInput =
+            document.getElementById("audio");
+
+            if(audioInput && !audioInput.disabled && audioInput.files[0]){
+
+                formData.append("audio", audioInput.files[0]);
 
             }
 

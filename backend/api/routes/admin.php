@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/../../includes/session.php';
+require_once __DIR__ . '/../../includes/mail.php';
 require_once __DIR__ . '/notifications.php';
 
 function handleAdminRoute(array $segments, string $method): void
@@ -67,6 +68,11 @@ function handleAdminRoute(array $segments, string $method): void
 
     if ($resource === 'visites' && $method === 'GET' && $id === 'stats') {
         statsVisites();
+        return;
+    }
+
+    if ($resource === 'newsletter' && $method === 'POST') {
+        envoyerNewsletter();
         return;
     }
 
@@ -229,5 +235,43 @@ function statsVisites(): void
         'vues_aujourdhui'   => (int) $vuesAujourdhui,
         'vues_semaine'      => (int) $vuesSemaine,
         'derniers_jours'    => $derniersJours,
+    ]);
+}
+
+/**
+ * Envoie un email de newsletter à tous les utilisateurs inscrits,
+ * un par un via le même SMTP Gmail que la réinitialisation de mot
+ * de passe. Continue même si un envoi échoue (adresse invalide,
+ * etc.) et rapporte le nombre réel d'envois réussis à l'admin —
+ * pas de faux "envoyé à tous" si certains ont échoué.
+ */
+function envoyerNewsletter(): void
+{
+    $body = getJsonBody();
+
+    $sujet = trim($body['sujet'] ?? '');
+    $message = trim($body['message'] ?? '');
+
+    if (!$sujet || !$message) {
+        jsonError('Le sujet et le message sont obligatoires.');
+    }
+
+    $destinataires = getPdo()->query('SELECT email, nom_complet FROM utilisateurs')->fetchAll();
+
+    $corpsHtml = '<p>' . nl2br(htmlspecialchars($message)) . '</p><p>— L\'équipe TerangaHome</p>';
+
+    $envoyes = 0;
+
+    foreach ($destinataires as $destinataire) {
+
+        if (envoyerEmail($destinataire['email'], $sujet, $corpsHtml)) {
+            $envoyes++;
+        }
+    }
+
+    jsonResponse([
+        'message'  => "Newsletter envoyée à {$envoyes} utilisateur(s) sur " . count($destinataires) . '.',
+        'envoyes'  => $envoyes,
+        'total'    => count($destinataires),
     ]);
 }

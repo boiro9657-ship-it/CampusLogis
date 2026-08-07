@@ -96,6 +96,11 @@
                 Statistiques
             </a></li>
 
+            <li><a href="#newsletter">
+                <i class="ph ph-megaphone"></i>
+                Newsletter
+            </a></li>
+
             <li><a href="#" id="logoutLink">
                 <i class="ph ph-sign-out"></i>
                 Déconnexion
@@ -326,6 +331,46 @@
         Les revenus des abonnements (Premium/Pro) s'afficheront ici
         une fois les paiements Wave et Orange Money réellement
         branchés — pas de chiffre inventé en attendant.
+    </div>
+
+</section>
+
+<!-- ===========================
+        NEWSLETTER
+=========================== -->
+
+<section class="owner-properties" id="newsletter">
+
+    <div class="section-header">
+        <h2>Newsletter</h2>
+    </div>
+
+    <div class="newsletter-card">
+
+        <p class="form-hint">
+            Envoie un email à tous les utilisateurs inscrits (<span id="newsletterNbDestinataires">—</span> destinataire(s)).
+            À utiliser avec parcimonie.
+        </p>
+
+        <form id="newsletterForm">
+
+            <div class="form-group">
+                <label>Sujet</label>
+                <input type="text" id="newsletterSujet" placeholder="Ex : Nouveautés sur TerangaHome">
+            </div>
+
+            <div class="form-group">
+                <label>Message</label>
+                <textarea id="newsletterMessage" rows="6" placeholder="Votre message aux utilisateurs..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" id="newsletterSubmit">
+                <i class="ph ph-paper-plane-tilt"></i>
+                Envoyer à tous les utilisateurs
+            </button>
+
+        </form>
+
     </div>
 
 </section>

@@ -202,6 +202,7 @@ try {
         'profil_travailleur' => "TINYINT(1) NOT NULL DEFAULT 0",
         'profil_senegalais'  => "TINYINT(1) NOT NULL DEFAULT 0",
         'profil_etranger'    => "TINYINT(1) NOT NULL DEFAULT 0",
+        'audio_url'          => "VARCHAR(255) NULL",
     ];
 
     foreach ($colonnesAAjouter as $colonne => $definition) {
@@ -341,6 +342,22 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "notifications" prête.';
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS colocations (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            ville VARCHAR(100),
+            type_logement ENUM('Chambre','Studio','Appartement','Villa'),
+            budget DECIMAL(10,2) NULL,
+            description TEXT,
+            contact_telephone VARCHAR(30) NULL,
+            contact_whatsapp VARCHAR(30) NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "colocations" prête.';
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS visites (

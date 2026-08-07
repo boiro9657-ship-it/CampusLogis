@@ -1,0 +1,431 @@
+/* ==========================================================
+   COLOCATION.CSS — page colocation uniquement
+   ========================================================== */
+
+#coloc-hero{
+
+    margin-top:var(--header-height, 84px);
+
+    padding:70px 8% 60px;
+
+    text-align:center;
+
+    color:white;
+
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+
+}
+
+#coloc-hero .hero-badge{
+
+    display:inline-block;
+
+    background:rgba(255,255,255,.15);
+
+    padding:10px 20px;
+
+    border-radius:40px;
+
+    margin-bottom:20px;
+
+    font-weight:600;
+
+}
+
+#coloc-hero h1{
+
+    font-family:var(--font-heading);
+
+    margin-bottom:16px;
+
+}
+
+#coloc-hero p{
+
+    max-width:640px;
+
+    margin:0 auto 30px;
+
+    color:#CBD5E1;
+
+    line-height:1.8;
+
+}
+
+#coloc-hero .btn-primary{
+
+    background:var(--secondary);
+
+    border:none;
+
+    padding:16px 30px;
+
+    border-radius:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    transition:.3s;
+}
+
+#coloc-hero .btn-primary:hover{
+
+    background:var(--secondary-dark);
+
+    transform:translateY(-3px);
+
+}
+
+/* ==========================
+    FORMULAIRE
+========================== */
+
+#coloc-form-section{
+
+    padding:50px 8% 0;
+
+}
+
+.coloc-form-card{
+
+    max-width:700px;
+
+    margin:0 auto;
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:25px;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.08);
+
+}
+
+.coloc-form-card h2{
+
+    color:var(--primary);
+
+    margin-bottom:25px;
+
+}
+
+.coloc-form-card .form-group{
+
+    margin-bottom:20px;
+
+}
+
+.coloc-form-card label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+}
+
+.coloc-form-card input,
+.coloc-form-card select,
+.coloc-form-card textarea{
+
+    width:100%;
+
+    padding:16px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:14px;
+
+    outline:none;
+
+    font-size:15px;
+
+    font-family:inherit;
+
+    transition:border-color .2s, box-shadow .2s;
+
+}
+
+.coloc-form-card textarea{
+
+    height:120px;
+
+    resize:none;
+
+}
+
+.coloc-form-card input:focus,
+.coloc-form-card select:focus,
+.coloc-form-card textarea:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(20,92,61,.12);
+
+}
+
+.coloc-form-card button[type=submit]{
+
+    border:none;
+
+    cursor:pointer;
+
+    width:100%;
+
+    padding:16px;
+
+    border-radius:14px;
+
+    font-weight:700;
+
+}
+
+/* ==========================
+    LISTE DES ANNONCES
+========================== */
+
+#coloc-list{
+
+    padding:60px 8% 80px;
+
+    max-width:1300px;
+
+    margin:0 auto;
+
+}
+
+#coloc-list h2{
+
+    text-align:center;
+
+    margin-bottom:40px;
+
+    color:var(--primary);
+
+}
+
+.coloc-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+
+    gap:30px;
+
+}
+
+.coloc-card{
+
+    background:white;
+
+    padding:28px;
+
+    border-radius:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+
+    transition:.3s;
+
+}
+
+.coloc-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.1);
+
+}
+
+.coloc-card-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    margin-bottom:16px;
+
+}
+
+.coloc-avatar{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:50%;
+
+    background:var(--primary-light);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    flex-shrink:0;
+
+}
+
+.coloc-avatar i{
+
+    font-size:22px;
+    color:var(--primary);
+
+}
+
+.coloc-avatar img{
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
+
+}
+
+.coloc-card-header h4{
+
+    font-size:15px;
+
+}
+
+.coloc-card-header span{
+
+    font-size:12px;
+    color:#94A3B8;
+
+}
+
+.coloc-meta{
+
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+
+    color:#475569;
+    font-weight:600;
+
+    margin-bottom:8px;
+
+}
+
+.coloc-tag{
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+    padding:3px 12px;
+    border-radius:20px;
+    font-size:12px;
+
+}
+
+.coloc-budget{
+
+    color:var(--primary);
+    font-weight:700;
+
+    margin-bottom:14px;
+
+}
+
+.coloc-description{
+
+    color:#334155;
+    line-height:1.6;
+
+    margin-bottom:20px;
+
+    word-wrap:break-word;
+
+}
+
+.coloc-actions{
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+
+}
+
+.coloc-actions a,
+.coloc-actions button{
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    padding:10px 16px;
+
+    border-radius:12px;
+
+    font-weight:600;
+    font-size:13.5px;
+
+    text-decoration:none;
+
+    border:none;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.coloc-actions .btn-call{
+
+    background:var(--primary);
+    color:white;
+
+}
+
+.coloc-actions .btn-call:hover{
+
+    background:var(--primary-dark);
+
+}
+
+.coloc-actions .btn-whatsapp{
+
+    background:#25D366;
+    color:white;
+
+}
+
+.coloc-actions .btn-whatsapp:hover{
+
+    background:#1EBE57;
+
+}
+
+.btn-supprimer-coloc{
+
+    background:#FEE2E2;
+    color:#DC2626;
+
+}
+
+.btn-supprimer-coloc:hover{
+
+    background:#DC2626;
+    color:white;
+
+}
+
+@media(max-width:600px){
+
+    .coloc-form-card{
+
+        padding:26px 20px;
+
+    }
+
+}

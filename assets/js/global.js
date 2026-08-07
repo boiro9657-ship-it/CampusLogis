@@ -648,9 +648,22 @@ function demarrerCarrousels(container){
     container.querySelectorAll(".carousel-img[data-photos]").forEach(img => {
 
         const photos =
-        img.dataset.photos.split("|").filter(Boolean);
+        img.dataset.photos.split("|").filter(Boolean).map(url => ({ type: "image", url }));
 
-        if(photos.length <= 1) return;
+        // Les vidéos de l'annonce rejoignent le même carrousel que
+        // les photos (même rotation, mêmes points de navigation) —
+        // une vidéo apparaît donc sur la carte au même titre qu'une
+        // photo, pas seulement sur la page détails.
+        const videos =
+        (img.dataset.videos || "").split("|").filter(Boolean).map(url => ({ type: "video", url }));
+
+        const slides =
+        photos.concat(videos);
+
+        if(slides.length <= 1) return;
+
+        const video =
+        img.parentElement.querySelector(".carousel-video");
 
         const dotsContainer =
         img.parentElement.querySelector(".carousel-dots");
@@ -660,14 +673,42 @@ function demarrerCarrousels(container){
         if(dotsContainer){
 
             dotsContainer.innerHTML =
-            photos.map((_, i) => `<span class="carousel-dot${i === 0 ? " active" : ""}"></span>`).join("");
+            slides.map((_, i) => `<span class="carousel-dot${i === 0 ? " active" : ""}"></span>`).join("");
 
         }
 
-        const afficherPhoto = (i) => {
+        const afficherSlide = (i) => {
 
             index = i;
-            img.src = photos[index];
+
+            const slide = slides[index];
+
+            if(slide.type === "video" && video){
+
+                img.style.display = "none";
+
+                video.style.display = "";
+
+                if(video.getAttribute("src") !== slide.url){
+                    video.src = slide.url;
+                }
+
+                video.currentTime = 0;
+                video.play().catch(() => {});
+
+            }else{
+
+                if(video){
+
+                    video.pause();
+                    video.style.display = "none";
+
+                }
+
+                img.style.display = "";
+                img.src = slide.url;
+
+            }
 
             if(dotsContainer){
 
@@ -682,7 +723,7 @@ function demarrerCarrousels(container){
         };
 
         let intervalle =
-        setInterval(() => afficherPhoto((index + 1) % photos.length), 3500);
+        setInterval(() => afficherSlide((index + 1) % slides.length), 3500);
 
         const carte =
         img.closest(".card, .housing-card");
@@ -693,7 +734,7 @@ function demarrerCarrousels(container){
 
             carte.addEventListener("mouseleave", () => {
 
-                intervalle = setInterval(() => afficherPhoto((index + 1) % photos.length), 3500);
+                intervalle = setInterval(() => afficherSlide((index + 1) % slides.length), 3500);
 
             });
 
@@ -708,7 +749,7 @@ function demarrerCarrousels(container){
                     e.preventDefault();
                     e.stopPropagation();
 
-                    afficherPhoto(i);
+                    afficherSlide(i);
 
                 });
 

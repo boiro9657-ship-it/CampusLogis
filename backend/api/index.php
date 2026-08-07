@@ -66,6 +66,11 @@ try {
             handleNotificationsRoute($rest, $method);
             break;
 
+        case 'colocations':
+            require __DIR__ . '/routes/colocations.php';
+            handleColocationsRoute($rest, $method);
+            break;
+
         default:
             jsonError('Route introuvable.', 404);
 

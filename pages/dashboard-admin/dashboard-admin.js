@@ -81,6 +81,16 @@ async function chargerUtilisateurs(){
     document.getElementById("statUtilisateurs").textContent =
     utilisateurs.length;
 
+    const nbDestinatairesEl =
+    document.getElementById("newsletterNbDestinataires");
+
+    if(nbDestinatairesEl){
+
+        nbDestinatairesEl.textContent =
+        utilisateurs.length;
+
+    }
+
     const table =
     document.getElementById("tableUtilisateurs");
 
@@ -503,5 +513,73 @@ async function chargerStatsVisites(){
             <td>${j.uniques}</td>
         </tr>
     `).join("");
+
+}
+
+/* ==========================
+    NEWSLETTER
+========================== */
+
+const newsletterForm =
+document.getElementById("newsletterForm");
+
+if(newsletterForm){
+
+    newsletterForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const sujet =
+        document.getElementById("newsletterSujet").value.trim();
+
+        const message =
+        document.getElementById("newsletterMessage").value.trim();
+
+        if(!sujet || !message){
+
+            showToast("Le sujet et le message sont obligatoires.", "error");
+
+            return;
+        }
+
+        const nbDestinataires =
+        document.getElementById("newsletterNbDestinataires").textContent;
+
+        if(!confirm(`Envoyer cet email à ${nbDestinataires} utilisateur(s) ? Cette action ne peut pas être annulée.`)){
+
+            return;
+        }
+
+        const submitBtn =
+        document.getElementById("newsletterSubmit");
+
+        submitBtn.disabled = true;
+
+        try{
+
+            const resultat =
+            await apiFetch("/admin/newsletter", {
+
+                method: "POST",
+
+                body: JSON.stringify({ sujet, message })
+
+            });
+
+            showToast(resultat.message);
+
+            newsletterForm.reset();
+
+        }catch(error){
+
+            showToast(error.message, "error");
+
+        }finally{
+
+            submitBtn.disabled = false;
+
+        }
+
+    });
 
 }

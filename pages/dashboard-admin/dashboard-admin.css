@@ -497,3 +497,96 @@ tr:hover td{
     }
 
 }
+
+/* ==========================
+    NEWSLETTER
+========================== */
+
+.newsletter-card{
+
+    background:white;
+
+    padding:35px;
+
+    border-radius:25px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.06);
+
+    max-width:700px;
+
+}
+
+.newsletter-card > .form-hint{
+
+    margin-bottom:25px;
+
+}
+
+.newsletter-card .form-group{
+
+    margin-bottom:20px;
+
+}
+
+.newsletter-card label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+}
+
+.newsletter-card input,
+.newsletter-card textarea{
+
+    width:100%;
+
+    padding:16px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:14px;
+
+    outline:none;
+
+    font-size:15px;
+
+    font-family:inherit;
+
+    resize:vertical;
+
+    transition:border-color .2s, box-shadow .2s;
+
+}
+
+.newsletter-card input:focus,
+.newsletter-card textarea:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(20,92,61,.12);
+
+}
+
+.newsletter-card .btn-primary{
+
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    border:none;
+    cursor:pointer;
+
+}
+
+@media(max-width:600px){
+
+    .newsletter-card{
+
+        padding:26px 20px;
+
+    }
+
+}

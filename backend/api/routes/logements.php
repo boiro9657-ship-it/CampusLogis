@@ -89,7 +89,9 @@ function listLogements(): void
     $sql = "
         SELECT l.*,
             (SELECT GROUP_CONCAT(url ORDER BY position SEPARATOR '|')
-             FROM logement_medias m WHERE m.logement_id = l.id AND m.type = 'image') AS photos
+             FROM logement_medias m WHERE m.logement_id = l.id AND m.type = 'image') AS photos,
+            (SELECT GROUP_CONCAT(url ORDER BY position SEPARATOR '|')
+             FROM logement_medias m WHERE m.logement_id = l.id AND m.type = 'video') AS videos
         FROM logements l
     ";
 
@@ -336,6 +338,33 @@ function createLogement(): void
     $photos = extraireFichiers($_FILES['photos'] ?? null);
     $videos = extraireFichiers($_FILES['videos'] ?? null);
 
+    // Publicité vocale : réservée aux plans Premium et Pro. Le
+    // champ est masqué/désactivé côté client pour un compte
+    // Gratuit, mais revérifié ici pour ne pas dépendre uniquement
+    // du frontend.
+    $audioUrl = null;
+    $fichierAudio = $_FILES['audio'] ?? null;
+
+    if ($fichierAudio && ($fichierAudio['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+
+        $stmt = getPdo()->prepare('SELECT plan FROM utilisateurs WHERE id = ?');
+        $stmt->execute([$userId]);
+        $planActuel = $stmt->fetchColumn() ?: 'gratuit';
+
+        if ($planActuel === 'gratuit') {
+            jsonError('La publicité vocale est réservée aux plans Premium et Pro.', 403);
+        }
+
+        $audioUrl = enregistrerMedia(
+            ['name' => $fichierAudio['name'], 'tmp_name' => $fichierAudio['tmp_name']],
+            ['mp3', 'wav', 'm4a', 'ogg']
+        );
+
+        if (!$audioUrl) {
+            jsonError('Le fichier audio fourni est invalide (formats acceptés : mp3, wav, m4a, ogg).');
+        }
+    }
+
     if (count($photos) === 0) {
         jsonError('Au moins une photo est obligatoire.');
     }
@@ -388,9 +417,9 @@ function createLogement(): void
                 equip_wifi, equip_parking, equip_cuisine, equip_douche, equip_salon, equip_balcon,
                 equip_eau, equip_electricite, equip_climatisation,
                 profil_celibataire, profil_marie, profil_etudiant, profil_travailleur,
-                profil_senegalais, profil_etranger
+                profil_senegalais, profil_etranger, audio_url
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
             $userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl,
@@ -400,7 +429,7 @@ function createLogement(): void
             $equipements['douche'], $equipements['salon'], $equipements['balcon'],
             $equipements['eau'], $equipements['electricite'], $equipements['climatisation'],
             $profils['celibataire'], $profils['marie'], $profils['etudiant'], $profils['travailleur'],
-            $profils['senegalais'], $profils['etranger'],
+            $profils['senegalais'], $profils['etranger'], $audioUrl,
         ]);
 
         $logementId = $pdo->lastInsertId();

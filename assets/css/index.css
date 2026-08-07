@@ -672,6 +672,46 @@
 
 }
 
+.carousel-video{
+
+    position:absolute;
+    top:0;
+    left:0;
+
+    width:100%;
+    height:260px;
+
+    object-fit:cover;
+
+    background:#000;
+
+}
+
+.badge-video-card{
+
+    position:absolute;
+
+    bottom:14px;
+    left:18px;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    background:rgba(0,0,0,.6);
+    color:white;
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    font-size:12.5px;
+    font-weight:600;
+
+    z-index:2;
+
+}
+
 /*========== BADGE ==========*/
 
 .badge-card{

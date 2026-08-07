@@ -242,7 +242,7 @@ function currentUser(): void
     }
 
     $stmt = getPdo()->prepare('
-        SELECT id, nom_complet, email, telephone, photo_url, role, notifications_actives
+        SELECT id, nom_complet, email, telephone, photo_url, role, notifications_actives, plan
         FROM utilisateurs WHERE id = ?
     ');
     $stmt->execute([$_SESSION['user_id']]);

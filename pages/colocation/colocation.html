@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recherche | TerangaHome</title>
-    <meta name="description" content="Recherchez une chambre, un studio, un appartement ou une villa partout au Sénégal sur TerangaHome.">
+    <title>Trouver un(e) colocataire | TerangaHome</title>
+    <meta name="description" content="Publiez ou consultez des annonces de colocation pour partager une chambre, un studio ou un appartement au Sénégal.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7866648430674346" crossorigin="anonymous"></script>
-
     <link rel="stylesheet" href="../../assets/css/global.css?v=20260806a">
-    <link rel="stylesheet" href="./rechercher.css?v=20260806a">
+    <link rel="stylesheet" href="./colocation.css?v=20260806a">
 
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -28,7 +25,7 @@
     <ul class="nav-links">
 
         <li><a href="../../index.html">Accueil</a></li>
-        <li><a href="./rechercher.html" class="active">Rechercher</a></li>
+        <li><a href="../rechercher/rechercher.html">Rechercher</a></li>
         <li><a href="../apropos/apropos.html">À propos</a></li>
         <li><a href="../contacte/contacte.html">Contact</a></li>
         <li><a href="../favoris/favoris.html">Favoris</a> </li>
@@ -57,66 +54,94 @@
 </nav>
 
 </header>
-    <!-- HERO -->
-    <section id="search-hero">
+
+<section id="coloc-hero">
 
     <div class="container">
 
-        <h1>Trouvez votre logement idéal</h1>
+        <span class="hero-badge">TerangaHome</span>
+
+        <h1>Trouver un(e) colocataire</h1>
 
         <p>
-            Découvrez des logements fiables et abordables partout au Sénégal.
+            Vous cherchez quelqu'un pour partager une chambre, un studio ou un appartement ?
+            Publiez une annonce ou parcourez celles des autres.
         </p>
 
-        <form class="search-page-box">
-
-            <input type="text"
-            id="searchVille"
-            list="listeVilles"
-            placeholder="Ville ou quartier">
-
-            <datalist id="listeVilles"></datalist>
-
-            <input type="number"
-            id="searchBudget"
-            min="10000"
-            placeholder="Budget maximum (FCFA)">
-
-            <select id="searchType">
-                <option value="">Type de logement</option>
-                <option>Chambre</option>
-                <option>Studio</option>
-                <option>Appartement</option>
-                <option>Villa</option>
-                <option>Bureau</option>
-                <option>Immeuble</option>
-                <option>Passe-temps</option>
-            </select>
-
-            <button type="submit">
-                <i class="ph ph-magnifying-glass"></i>
-                Rechercher
-            </button>
-
-        </form>
+        <button type="button" class="btn-primary" id="btnAfficherFormulaire">
+            <i class="ph ph-plus-circle"></i>
+            Publier une annonce de colocation
+        </button>
 
     </div>
 
-    </section>
+</section>
 
-    <a href="../colocation/colocation.html" class="coloc-banner">
-        <i class="ph ph-users-three"></i>
-        <span>Vous cherchez un(e) colocataire pour partager un logement ? Voir les annonces de colocation →</span>
-    </a>
-
-    <section id="logements">
+<section id="coloc-form-section" style="display:none;">
 
     <div class="container">
 
-        <div class="cards-grid" id="searchResults">
+        <div class="coloc-form-card">
 
-            <p class="cards-loading">Chargement des logements...</p>
+            <h2>Publier une annonce de colocation</h2>
 
+            <form id="colocForm">
+
+                <div class="form-group">
+                    <label>Ville / Quartier</label>
+                    <input type="text" id="colocVille" list="listeVilles" placeholder="Ex : Dakar - Sacré-Cœur">
+                    <datalist id="listeVilles"></datalist>
+                </div>
+
+                <div class="form-group">
+                    <label>Type de logement recherché</label>
+                    <select id="colocType">
+                        <option value="">Peu importe</option>
+                        <option value="Chambre">Chambre</option>
+                        <option value="Studio">Studio</option>
+                        <option value="Appartement">Appartement</option>
+                        <option value="Villa">Villa</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Budget maximum (FCFA, facultatif)</label>
+                    <input type="number" id="colocBudget" min="0" placeholder="Ex : 40000">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="colocDescription" maxlength="1000" placeholder="Parlez de vous, de ce que vous cherchez, de vos disponibilités..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Téléphone de contact</label>
+                    <input type="tel" id="colocTelephone" placeholder="+221 77 000 00 00">
+                </div>
+
+                <div class="form-group">
+                    <label>WhatsApp (facultatif)</label>
+                    <input type="tel" id="colocWhatsapp" placeholder="+221 77 000 00 00">
+                </div>
+
+                <button type="submit" class="btn-primary">Publier l'annonce</button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="coloc-list">
+
+    <div class="container">
+
+        <h2>Annonces de colocation</h2>
+
+        <div class="coloc-grid" id="colocGrid">
+            <p class="cards-loading">Chargement des annonces...</p>
         </div>
 
     </div>
@@ -146,7 +171,7 @@
                 <h3>Navigation</h3>
                 <ul>
                     <li><a href="../../index.html">Accueil</a></li>
-                    <li><a href="./rechercher.html">Rechercher</a></li>
+                    <li><a href="../rechercher/rechercher.html">Rechercher</a></li>
                     <li><a href="../connexion/connexion.html">Connexion</a></li>
                     <li><a href="../inscription/inscription.html">Inscription</a></li>
                 </ul>
@@ -156,9 +181,8 @@
                 <h3>Services</h3>
                 <ul>
                     <li><a href="../publier-logement/publier-logement.html">Publier une annonce</a></li>
-                    <li><a href="../colocation/colocation.html">Trouver un(e) colocataire</a></li>
+                    <li><a href="./colocation.html">Colocation</a></li>
                     <li><a href="../tarifs/tarifs.html">Tarifs</a></li>
-                    <li><a href="./rechercher.html">Réserver</a></li>
                     <li><a href="../favoris/favoris.html">Favoris</a></li>
                     <li><a href="../contacte/contacte.html">Support</a></li>
                 </ul>
@@ -208,8 +232,7 @@
 <script src="../../assets/js/api.js?v=20260806a"></script>
 <script src="../../assets/js/global.js?v=20260806a"></script>
 <script src="../../assets/js/senegal-locations.js?v=20260806a"></script>
-<script src="./rechercher.js?v=20260806a"></script>
+<script src="./colocation.js?v=20260806a"></script>
 
 </body>
-
 </html>

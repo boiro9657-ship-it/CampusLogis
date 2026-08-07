@@ -106,6 +106,8 @@ async function chargerLogement(id){
 
     afficherProfilRecherche(logement);
 
+    afficherAudio(logement.audio_url);
+
     const contactBtn =
     document.getElementById("contactOwnerBtn");
 
@@ -563,6 +565,32 @@ const LIBELLES_NIVEAU_ETAGE = {
     "3": "3e étage",
     "4_plus": "4e étage et plus"
 };
+
+/**
+ * Affiche le lecteur de publicité vocale (plans Premium/Pro
+ * uniquement), si le propriétaire en a ajouté une.
+ */
+function afficherAudio(audioUrl){
+
+    const audioCard =
+    document.getElementById("audioCard");
+
+    const audioPlayer =
+    document.getElementById("audioPlayer");
+
+    if(!audioCard || !audioPlayer) return;
+
+    if(!audioUrl){
+
+        audioCard.style.display = "none";
+
+        return;
+    }
+
+    audioPlayer.src = audioUrl;
+    audioCard.style.display = "";
+
+}
 
 /**
  * Reconstruit les badges rapides (chambres, capacité, étage) à

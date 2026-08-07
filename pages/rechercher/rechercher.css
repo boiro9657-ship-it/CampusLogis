@@ -276,7 +276,11 @@
 
     height:250px;
 
-    object-fit:cover;
+    /* "cover" recadrait les photos horizontales/larges pour
+       remplir la vignette. "contain" montre toujours la photo
+       entière, quel que soit son format. */
+    object-fit:contain;
+    background:#F1F5F9;
 
 }
 

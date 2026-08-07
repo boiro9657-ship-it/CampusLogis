@@ -655,7 +655,12 @@
 
     width:100%;
     height:260px;
-    object-fit:cover;
+
+    /* "cover" recadrait les photos horizontales/larges pour
+       remplir la vignette, coupant une partie de l'image sur
+       grand écran. "contain" montre toujours la photo entière. */
+    object-fit:contain;
+    background:#F1F5F9;
 
     transition:.5s;
 

@@ -28,7 +28,7 @@ document.querySelectorAll("[data-plan]").forEach(btn => {
             const donnees =
             await apiFetch("/paiements/creer", {
                 method: "POST",
-                body: JSON.stringify({ plan: "premium" }),
+                body: JSON.stringify({ plan: "premium", origine: "tarifs" }),
             });
 
             window.location.href = donnees.invoice_url;

@@ -445,6 +445,7 @@ try {
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
             plan ENUM('premium','pro') NOT NULL,
+            origine VARCHAR(30) NOT NULL DEFAULT 'tarifs',
             montant DECIMAL(10,2) NOT NULL,
             token VARCHAR(100) NOT NULL UNIQUE,
             statut ENUM('en_attente','complete','echoue') NOT NULL DEFAULT 'en_attente',
@@ -454,6 +455,26 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "paiements" prête.';
+
+    // "origine" a été ajoutée après coup — pour les installations où
+    // la table "paiements" existait déjà sans cette colonne. Sert à
+    // renvoyer l'utilisateur là où il a démarré son paiement
+    // (tarifs.html ou publier-logement.html) plutôt que toujours
+    // sur tarifs.html.
+    $colonneOrigineExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'paiements'
+        AND COLUMN_NAME = 'origine'
+    ")->fetchColumn();
+
+    if ($colonneOrigineExiste == 0) {
+        $pdo->exec("
+            ALTER TABLE paiements
+            ADD COLUMN origine VARCHAR(30) NOT NULL DEFAULT 'tarifs' AFTER plan
+        ");
+        $etapes[] = 'Colonne "origine" ajoutée à "paiements".';
+    }
 
     // Pas d'annonces de démonstration : seules de vraies annonces,
     // publiées par de vrais propriétaires contactables, doivent

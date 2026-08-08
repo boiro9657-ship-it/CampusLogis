@@ -17,6 +17,14 @@ const PAIEMENTS_TARIFS_PLAN = [
     'pro'     => 15000,
 ];
 
+// Pages depuis lesquelles un paiement peut être démarré, et où
+// renvoyer l'utilisateur une fois le paiement traité — jamais une
+// URL fournie par le client directement (redirection ouverte).
+const PAIEMENTS_ORIGINES = [
+    'tarifs'           => '/pages/tarifs/tarifs.html',
+    'publier-logement' => '/pages/publier-logement/publier-logement.html',
+];
+
 function handlePaiementsRoute(array $segments, string $method): void
 {
     $premier = $segments[0] ?? null;
@@ -67,6 +75,12 @@ function creerPaiement(): void
         jsonError('Formule invalide.');
     }
 
+    $origine = $body['origine'] ?? 'tarifs';
+
+    if (!isset(PAIEMENTS_ORIGINES[$origine])) {
+        $origine = 'tarifs';
+    }
+
     $montant = PAIEMENTS_TARIFS_PLAN[$plan];
     $urls = urlsActionsPaiement();
 
@@ -89,12 +103,23 @@ function creerPaiement(): void
     }
 
     $stmt = getPdo()->prepare('
-        INSERT INTO paiements (user_id, plan, montant, token, statut)
-        VALUES (?, ?, ?, ?, "en_attente")
+        INSERT INTO paiements (user_id, plan, origine, montant, token, statut)
+        VALUES (?, ?, ?, ?, ?, "en_attente")
     ');
-    $stmt->execute([$userId, $plan, $montant, $facture['token']]);
+    $stmt->execute([$userId, $plan, $origine, $montant, $facture['token']]);
 
     jsonResponse(['invoice_url' => $facture['invoice_url']]);
+}
+
+/**
+ * URL (relative au site) vers laquelle renvoyer l'utilisateur après
+ * un paiement, selon la page depuis laquelle il l'a démarré.
+ */
+function urlRetourPourOrigine(string $siteUrl, ?string $origine): string
+{
+    $chemin = PAIEMENTS_ORIGINES[$origine] ?? PAIEMENTS_ORIGINES['tarifs'];
+
+    return $siteUrl . $chemin;
 }
 
 /**
@@ -122,12 +147,12 @@ function appliquerPaiementConfirme(array $paiement): void
 function gererRetourPaiement(): void
 {
     $appConfig = require __DIR__ . '/../../config/app.php';
-    $urlTarifs = $appConfig['site_url'] . '/pages/tarifs/tarifs.html';
+    $urlParDefaut = $appConfig['site_url'] . PAIEMENTS_ORIGINES['tarifs'];
 
     $token = $_GET['token'] ?? null;
 
     if (!$token) {
-        header('Location: ' . $urlTarifs . '?paiement=echec');
+        header('Location: ' . $urlParDefaut . '?paiement=echec');
         exit;
     }
 
@@ -136,16 +161,18 @@ function gererRetourPaiement(): void
     $paiement = $stmt->fetch();
 
     if (!$paiement) {
-        header('Location: ' . $urlTarifs . '?paiement=echec');
+        header('Location: ' . $urlParDefaut . '?paiement=echec');
         exit;
     }
+
+    $urlRetour = urlRetourPourOrigine($appConfig['site_url'], $paiement['origine']);
 
     $verification = paydunyaVerifierFacture($token);
 
     if ($verification['statut'] === 'complete') {
 
         appliquerPaiementConfirme($paiement);
-        header('Location: ' . $urlTarifs . '?paiement=succes');
+        header('Location: ' . $urlRetour . '?paiement=succes');
         exit;
 
     }
@@ -155,23 +182,35 @@ function gererRetourPaiement(): void
             ->execute([$paiement['id']]);
     }
 
-    header('Location: ' . $urlTarifs . '?paiement=' . ($verification['statut'] === 'en_attente' ? 'en_attente' : 'echec'));
+    header('Location: ' . $urlRetour . '?paiement=' . ($verification['statut'] === 'en_attente' ? 'en_attente' : 'echec'));
     exit;
 }
 
 function gererAnnulationPaiement(): void
 {
     $appConfig = require __DIR__ . '/../../config/app.php';
-    $urlTarifs = $appConfig['site_url'] . '/pages/tarifs/tarifs.html';
+    $urlRetour = $appConfig['site_url'] . PAIEMENTS_ORIGINES['tarifs'];
 
     $token = $_GET['token'] ?? null;
 
     if ($token) {
-        getPdo()->prepare('UPDATE paiements SET statut = "echoue" WHERE token = ? AND statut = "en_attente"')
-            ->execute([$token]);
+
+        $stmt = getPdo()->prepare('SELECT * FROM paiements WHERE token = ?');
+        $stmt->execute([$token]);
+        $paiement = $stmt->fetch();
+
+        if ($paiement) {
+
+            $urlRetour = urlRetourPourOrigine($appConfig['site_url'], $paiement['origine']);
+
+            getPdo()->prepare('UPDATE paiements SET statut = "echoue" WHERE id = ? AND statut = "en_attente"')
+                ->execute([$paiement['id']]);
+
+        }
+
     }
 
-    header('Location: ' . $urlTarifs . '?paiement=annule');
+    header('Location: ' . $urlRetour . '?paiement=annule');
     exit;
 }
 

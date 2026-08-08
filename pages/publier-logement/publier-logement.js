@@ -294,7 +294,7 @@ document.querySelectorAll("#planChoice [data-plan]").forEach(btn => {
             const donnees =
             await apiFetch("/paiements/creer", {
                 method: "POST",
-                body: JSON.stringify({ plan: "premium" }),
+                body: JSON.stringify({ plan: "premium", origine: "publier-logement" }),
             });
 
             window.location.href = donnees.invoice_url;
@@ -580,3 +580,40 @@ async function afficherSuggestionPlan(){
     window.scrollTo({ top: 0, behavior: "smooth" });
 
 }
+
+/* ==========================================================
+   RETOUR DEPUIS PAYDUNYA (succès, échec, annulation, en attente)
+   ========================================================== */
+
+(() => {
+
+    const params =
+    new URLSearchParams(window.location.search);
+
+    const paiement =
+    params.get("paiement");
+
+    if(!paiement) return;
+
+    const messages = {
+        succes:     ["Paiement confirmé ! Votre formule Premium est active.", "success"],
+        echec:      ["Le paiement n'a pas abouti. Vous n'avez pas été débité.", "error"],
+        annule:     ["Paiement annulé.", "error"],
+        en_attente: ["Paiement en cours de traitement, cela peut prendre quelques instants.", "error"],
+    };
+
+    const [message, type] = messages[paiement] || [];
+
+    if(message) showToast(message, type);
+
+    if(paiement === "succes") afficherFormulairePublication();
+
+    // Nettoie l'URL pour ne pas redéclencher le toast au rechargement.
+    params.delete("paiement");
+
+    const nouvelleUrl =
+    window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+
+    window.history.replaceState({}, "", nouvelleUrl);
+
+})();

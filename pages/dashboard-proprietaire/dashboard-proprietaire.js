@@ -248,7 +248,7 @@ function afficherAnnonces(logements){
 
                 <p>📍 ${logement.ville || ""}</p>
 
-                <p>💰 ${logement.prix} FCFA</p>
+                <p>💰 ${logement.prix} FCFA${libelleCourtDuree(logement.duree_location)}${libelleEngagementDuree(logement.duree_location) ? " · " + libelleEngagementDuree(logement.duree_location) : ""}</p>
 
                 <p>🛏 ${logement.chambres || 0} chambre(s)</p>
 

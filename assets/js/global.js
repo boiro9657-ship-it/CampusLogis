@@ -790,20 +790,44 @@ function attacherBoutonsReservation(container){
     fixe qui serait faux pour une annonce en courte durée.
 ========================== */
 
+// Pour "3_mois", "6_mois" et "1_an", le prix reste un loyer MENSUEL
+// (voir le formulaire de publication : "3 mois (minimum)", "6 mois
+// (minimum)") — seul l'engagement de location est plus long, pas la
+// fréquence de paiement. Afficher "/3 mois" ou "/an" laissait croire
+// à tort que le prix était une somme forfaitaire pour toute la
+// période, d'où la confusion ("100 000 F/an" alors que c'est
+// 100 000 F chaque mois). La durée d'engagement choisie par le
+// propriétaire est affichée séparément, voir libelleEngagementDuree().
 const LIBELLES_COURTS_DUREE = {
     "24h": "/24h",
     nuit: "/nuitée",
     journee: "/jour",
     semaine: "/semaine",
     "1_mois": "/mois",
-    "3_mois": "/3 mois",
-    "6_mois": "/6 mois",
-    "1_an": "/an"
+    "3_mois": "/mois",
+    "6_mois": "/mois",
+    "1_an": "/mois"
 };
 
 function libelleCourtDuree(duree){
 
     return LIBELLES_COURTS_DUREE[duree] || "/mois";
+
+}
+
+// Durée d'engagement à afficher séparément du prix, uniquement pour
+// les locations longue durée avec un minimum de séjour supérieur au
+// mois simple — "1_mois" n'a pas besoin d'être précisé, c'est le cas
+// par défaut sans engagement particulier.
+const LIBELLES_ENGAGEMENT_DUREE = {
+    "3_mois": "Engagement 3 mois",
+    "6_mois": "Engagement 6 mois",
+    "1_an": "Engagement 1 an"
+};
+
+function libelleEngagementDuree(duree){
+
+    return LIBELLES_ENGAGEMENT_DUREE[duree] || null;
 
 }
 

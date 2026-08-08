@@ -271,6 +271,9 @@ function carteLogementHTML(logement){
     const estReserve =
     logement.statut === "reserve";
 
+    const engagement =
+    libelleEngagementDuree(logement.duree_location);
+
     return `
     <div class="card ${estPro ? "card-pro" : estPremium ? "card-premium" : ""}">
 
@@ -283,6 +286,8 @@ function carteLogementHTML(logement){
             <div class="carousel-dots"></div>
 
             ${videos.length > 0 ? `<span class="badge-video-card"><i class="ph ph-play-circle"></i> Vidéo</span>` : ""}
+
+            ${engagement ? `<span class="badge-engagement"><i class="ph ph-calendar-check"></i> ${engagement}</span>` : ""}
 
             <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
 

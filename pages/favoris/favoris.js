@@ -88,7 +88,7 @@ async function chargerFavoris(){
 
                 <h3>${logement.titre}</h3>
 
-                <p>📍 ${logement.ville || ""} — ${prix} FCFA/mois</p>
+                <p>📍 ${logement.ville || ""} — ${prix} FCFA${libelleCourtDuree(logement.duree_location)}${libelleEngagementDuree(logement.duree_location) ? " · " + libelleEngagementDuree(logement.duree_location) : ""}</p>
 
                 <button class="favorite active" data-id="${logement.id}">
                     ❤️ Retirer des favoris

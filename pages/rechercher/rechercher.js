@@ -204,6 +204,9 @@ function carteRechercheHTML(logement){
     const estReserve =
     logement.statut === "reserve";
 
+    const engagement =
+    libelleEngagementDuree(logement.duree_location);
+
     return `
     <div class="housing-card ${estPro ? "housing-card-pro" : estPremium ? "housing-card-premium" : ""}">
 
@@ -216,6 +219,8 @@ function carteRechercheHTML(logement){
             <div class="carousel-dots"></div>
 
             ${videos.length > 0 ? `<span class="badge-video-card"><i class="ph ph-play-circle"></i> Vidéo</span>` : ""}
+
+            ${engagement ? `<span class="badge-engagement"><i class="ph ph-calendar-check"></i> ${engagement}</span>` : ""}
 
         </div>
 

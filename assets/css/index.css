@@ -730,6 +730,41 @@
 
 }
 
+/* Durée d'engagement (ex. "Engagement 6 mois") — séparée du prix
+   pour qu'on ne confonde jamais la durée de location avec la
+   fréquence de paiement (le loyer reste mensuel, même sur un
+   engagement de 6 mois ou 1 an). */
+.badge-engagement{
+
+    position:absolute;
+
+    bottom:14px;
+    right:18px;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    background:rgba(0,0,0,.6);
+    color:white;
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    font-size:12.5px;
+    font-weight:600;
+
+    z-index:2;
+
+}
+
+.badge-engagement i{
+
+    font-size:14px;
+
+}
+
 .badge-card-reserve{
 
     background:#D97706;

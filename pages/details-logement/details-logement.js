@@ -6,15 +6,26 @@
    page), le contenu de démonstration reste affiché tel quel.
    ========================================================== */
 
+// Pour "3_mois", "6_mois" et "1_an", le prix reste un loyer MENSUEL
+// (voir le formulaire de publication : "3 mois (minimum)", "6 mois
+// (minimum)") — seul l'engagement de location est plus long, pas la
+// fréquence de paiement. La durée d'engagement est affichée à part,
+// voir LIBELLES_ENGAGEMENT plus bas.
 const LIBELLES_DUREE = {
     "24h": "pour 24 heures",
     nuit: "par nuitée",
     journee: "par jour",
     semaine: "par semaine",
     "1_mois": "par mois",
-    "3_mois": "par tranche de 3 mois",
-    "6_mois": "par tranche de 6 mois",
-    "1_an": "par an"
+    "3_mois": "par mois",
+    "6_mois": "par mois",
+    "1_an": "par mois"
+};
+
+const LIBELLES_ENGAGEMENT = {
+    "3_mois": "Engagement 3 mois",
+    "6_mois": "Engagement 6 mois",
+    "1_an": "Engagement 1 an"
 };
 
 /* ==========================
@@ -89,8 +100,12 @@ async function chargerLogement(id){
 
     if(periodeEl){
 
+        const engagement =
+        LIBELLES_ENGAGEMENT[logement.duree_location];
+
         periodeEl.textContent =
-        LIBELLES_DUREE[logement.duree_location] || "par mois";
+        (LIBELLES_DUREE[logement.duree_location] || "par mois") +
+        (engagement ? " · " + engagement : "");
 
     }
 

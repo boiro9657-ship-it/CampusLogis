@@ -21,6 +21,11 @@ function handleLogementsRoute(array $segments, string $method): void
         return;
     }
 
+    if ($method === 'GET' && $first === 'temoignages') {
+        listTemoignages();
+        return;
+    }
+
     if ($method === 'GET' && $first === null) {
         listLogements();
         return;
@@ -87,12 +92,13 @@ function listLogements(): void
     }
 
     $sql = "
-        SELECT l.*,
+        SELECT l.*, u.plan AS owner_plan,
             (SELECT GROUP_CONCAT(url ORDER BY position SEPARATOR '|')
              FROM logement_medias m WHERE m.logement_id = l.id AND m.type = 'image') AS photos,
             (SELECT GROUP_CONCAT(url ORDER BY position SEPARATOR '|')
              FROM logement_medias m WHERE m.logement_id = l.id AND m.type = 'video') AS videos
         FROM logements l
+        LEFT JOIN utilisateurs u ON u.id = l.owner_id
     ";
 
     if ($conditions) {
@@ -100,11 +106,48 @@ function listLogements(): void
     }
 
     // Les logements encore disponibles passent toujours avant les
-    // déjà réservés, indépendamment de la date de publication.
-    $sql .= " ORDER BY (statut = 'disponible') DESC, premium DESC, created_at DESC";
+    // déjà réservés, indépendamment de la date de publication. La
+    // mise en avant Pro/Premium se base sur le plan ACTUEL du
+    // propriétaire (pas un indicateur figé sur l'annonce) : un
+    // abonnement souscrit après coup profite immédiatement à toutes
+    // ses annonces existantes, et s'arrête dès que le plan change.
+    $sql .= "
+        ORDER BY (l.statut = 'disponible') DESC,
+            (CASE u.plan WHEN 'pro' THEN 2 WHEN 'premium' THEN 1 ELSE 0 END) DESC,
+            l.created_at DESC
+    ";
 
     $stmt = getPdo()->prepare($sql);
     $stmt->execute($params);
+
+    jsonResponse($stmt->fetchAll());
+}
+
+/**
+ * Derniers vrais commentaires laissés sur des annonces, réutilisés
+ * comme témoignages sur la page d'accueil — jamais d'avis inventé,
+ * uniquement de vrais commentaires de vrais utilisateurs, avec leur
+ * vraie photo de profil. Les messages très courts (ex. "ok") sont
+ * écartés : pas pertinents à mettre en avant, sans rien inventer
+ * pour autant.
+ */
+function listTemoignages(): void
+{
+    $limite = isset($_GET['limite']) ? min(20, max(1, (int) $_GET['limite'])) : 10;
+
+    $stmt = getPdo()->prepare("
+        SELECT c.id, c.message, c.created_at,
+               u.nom_complet AS auteur_nom, u.photo_url AS auteur_photo,
+               l.titre AS logement_titre, l.id AS logement_id
+        FROM commentaires c
+        JOIN utilisateurs u ON u.id = c.user_id
+        JOIN logements l ON l.id = c.logement_id
+        WHERE CHAR_LENGTH(c.message) >= 20
+        AND l.statut_validation = 'approuve'
+        ORDER BY c.created_at DESC
+        LIMIT " . $limite . "
+    ");
+    $stmt->execute();
 
     jsonResponse($stmt->fetchAll());
 }
@@ -146,10 +189,11 @@ function listMesLogements(): void
     $userId = requireAuth();
 
     $stmt = getPdo()->prepare('
-        SELECT l.*,
+        SELECT l.*, u.plan AS owner_plan,
             (SELECT COUNT(*) FROM logement_medias m WHERE m.logement_id = l.id AND m.type = "image") AS nb_photos,
             (SELECT COUNT(*) FROM logement_medias m WHERE m.logement_id = l.id AND m.type = "video") AS nb_videos
         FROM logements l
+        LEFT JOIN utilisateurs u ON u.id = l.owner_id
         WHERE l.owner_id = ?
         ORDER BY l.created_at DESC
     ');
@@ -164,6 +208,7 @@ function getLogement(int $id): void
         SELECT l.*, u.nom_complet AS proprietaire_nom, u.telephone AS proprietaire_telephone,
             u.photo_url AS proprietaire_photo,
             u.created_at AS proprietaire_membre_depuis,
+            u.plan AS owner_plan,
             (
                 SELECT COUNT(*) FROM logements l2
                 WHERE l2.owner_id = l.owner_id AND l2.statut_validation = "approuve"
@@ -202,6 +247,7 @@ function getLogement(int $id): void
 const MAX_PHOTOS = 8;
 const MAX_VIDEOS_GRATUIT = 2;
 const MAX_VIDEOS_PREMIUM = 5;
+const MAX_VIDEOS_PRO = 8;
 
 // Nombre maximum d'annonces qu'un compte au plan Gratuit peut
 // publier par jour calendaire — Premium et Pro n'ont pas cette
@@ -382,7 +428,13 @@ function createLogement(): void
         jsonError('Au moins une photo est obligatoire.');
     }
 
-    $maxVideos = $planActuel === 'gratuit' ? MAX_VIDEOS_GRATUIT : MAX_VIDEOS_PREMIUM;
+    $maxVideosParPlan = [
+        'gratuit' => MAX_VIDEOS_GRATUIT,
+        'premium' => MAX_VIDEOS_PREMIUM,
+        'pro'     => MAX_VIDEOS_PRO,
+    ];
+
+    $maxVideos = $maxVideosParPlan[$planActuel] ?? MAX_VIDEOS_GRATUIT;
 
     $photos = array_slice($photos, 0, MAX_PHOTOS);
     $videos = array_slice($videos, 0, $maxVideos);

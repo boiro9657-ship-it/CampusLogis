@@ -180,8 +180,14 @@ async function afficherSuggestions(ville, type){
 
 function carteRechercheHTML(logement){
 
+    const planProprietaire =
+    logement.owner_plan || "gratuit";
+
+    const estPro =
+    planProprietaire === "pro";
+
     const estPremium =
-    Number(logement.premium) === 1;
+    planProprietaire === "premium";
 
     const photos =
     (logement.photos ? logement.photos.split("|") : [logement.image_url]).filter(Boolean);
@@ -199,7 +205,7 @@ function carteRechercheHTML(logement){
     logement.statut === "reserve";
 
     return `
-    <div class="housing-card ${estPremium ? "housing-card-premium" : ""}">
+    <div class="housing-card ${estPro ? "housing-card-pro" : estPremium ? "housing-card-premium" : ""}">
 
         <div class="card-image-wrap">
 
@@ -215,7 +221,11 @@ function carteRechercheHTML(logement){
 
         <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
 
-        ${estPremium ? `
+        ${estPro ? `
+        <span class="badge-pro">
+            <i class="ph ph-medal"></i> Pro
+        </span>
+        ` : estPremium ? `
         <span class="badge-premium">
             <i class="ph ph-crown-simple"></i> Premium
         </span>

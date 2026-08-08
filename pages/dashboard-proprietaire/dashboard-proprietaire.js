@@ -252,6 +252,14 @@ function afficherAnnonces(logements){
 
                 <span class="validation-badge ${validation.classe}">${validation.texte}</span>
 
+                ${
+                    utilisateurConnecte && utilisateurConnecte.plan === "pro"
+                    ? `<span class="plan-badge plan-badge-pro"><i class="ph ph-medal"></i> Pro</span>`
+                    : utilisateurConnecte && utilisateurConnecte.plan === "premium"
+                    ? `<span class="plan-badge plan-badge-premium"><i class="ph ph-crown-simple"></i> Premium</span>`
+                    : ""
+                }
+
                 <h3>${logement.titre}</h3>
 
                 <p>📍 ${logement.ville || ""}</p>

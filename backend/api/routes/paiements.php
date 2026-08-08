@@ -172,7 +172,7 @@ function gererRetourPaiement(): void
     if ($verification['statut'] === 'complete') {
 
         appliquerPaiementConfirme($paiement);
-        header('Location: ' . $urlRetour . '?paiement=succes');
+        header('Location: ' . $urlRetour . '?paiement=succes&plan=' . urlencode($paiement['plan']));
         exit;
 
     }

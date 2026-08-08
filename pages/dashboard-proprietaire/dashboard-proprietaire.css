@@ -994,6 +994,37 @@ tr:hover td{
 
 }
 
+.plan-badge{
+
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+
+    padding:5px 12px;
+    border-radius:20px;
+
+    font-size:12px;
+    font-weight:700;
+
+    margin-left:8px;
+    margin-bottom:10px;
+
+}
+
+.plan-badge-premium{
+
+    background:linear-gradient(135deg,var(--secondary),var(--secondary-dark));
+    color:white;
+
+}
+
+.plan-badge-pro{
+
+    background:linear-gradient(135deg,#7C3AED,#5B21B6);
+    color:white;
+
+}
+
 .validation-badge-approuve{
 
     background:#DCFCE7;

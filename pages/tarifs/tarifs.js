@@ -2,19 +2,15 @@
    TARIFS.JS — page tarifs uniquement
    ========================================================== */
 
+const PLANS_PAYANTS = ["Premium", "Pro"];
+
 document.querySelectorAll("[data-plan]").forEach(btn => {
 
     btn.addEventListener("click", async () => {
 
         const plan = btn.dataset.plan;
 
-        if(plan !== "Premium"){
-
-            showToast(
-                "Formule " + plan + " : contactez notre équipe pour en profiter.",
-                "error"
-            );
-
+        if(!PLANS_PAYANTS.includes(plan)){
             return;
         }
 
@@ -28,7 +24,7 @@ document.querySelectorAll("[data-plan]").forEach(btn => {
             const donnees =
             await apiFetch("/paiements/creer", {
                 method: "POST",
-                body: JSON.stringify({ plan: "premium", origine: "tarifs" }),
+                body: JSON.stringify({ plan: plan.toLowerCase(), origine: "tarifs" }),
             });
 
             window.location.href = donnees.invoice_url;
@@ -37,7 +33,7 @@ document.querySelectorAll("[data-plan]").forEach(btn => {
 
             if(error.status === 401){
 
-                showToast("Connectez-vous d'abord pour passer au Premium.", "error");
+                showToast("Connectez-vous d'abord pour passer au " + plan + ".", "error");
 
                 setTimeout(() => {
                     window.location.href = "../connexion/connexion.html";
@@ -72,8 +68,11 @@ document.querySelectorAll("[data-plan]").forEach(btn => {
 
     if(!paiement) return;
 
+    const planPaye =
+    params.get("plan") === "pro" ? "Pro" : "Premium";
+
     const messages = {
-        succes:     ["Paiement confirmé ! Votre formule Premium est active.", "success"],
+        succes:     [`Paiement confirmé ! Votre formule ${planPaye} est active.`, "success"],
         echec:      ["Le paiement n'a pas abouti. Vous n'avez pas été débité.", "error"],
         annule:     ["Paiement annulé.", "error"],
         en_attente: ["Paiement en cours de traitement, cela peut prendre quelques instants.", "error"],
@@ -85,6 +84,7 @@ document.querySelectorAll("[data-plan]").forEach(btn => {
 
     // Nettoie l'URL pour ne pas redéclencher le toast au rechargement.
     params.delete("paiement");
+    params.delete("plan");
 
     const nouvelleUrl =
     window.location.pathname + (params.toString() ? "?" + params.toString() : "");

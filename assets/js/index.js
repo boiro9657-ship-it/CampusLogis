@@ -244,8 +244,17 @@ async function chargerLogementsPopulaires(){
 
 function carteLogementHTML(logement){
 
+    // La mise en avant reflète le plan ACTUEL du propriétaire (pas
+    // un indicateur figé sur l'annonce) : dès qu'il passe Premium
+    // ou Pro, toutes ses annonces en profitent immédiatement.
+    const planProprietaire =
+    logement.owner_plan || "gratuit";
+
+    const estPro =
+    planProprietaire === "pro";
+
     const estPremium =
-    Number(logement.premium) === 1;
+    planProprietaire === "premium";
 
     const photos =
     (logement.photos ? logement.photos.split("|") : [logement.image_url]).filter(Boolean);
@@ -263,7 +272,7 @@ function carteLogementHTML(logement){
     logement.statut === "reserve";
 
     return `
-    <div class="card ${estPremium ? "card-premium" : ""}">
+    <div class="card ${estPro ? "card-pro" : estPremium ? "card-premium" : ""}">
 
         <div class="card-image">
 
@@ -277,7 +286,11 @@ function carteLogementHTML(logement){
 
             <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
 
-            ${estPremium ? `
+            ${estPro ? `
+            <span class="badge-pro">
+                <i class="ph ph-medal"></i> Pro
+            </span>
+            ` : estPremium ? `
             <span class="badge-premium">
                 <i class="ph ph-crown-simple"></i> Premium
             </span>
@@ -310,6 +323,130 @@ function carteLogementHTML(logement){
                 </a>
 
             </div>
+
+        </div>
+
+    </div>
+    `;
+
+}
+
+/* ==========================
+    TÉMOIGNAGES (API)
+    Vrais commentaires laissés sur des annonces, présentés en
+    carrousel défilant automatiquement de droite à gauche, un par
+    un. La section entière reste masquée s'il n'y a pas au moins
+    deux témoignages réels à montrer.
+========================== */
+
+const temoignagesSection =
+document.getElementById("temoignagesSection");
+
+if(temoignagesSection){
+
+    chargerTemoignages();
+
+}
+
+let temoignageIndex = 0;
+let temoignagesChronometre = null;
+
+async function chargerTemoignages(){
+
+    let temoignages;
+
+    try{
+
+        temoignages = await apiFetch("/logements/temoignages?limite=10");
+
+    }catch(error){
+
+        return;
+    }
+
+    if(!temoignages || temoignages.length < 2){
+
+        return;
+    }
+
+    const track =
+    document.getElementById("temoignagesTrack");
+
+    const dots =
+    document.getElementById("temoignagesDots");
+
+    track.innerHTML =
+    temoignages.map(temoignageHTML).join("");
+
+    dots.innerHTML =
+    temoignages.map((t, i) => `<span class="temoignage-dot ${i === 0 ? "active" : ""}"></span>`).join("");
+
+    temoignagesSection.style.display = "";
+
+    temoignagesChronometre =
+    setInterval(() => avancerTemoignage(temoignages.length), 5000);
+
+    dots.querySelectorAll(".temoignage-dot").forEach((dot, i) => {
+
+        dot.addEventListener("click", () => {
+
+            temoignageIndex = i;
+
+            positionnerTemoignages();
+
+            clearInterval(temoignagesChronometre);
+
+            temoignagesChronometre = setInterval(() => avancerTemoignage(temoignages.length), 5000);
+
+        });
+
+    });
+
+}
+
+function avancerTemoignage(total){
+
+    temoignageIndex = (temoignageIndex + 1) % total;
+
+    positionnerTemoignages();
+
+}
+
+function positionnerTemoignages(){
+
+    const track =
+    document.getElementById("temoignagesTrack");
+
+    track.style.transform = `translateX(-${temoignageIndex * 100}%)`;
+
+    document.querySelectorAll(".temoignage-dot").forEach((dot, i) => {
+
+        dot.classList.toggle("active", i === temoignageIndex);
+
+    });
+
+}
+
+function temoignageHTML(t){
+
+    const avatar =
+    t.auteur_photo
+    ? `<img src="${t.auteur_photo}" alt="${t.auteur_nom}">`
+    : `<i class="ph ph-user"></i>`;
+
+    return `
+    <div class="temoignage-slide">
+
+        <div class="temoignage-card">
+
+            <div class="temoignage-avatar">${avatar}</div>
+
+            <p class="temoignage-texte">« ${t.message} »</p>
+
+            <p class="temoignage-auteur">
+                ${t.auteur_nom}
+                <span>à propos de « ${t.logement_titre} »</span>
+            </p>
 
         </div>
 

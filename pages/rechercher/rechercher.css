@@ -292,6 +292,47 @@
 
 }
 
+/* Badge Pro : distinct du badge Premium (violet plutôt que vert)
+   pour bien montrer qu'il s'agit d'un niveau au-dessus. */
+.badge-pro{
+
+    position:absolute;
+
+    top:62px;
+    left:18px;
+
+    display:flex;
+    align-items:center;
+    gap:5px;
+
+    background:linear-gradient(135deg,#7C3AED,#5B21B6);
+    color:white;
+
+    padding:7px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+    font-weight:700;
+
+    box-shadow:0 8px 18px rgba(124,58,237,.35);
+
+    z-index:2;
+
+}
+
+.badge-pro i{
+
+    font-size:13px;
+
+}
+
+.housing-card-pro{
+
+    border:2px solid #7C3AED;
+
+}
+
 .housing-card{
 
     position:relative;

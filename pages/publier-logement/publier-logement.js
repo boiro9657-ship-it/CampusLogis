@@ -10,6 +10,12 @@
 // bas dans ce fichier — renseigné dès que "/auth/me" répond ci-dessous.
 let planActuel = "gratuit";
 
+const MAX_VIDEOS_PAR_PLAN = {
+    gratuit: 2,
+    premium: 5,
+    pro: 8,
+};
+
 (async () => {
 
     let utilisateur;
@@ -39,8 +45,15 @@ let planActuel = "gratuit";
         const hintVideosPlan =
         document.getElementById("hintVideosPlan");
 
-        if(labelVideos) labelVideos.textContent = "Vidéos (facultatif, jusqu'à 5)";
-        if(hintVideosPlan) hintVideosPlan.style.display = "";
+        const maxVideosCePlan =
+        MAX_VIDEOS_PAR_PLAN[planActuel] || MAX_VIDEOS_PAR_PLAN.gratuit;
+
+        if(labelVideos) labelVideos.textContent = "Vidéos (facultatif, jusqu'à " + maxVideosCePlan + ")";
+
+        if(hintVideosPlan){
+            hintVideosPlan.style.display = "";
+            hintVideosPlan.innerHTML = `<i class="ph ph-crown-simple"></i> Avec votre plan ${planActuel === "pro" ? "Pro" : "Premium"}, publiez jusqu'à ${maxVideosCePlan} vidéos par annonce.`;
+        }
 
         const btnRecord =
         document.getElementById("btnAudioRecord");
@@ -274,13 +287,7 @@ document.querySelectorAll("#planChoice [data-plan]").forEach(btn => {
 
         const plan = btn.dataset.plan;
 
-        if(plan !== "Premium"){
-
-            showToast(
-                "Formule " + plan + " : contactez notre équipe pour en profiter.",
-                "error"
-            );
-
+        if(!["Premium", "Pro"].includes(plan)){
             return;
         }
 
@@ -294,7 +301,7 @@ document.querySelectorAll("#planChoice [data-plan]").forEach(btn => {
             const donnees =
             await apiFetch("/paiements/creer", {
                 method: "POST",
-                body: JSON.stringify({ plan: "premium", origine: "publier-logement" }),
+                body: JSON.stringify({ plan: plan.toLowerCase(), origine: "publier-logement" }),
             });
 
             window.location.href = donnees.invoice_url;
@@ -427,7 +434,7 @@ if(publishForm){
             }
 
             const maxVideosPlan =
-            planActuel === "gratuit" ? 2 : 5;
+            MAX_VIDEOS_PAR_PLAN[planActuel] || MAX_VIDEOS_PAR_PLAN.gratuit;
 
             if(videos.length > maxVideosPlan){
 
@@ -595,8 +602,11 @@ async function afficherSuggestionPlan(){
 
     if(!paiement) return;
 
+    const planPaye =
+    params.get("plan") === "pro" ? "Pro" : "Premium";
+
     const messages = {
-        succes:     ["Paiement confirmé ! Votre formule Premium est active.", "success"],
+        succes:     [`Paiement confirmé ! Votre formule ${planPaye} est active.`, "success"],
         echec:      ["Le paiement n'a pas abouti. Vous n'avez pas été débité.", "error"],
         annule:     ["Paiement annulé.", "error"],
         en_attente: ["Paiement en cours de traitement, cela peut prendre quelques instants.", "error"],
@@ -610,6 +620,7 @@ async function afficherSuggestionPlan(){
 
     // Nettoie l'URL pour ne pas redéclencher le toast au rechargement.
     params.delete("paiement");
+    params.delete("plan");
 
     const nouvelleUrl =
     window.location.pathname + (params.toString() ? "?" + params.toString() : "");

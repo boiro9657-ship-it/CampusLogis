@@ -856,12 +856,24 @@ tr:hover td{
 
 @media(max-width:480px){
 
+    /* En feuille remontant du bas plutôt qu'en plein écran : on
+       laisse volontairement de l'air en haut pour que l'espace de
+       discussion ne donne pas l'impression d'avaler tout l'écran. */
+    .chat-modal-overlay{
+
+        padding:0;
+        align-items:flex-end;
+
+    }
+
     .chat-modal{
 
-        height:100vh;
-        max-height:100vh;
+        max-width:100%;
 
-        border-radius:0;
+        height:82vh;
+        max-height:82vh;
+
+        border-radius:20px 20px 0 0;
 
     }
 

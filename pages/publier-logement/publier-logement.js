@@ -270,12 +270,43 @@ document.getElementById("lienIgnorerPlan")?.addEventListener(
 
 document.querySelectorAll("#planChoice [data-plan]").forEach(btn => {
 
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
 
-        showToast(
-            "Formule " + btn.dataset.plan + " bientôt disponible — " +
-            "paiement Wave / Orange Money en cours d'intégration."
-        );
+        const plan = btn.dataset.plan;
+
+        if(plan !== "Premium"){
+
+            showToast(
+                "Formule " + plan + " : contactez notre équipe pour en profiter.",
+                "error"
+            );
+
+            return;
+        }
+
+        const texteOriginal = btn.textContent;
+
+        btn.disabled = true;
+        btn.textContent = "Redirection vers le paiement...";
+
+        try{
+
+            const donnees =
+            await apiFetch("/paiements/creer", {
+                method: "POST",
+                body: JSON.stringify({ plan: "premium" }),
+            });
+
+            window.location.href = donnees.invoice_url;
+
+        }catch(error){
+
+            showToast(error.message || "Impossible de démarrer le paiement.", "error");
+
+            btn.disabled = false;
+            btn.textContent = texteOriginal;
+
+        }
 
     });
 

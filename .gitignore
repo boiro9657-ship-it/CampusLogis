@@ -9,7 +9,9 @@ backend/uploads/avatars/*
 .claude/
 
 # Secrets réels (mot de passe d'application Gmail, identifiants
-# OAuth Google) : jamais commités, uniquement déployés en direct
-# sur chaque environnement. Voir les fichiers .example.php.
+# OAuth Google, clés API PayDunya) : jamais commités, uniquement
+# déployés en direct sur chaque environnement. Voir les fichiers
+# .example.php.
 backend/config/mail.php
 backend/config/google.php
+backend/config/paydunya.php

@@ -440,6 +440,21 @@ try {
     ");
     $etapes[] = 'Table "visites" prête.';
 
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS paiements (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            plan ENUM('premium','pro') NOT NULL,
+            montant DECIMAL(10,2) NOT NULL,
+            token VARCHAR(100) NOT NULL UNIQUE,
+            statut ENUM('en_attente','complete','echoue') NOT NULL DEFAULT 'en_attente',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "paiements" prête.';
+
     // Pas d'annonces de démonstration : seules de vraies annonces,
     // publiées par de vrais propriétaires contactables, doivent
     // apparaître sur le site. D'anciennes installations peuvent

@@ -601,6 +601,7 @@ function afficherTableRecente(logements, reservations, afficherAnnoncesRecentes)
 
 let chatAutreUserId = null;
 let chatIntervalle = null;
+let chatParticipantActuel = null;
 
 const chatOverlay =
 document.getElementById("chatModalOverlay");
@@ -681,6 +682,8 @@ function afficherParticipantChat(participant){
     const whatsappBtn =
     document.getElementById("chatWhatsappBtn");
 
+    chatParticipantActuel = participant;
+
     if(!participant){
 
         if(nomEl) nomEl.textContent = "Discussion";
@@ -738,6 +741,38 @@ function afficherParticipantChat(participant){
 
 }
 
+function libelleRoleChat(role){
+
+    if(role === "proprietaire") return "le propriétaire";
+    if(role === "locataire") return "le/la locataire";
+
+    return null;
+
+}
+
+function intraductionChat(){
+
+    const participant = chatParticipantActuel;
+
+    if(!participant) return "";
+
+    const roleLibelle =
+    libelleRoleChat(participant.role);
+
+    const qui =
+    roleLibelle
+    ? `${roleLibelle} ${participant.nom_complet}`
+    : participant.nom_complet;
+
+    return `
+        <p class="chat-intro">
+            <i class="ph ph-chats-circle"></i>
+            Vous engagez une discussion avec ${qui}.
+        </p>
+    `;
+
+}
+
 let dernierAffichageMessagesChat = "";
 
 function afficherMessagesChat(messages){
@@ -750,7 +785,7 @@ function afficherMessagesChat(messages){
     // Évite de reconstruire/re-scroller le fil à chaque poll si
     // rien n'a changé depuis la dernière vérification.
     const signature =
-    JSON.stringify(messages.map(m => m.id));
+    chatAutreUserId + ":" + JSON.stringify(messages.map(m => m.id));
 
     if(signature === dernierAffichageMessagesChat) return;
 
@@ -759,12 +794,14 @@ function afficherMessagesChat(messages){
     if(messages.length === 0){
 
         container.innerHTML =
-        `<p class="chat-vide">Aucun message pour l'instant. Lancez la discussion !</p>`;
+        intraductionChat() +
+        `<p class="chat-vide">Lancez la discussion !</p>`;
 
         return;
     }
 
     container.innerHTML =
+    intraductionChat() +
     messages.map(m => `
         <div class="chat-bulle ${m.est_moi ? "chat-bulle-moi" : "chat-bulle-autre"}">
             <p>${m.message}</p>

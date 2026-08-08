@@ -190,7 +190,7 @@ function listerMessages(int $autreUserId): void
     verifierRelationReservation($userId, $autreUserId);
 
     $stmt = getPdo()->prepare("
-        SELECT id, nom_complet, photo_url, telephone,
+        SELECT id, nom_complet, photo_url, telephone, role,
                (derniere_activite IS NOT NULL AND derniere_activite >= NOW() - INTERVAL " . SECONDES_EN_LIGNE . " SECOND) AS en_ligne
         FROM utilisateurs
         WHERE id = ?
@@ -222,6 +222,7 @@ function listerMessages(int $autreUserId): void
             'nom_complet' => $autreParticipant['nom_complet'],
             'photo_url'   => $autreParticipant['photo_url'],
             'telephone'   => $autreParticipant['telephone'],
+            'role'        => $autreParticipant['role'],
             'en_ligne'    => (bool) $autreParticipant['en_ligne'],
         ],
         'messages' => $messages,

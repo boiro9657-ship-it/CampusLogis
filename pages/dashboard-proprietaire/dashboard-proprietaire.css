@@ -685,12 +685,48 @@ tr:hover td{
 
 .chat-vide{
 
-    margin:auto;
+    align-self:center;
+    margin-top:auto;
+    margin-bottom:auto;
 
     color:var(--gray-500);
 
     text-align:center;
     font-size:14px;
+
+}
+
+/* Petit rappel affiché en haut du fil dès l'ouverture de la
+   discussion, pour que chacun sache clairement avec qui il échange. */
+.chat-intro{
+
+    align-self:center;
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    max-width:90%;
+
+    margin-bottom:4px;
+
+    padding:8px 16px;
+
+    border-radius:var(--radius-full);
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+    text-align:center;
+    font-size:12.5px;
+    font-weight:600;
+
+}
+
+.chat-intro i{
+
+    flex-shrink:0;
+    font-size:15px;
 
 }
 

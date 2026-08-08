@@ -29,6 +29,46 @@ const revealObserver = new IntersectionObserver((entries) => {
 revealElements.forEach(el => revealObserver.observe(el));
 
 /* ==========================
+    TEXTE DÉFILANT DU HERO
+    Fait défiler verticalement, une à la fois, une série de phrases
+    sous le titre — remplace l'ancien sous-titre statique pour capter
+    l'attention dès les premières secondes.
+========================== */
+
+(() => {
+
+    const items =
+    document.querySelectorAll("#heroRotatingList li");
+
+    if(items.length < 2) return;
+
+    let indexActif = 0;
+
+    setInterval(() => {
+
+        const ancienIndex =
+        indexActif;
+
+        items[ancienIndex].classList.remove("active");
+        items[ancienIndex].classList.add("leaving");
+
+        indexActif =
+        (indexActif + 1) % items.length;
+
+        items[indexActif].classList.remove("leaving");
+        items[indexActif].classList.add("active");
+
+        setTimeout(() => {
+
+            items[ancienIndex].classList.remove("leaving");
+
+        }, 650);
+
+    }, 2800);
+
+})();
+
+/* ==========================
     ONGLETS DE LA CARTE DE RECHERCHE
 ========================== */
 

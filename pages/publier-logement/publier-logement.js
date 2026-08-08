@@ -55,8 +55,8 @@ const MAX_VIDEOS_PAR_PLAN = {
             hintVideosPlan.innerHTML = `<i class="ph ph-crown-simple"></i> Avec votre plan ${planActuel === "pro" ? "Pro" : "Premium"}, publiez jusqu'à ${maxVideosCePlan} vidéos par annonce.`;
         }
 
-        const btnRecord =
-        document.getElementById("btnAudioRecord");
+        const btnMic =
+        document.getElementById("btnAudioMic");
 
         const badgePlan =
         document.getElementById("badgePlanAudio");
@@ -64,11 +64,11 @@ const MAX_VIDEOS_PAR_PLAN = {
         const hintAudio =
         document.getElementById("hintAudio");
 
-        if(btnRecord) btnRecord.disabled = false;
+        if(btnMic) btnMic.disabled = false;
         if(badgePlan) badgePlan.style.display = "none";
 
         if(hintAudio){
-            hintAudio.textContent = "Enregistrez un message vocal directement depuis votre micro pour présenter votre logement.";
+            hintAudio.textContent = "Maintenez le micro appuyé pour enregistrer, comme sur WhatsApp — glissez vers la corbeille pour annuler.";
         }
 
     }
@@ -91,12 +91,17 @@ let audioChunks = [];
 let audioBlobEnregistre = null;
 let audioChronoIntervalle = null;
 let audioSecondes = 0;
+let annulerEnregistrementEnCours = false;
+let pointeurEnregistrementActif = false;
 
-const btnAudioRecord =
-document.getElementById("btnAudioRecord");
+const btnAudioMic =
+document.getElementById("btnAudioMic");
 
-const btnAudioStop =
-document.getElementById("btnAudioStop");
+const btnAudioCancel =
+document.getElementById("btnAudioCancel");
+
+const audioStatus =
+document.getElementById("audioStatus");
 
 const btnAudioSupprimer =
 document.getElementById("btnAudioSupprimer");
@@ -107,7 +112,24 @@ document.getElementById("audioPreview");
 const audioTimer =
 document.getElementById("audioTimer");
 
-btnAudioRecord?.addEventListener("click", async () => {
+const audioRecorderRow =
+document.getElementById("audioRecorderRow");
+
+const audioPreviewRow =
+document.getElementById("audioPreviewRow");
+
+function pointeurSurElement(x, y, el){
+
+    const rect =
+    el.getBoundingClientRect();
+
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+
+}
+
+async function demarrerEnregistrementAudio(){
+
+    if(!btnAudioMic || btnAudioMic.disabled) return;
 
     let stream;
 
@@ -119,9 +141,12 @@ btnAudioRecord?.addEventListener("click", async () => {
 
         showToast("Impossible d'accéder au micro. Vérifiez les autorisations de votre navigateur.", "error");
 
+        pointeurEnregistrementActif = false;
+
         return;
     }
 
+    annulerEnregistrementEnCours = false;
     audioChunks = [];
     mediaRecorder = new MediaRecorder(stream);
 
@@ -133,18 +158,30 @@ btnAudioRecord?.addEventListener("click", async () => {
 
     mediaRecorder.addEventListener("stop", () => {
 
+        stream.getTracks().forEach(track => track.stop());
+
+        if(annulerEnregistrementEnCours){
+
+            audioBlobEnregistre = null;
+
+            return;
+        }
+
         audioBlobEnregistre = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
 
         audioPreview.src = URL.createObjectURL(audioBlobEnregistre);
-        audioPreview.style.display = "";
 
-        btnAudioSupprimer.style.display = "";
-
-        stream.getTracks().forEach(track => track.stop());
+        audioRecorderRow.style.display = "none";
+        audioPreviewRow.style.display = "";
 
     });
 
     mediaRecorder.start();
+
+    btnAudioMic.classList.add("recording");
+    btnAudioCancel.style.display = "";
+    audioTimer.style.display = "";
+    audioStatus.textContent = "Glissez vers la corbeille pour annuler";
 
     audioSecondes = 0;
     audioTimer.textContent = "0:00";
@@ -160,25 +197,61 @@ btnAudioRecord?.addEventListener("click", async () => {
 
     }, 1000);
 
-    btnAudioRecord.style.display = "none";
-    btnAudioStop.style.display = "";
-    audioPreview.style.display = "none";
-    btnAudioSupprimer.style.display = "none";
+}
 
-});
+function arreterEnregistrementAudio(annuler){
 
-btnAudioStop?.addEventListener("click", () => {
+    if(!mediaRecorder || mediaRecorder.state === "inactive") return;
 
-    if(mediaRecorder && mediaRecorder.state !== "inactive"){
+    annulerEnregistrementEnCours = annuler;
 
-        mediaRecorder.stop();
-
-    }
+    mediaRecorder.stop();
 
     clearInterval(audioChronoIntervalle);
 
-    btnAudioStop.style.display = "none";
-    btnAudioRecord.style.display = "";
+    btnAudioMic.classList.remove("recording");
+    btnAudioCancel.style.display = "none";
+    btnAudioCancel.classList.remove("audio-cancel-armed");
+    audioTimer.style.display = "none";
+    audioStatus.textContent = "Maintenez appuyé pour enregistrer";
+
+}
+
+btnAudioMic?.addEventListener("pointerdown", (e) => {
+
+    if(btnAudioMic.disabled) return;
+
+    e.preventDefault();
+
+    pointeurEnregistrementActif = true;
+
+    demarrerEnregistrementAudio();
+
+});
+
+document.addEventListener("pointermove", (e) => {
+
+    if(!pointeurEnregistrementActif || !mediaRecorder || mediaRecorder.state !== "recording") return;
+
+    const surCorbeille =
+    pointeurSurElement(e.clientX, e.clientY, btnAudioCancel);
+
+    btnAudioCancel.classList.toggle("audio-cancel-armed", surCorbeille);
+
+});
+
+document.addEventListener("pointerup", (e) => {
+
+    if(!pointeurEnregistrementActif) return;
+
+    pointeurEnregistrementActif = false;
+
+    if(!mediaRecorder || mediaRecorder.state !== "recording") return;
+
+    const surCorbeille =
+    pointeurSurElement(e.clientX, e.clientY, btnAudioCancel);
+
+    arreterEnregistrementAudio(surCorbeille);
 
 });
 
@@ -187,9 +260,9 @@ btnAudioSupprimer?.addEventListener("click", () => {
     audioBlobEnregistre = null;
 
     audioPreview.removeAttribute("src");
-    audioPreview.style.display = "none";
 
-    btnAudioSupprimer.style.display = "none";
+    audioPreviewRow.style.display = "none";
+    audioRecorderRow.style.display = "";
 
 });
 

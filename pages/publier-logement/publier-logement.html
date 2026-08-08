@@ -395,25 +395,37 @@
 
         <div class="audio-recorder">
 
-            <button type="button" class="btn-audio-record" id="btnAudioRecord" disabled>
-                <i class="ph ph-microphone"></i> Enregistrer
-            </button>
+            <div class="audio-recorder-row" id="audioRecorderRow">
 
-            <button type="button" class="btn-audio-stop" id="btnAudioStop" style="display:none;">
-                <i class="ph ph-stop-circle"></i> Arrêter <span id="audioTimer">0:00</span>
-            </button>
+                <button type="button" class="btn-audio-cancel" id="btnAudioCancel" style="display:none;" title="Glissez ici pour annuler">
+                    <i class="ph ph-trash"></i>
+                </button>
 
-            <audio id="audioPreview" controls style="display:none;"></audio>
+                <span class="audio-recorder-status" id="audioStatus">Maintenez appuyé pour enregistrer</span>
 
-            <button type="button" class="btn-audio-supprimer" id="btnAudioSupprimer" style="display:none;" title="Supprimer l'enregistrement">
-                <i class="ph ph-trash"></i>
-            </button>
+                <span class="audio-recorder-timer" id="audioTimer" style="display:none;">0:00</span>
+
+                <button type="button" class="btn-audio-mic" id="btnAudioMic" disabled title="Maintenez appuyé pour enregistrer">
+                    <i class="ph ph-microphone"></i>
+                </button>
+
+            </div>
+
+            <div class="audio-preview-row" id="audioPreviewRow" style="display:none;">
+
+                <button type="button" class="btn-audio-supprimer" id="btnAudioSupprimer" title="Supprimer l'enregistrement">
+                    <i class="ph ph-trash"></i>
+                </button>
+
+                <audio id="audioPreview" controls></audio>
+
+            </div>
 
         </div>
 
         <p class="form-hint" id="hintAudio">
-            Enregistrez un message vocal directement depuis votre micro pour présenter votre logement —
-            réservé aux plans Premium et Pro. <a href="../tarifs/tarifs.html">Voir les formules</a>.
+            Maintenez le micro appuyé pour enregistrer un message vocal présentant votre logement, comme sur WhatsApp — glissez vers la corbeille pour annuler.
+            Réservé aux plans Premium et Pro. <a href="../tarifs/tarifs.html">Voir les formules</a>.
         </p>
 
     </div>
@@ -426,12 +438,12 @@
 
         <div class="form-group">
             <label>Téléphone</label>
-            <input type="tel" id="contact_telephone" placeholder="+221 77 000 00 00">
+            <input type="tel" id="contact_telephone" placeholder="+221 78 294 39 49">
         </div>
 
         <div class="form-group">
             <label>WhatsApp</label>
-            <input type="tel" id="contact_whatsapp" placeholder="+221 77 000 00 00">
+            <input type="tel" id="contact_whatsapp" placeholder="+221 78 294 39 49">
         </div>
 
         <div class="form-group">
@@ -562,7 +574,7 @@
             <div class="footer-col">
                 <h3>Contact</h3>
                 <ul>
-                    <li><i class="ph ph-phone"></i> +221 77 000 00 00</li>
+                    <li><i class="ph ph-phone"></i> +221 78 294 39 49</li>
                     <li><i class="ph ph-envelope-simple"></i> contact@terangahome.sn</li>
                     <li><i class="ph ph-map-pin"></i> Dakar, Sénégal</li>
                 </ul>

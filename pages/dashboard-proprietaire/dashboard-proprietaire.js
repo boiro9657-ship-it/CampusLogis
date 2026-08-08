@@ -65,22 +65,6 @@ if(logoutLink){
 }
 
 /* ==========================
-    LIENS SIDEBAR À VENIR
-========================== */
-
-document.querySelectorAll(".sidebar-soon").forEach(link => {
-
-    link.addEventListener("click", (e) => {
-
-        e.preventDefault();
-
-        showToast("Fonctionnalité bientôt disponible.");
-
-    });
-
-});
-
-/* ==========================
     ORCHESTRATION DU TABLEAU DE BORD
 ========================== */
 

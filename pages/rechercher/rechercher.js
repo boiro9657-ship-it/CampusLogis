@@ -205,7 +205,7 @@ function carteRechercheHTML(logement){
     logement.statut === "reserve";
 
     const engagement =
-    libelleEngagementDuree(logement.duree_location);
+    libelleEngagementDuree(logement.duree_location, logement.duree_location_autre);
 
     return `
     <div class="housing-card ${estPro ? "housing-card-pro" : estPremium ? "housing-card-premium" : ""}">
@@ -262,7 +262,7 @@ function carteRechercheHTML(logement){
                 ${Number(logement.chambres) > 0 ? `
                 <span>
                     <i class="ph ph-bed"></i>
-                    ${logement.chambres} chambre(s)
+                    ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)
                 </span>
                 ` : ""}
             </div>
@@ -275,7 +275,7 @@ function carteRechercheHTML(logement){
                 </a>
 
                 <button class="btn-reserver ${estReserve ? "btn-reserver-reserve" : ""}" data-id="${logement.id}" data-statut="${logement.statut || "disponible"}">
-                    ${estReserve ? "Déjà réservé" : "Réserver"}
+                    ${estReserve ? "Déjà réservé" : "Demander une visite"}
                 </button>
 
             </div>

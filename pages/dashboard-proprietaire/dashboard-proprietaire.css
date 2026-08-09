@@ -903,6 +903,59 @@ tr:hover td{
 
 }
 
+.btn-chat-mic.recording{
+
+    background:#DC2626;
+
+    animation:pulseEnregistrementChat 1.4s ease-in-out infinite;
+
+}
+
+@keyframes pulseEnregistrementChat{
+
+    0%, 100%{ box-shadow:0 0 0 0 rgba(220,38,38,.35); }
+    50%{ box-shadow:0 0 0 8px rgba(220,38,38,0); }
+
+}
+
+.btn-chat-audio-cancel{
+
+    background:#FEE2E2 !important;
+    color:#DC2626 !important;
+
+}
+
+.btn-chat-audio-cancel.audio-cancel-armed{
+
+    background:#DC2626 !important;
+    color:white !important;
+
+    transform:scale(1.15);
+
+}
+
+.chat-audio-timer{
+
+    flex-shrink:0;
+
+    color:#DC2626;
+
+    font-weight:700;
+    font-size:14px;
+
+    font-variant-numeric:tabular-nums;
+
+    padding-bottom:10px;
+
+}
+
+.chat-bulle-audio audio{
+
+    height:38px;
+    max-width:220px;
+
+}
+
 @media(max-width:480px){
 
     /* En feuille remontant du bas plutôt qu'en plein écran : on

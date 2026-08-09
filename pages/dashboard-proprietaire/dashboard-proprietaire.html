@@ -253,9 +253,19 @@
 
         <form class="chat-modal-input" id="chatForm">
 
+            <button type="button" class="btn-chat-audio-cancel" id="btnChatAudioCancel" style="display:none;" title="Glissez ici pour annuler">
+                <i class="ph ph-trash"></i>
+            </button>
+
             <textarea id="chatInput" placeholder="Écrivez un message..." maxlength="1000"></textarea>
 
-            <button type="submit" title="Envoyer">
+            <span class="chat-audio-timer" id="chatAudioTimer" style="display:none;">0:00</span>
+
+            <button type="button" class="btn-chat-mic" id="btnChatMic" title="Maintenez appuyé pour un message vocal">
+                <i class="ph ph-microphone"></i>
+            </button>
+
+            <button type="submit" title="Envoyer" id="btnChatSend">
                 <i class="ph ph-paper-plane-tilt"></i>
             </button>
 

@@ -460,6 +460,54 @@
 
 }
 
+.hero-cta-row{
+
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+
+    gap:14px;
+
+}
+
+.hero-cta-secondary{
+
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+    background:rgba(255,255,255,.12);
+
+    border:2px solid rgba(255,255,255,.5);
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:15px 28px;
+
+    border-radius:14px;
+
+    font-weight:700;
+
+    backdrop-filter:blur(10px);
+
+    transition:.3s;
+
+}
+
+.hero-cta-secondary:hover{
+
+    background:white;
+
+    color:var(--primary);
+
+    border-color:white;
+
+    transform:translateY(-3px);
+
+}
+
 .stats{
 
     display:flex;

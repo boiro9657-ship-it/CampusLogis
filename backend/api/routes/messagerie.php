@@ -13,6 +13,7 @@
  */
 
 require_once __DIR__ . '/../../includes/session.php';
+require_once __DIR__ . '/../../includes/uploads.php';
 
 // Une personne est considérée "en ligne" si elle a envoyé un signal
 // d'activité (voir enregistrerActivite() dans auth.php) au cours
@@ -68,6 +69,11 @@ function listerConversations(): void
 {
     $userId = requireAuth();
 
+    // En plus des relations par réservation, toute personne avec qui
+    // un échange de messages existe déjà apparaît dans la liste —
+    // couvre notamment les contacts via une annonce de colocation
+    // (voir verifierRelationReservation), sans avoir à dupliquer ici
+    // cette logique.
     $stmt = getPdo()->prepare('
         SELECT DISTINCT autre_id FROM (
             SELECT l.owner_id AS autre_id
@@ -79,9 +85,13 @@ function listerConversations(): void
             FROM reservations r
             JOIN logements l ON l.id = r.logement_id
             WHERE l.owner_id = ?
+            UNION
+            SELECT destinataire_id AS autre_id FROM messages WHERE sender_id = ?
+            UNION
+            SELECT sender_id AS autre_id FROM messages WHERE destinataire_id = ?
         ) t
     ');
-    $stmt->execute([$userId, $userId]);
+    $stmt->execute([$userId, $userId, $userId, $userId]);
     $autresIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     $conversations = [];
@@ -160,9 +170,15 @@ function supprimerMessage(int $messageId): void
 }
 
 /**
- * Vérifie qu'une vraie réservation lie ces deux utilisateurs (dans
- * un sens ou dans l'autre) avant d'autoriser la discussion —
- * n'importe qui ne peut pas juste écrire à n'importe qui.
+ * Autorise la discussion entre deux utilisateurs si :
+ * - une vraie réservation les lie (dans un sens ou dans l'autre), ou
+ * - la personne qu'on cherche à joindre a publié une annonce de
+ *   colocation (une invitation ouverte au contact — pas besoin de
+ *   réservation préalable pour se coordonner entre futurs
+ *   colocataires), ou
+ * - un message existe déjà entre les deux (pour que la personne
+ *   contactée via une annonce de colocation puisse répondre).
+ * N'importe qui ne peut pas juste écrire à n'importe qui.
  */
 function verifierRelationReservation(int $userId, int $autreUserId): void
 {
@@ -178,9 +194,23 @@ function verifierRelationReservation(int $userId, int $autreUserId): void
     ');
     $stmt->execute([$userId, $autreUserId, $autreUserId, $userId]);
 
-    if ((int) $stmt->fetchColumn() === 0) {
-        jsonError('Aucune réservation ne vous lie à cet utilisateur.', 403);
+    if ((int) $stmt->fetchColumn() > 0) {
+        return;
     }
+
+    $stmt = getPdo()->prepare('
+        SELECT
+            (SELECT COUNT(*) FROM colocations WHERE user_id = ?) AS annonce_destinataire,
+            (SELECT COUNT(*) FROM messages WHERE (sender_id = ? AND destinataire_id = ?) OR (sender_id = ? AND destinataire_id = ?)) AS deja_en_contact
+    ');
+    $stmt->execute([$autreUserId, $userId, $autreUserId, $autreUserId, $userId]);
+    $verif = $stmt->fetch();
+
+    if ((int) $verif['annonce_destinataire'] > 0 || (int) $verif['deja_en_contact'] > 0) {
+        return;
+    }
+
+    jsonError('Vous ne pouvez pas encore discuter avec cette personne.', 403);
 }
 
 function listerMessages(int $autreUserId): void
@@ -203,7 +233,7 @@ function listerMessages(int $autreUserId): void
     }
 
     $stmt = getPdo()->prepare('
-        SELECT id, sender_id, message, created_at
+        SELECT id, sender_id, message, audio_url, created_at
         FROM messages
         WHERE (sender_id = ? AND destinataire_id = ?)
            OR (sender_id = ? AND destinataire_id = ?)
@@ -234,6 +264,32 @@ function envoyerMessage(int $autreUserId): void
     $userId = requireAuth();
 
     verifierRelationReservation($userId, $autreUserId);
+
+    // Message vocal (enregistré directement depuis le micro, comme
+    // la publicité vocale) : arrive en multipart/form-data avec un
+    // champ "audio", pas en JSON.
+    $fichierAudio = $_FILES['audio'] ?? null;
+
+    if ($fichierAudio && ($fichierAudio['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+
+        $audioUrl = enregistrerMedia(
+            ['name' => $fichierAudio['name'], 'tmp_name' => $fichierAudio['tmp_name']],
+            ['mp3', 'wav', 'm4a', 'ogg', 'webm', 'mp4'],
+            'messages'
+        );
+
+        if (!$audioUrl) {
+            jsonError('L\'enregistrement vocal fourni est invalide.');
+        }
+
+        getPdo()->prepare('
+            INSERT INTO messages (sender_id, destinataire_id, message, audio_url)
+            VALUES (?, ?, ?, ?)
+        ')->execute([$userId, $autreUserId, '', $audioUrl]);
+
+        jsonResponse(['message' => 'Message vocal envoyé.'], 201);
+        return;
+    }
 
     $body = getJsonBody();
     $message = trim($body['message'] ?? '');

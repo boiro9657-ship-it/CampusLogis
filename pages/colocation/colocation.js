@@ -186,6 +186,32 @@ async function chargerColocations(){
 
     });
 
+    colocGrid.querySelectorAll(".btn-discuter-coloc").forEach(btn => {
+
+        btn.addEventListener("click", async () => {
+
+            try{
+
+                await apiFetch("/auth/me");
+
+            }catch(error){
+
+                showToast("Connectez-vous pour discuter avec cette personne.", "error");
+
+                setTimeout(() => {
+                    window.location.href = "../connexion/connexion.html";
+                }, 1200);
+
+                return;
+            }
+
+            window.location.href =
+            "../dashboard-proprietaire/dashboard-proprietaire.html?discuter=" + btn.dataset.id;
+
+        });
+
+    });
+
 }
 
 function colocHTML(c){
@@ -234,6 +260,12 @@ function colocHTML(c){
         <p class="coloc-description">${c.description}</p>
 
         <div class="coloc-actions">
+
+            ${
+                !estAuteur
+                ? `<button class="btn-discuter-coloc" data-id="${c.user_id}"><i class="ph ph-chat-circle-dots"></i> Discuter</button>`
+                : ""
+            }
 
             ${
                 telephoneEffectif

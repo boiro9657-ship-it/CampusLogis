@@ -4,6 +4,8 @@ backend/uploads/logements/*
 !backend/uploads/logements/.gitkeep
 backend/uploads/avatars/*
 !backend/uploads/avatars/.gitkeep
+backend/uploads/messages/*
+!backend/uploads/messages/.gitkeep
 
 # Configuration locale de l'outil Claude Code, pas du projet.
 .claude/

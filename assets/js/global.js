@@ -173,6 +173,12 @@ if(typeof apiFetch !== "undefined"){
 
         }, 25000);
 
+        // "S'inscrire" n'a plus de sens une fois connecté.
+        const boutonInscription =
+        document.getElementById("heroSignupBtn");
+
+        if(boutonInscription) boutonInscription.style.display = "none";
+
         const navBtn =
         document.querySelector(".btn-nav-link");
 
@@ -473,7 +479,7 @@ async function chargerConversations(racine){
     if(conversations.length === 0){
 
         list.innerHTML =
-        `<p class="notif-empty">Aucune discussion pour le moment. Réservez un logement pour échanger avec le propriétaire.</p>`;
+        `<p class="notif-empty">Aucune discussion pour le moment. Demandez une visite ou contactez une annonce de colocation pour échanger.</p>`;
 
         return;
     }
@@ -611,10 +617,10 @@ function creerModaleReservation(){
                 <i class="ph ph-x"></i>
             </button>
 
-            <h3><i class="ph ph-calendar-check"></i> Demande de réservation</h3>
+            <h3><i class="ph ph-calendar-check"></i> Demander une visite</h3>
 
             <p class="reservation-modal-hint">
-                Laissez un message au propriétaire (facultatif), puis confirmez votre demande.
+                Précisez quand vous aimeriez visiter ce logement, laissez un message au propriétaire (facultatif), puis confirmez votre demande.
             </p>
 
             <textarea id="reservationMessage" maxlength="500" placeholder="Ex : Bonjour, je suis intéressé(e) par ce logement, serait-il possible de le visiter cette semaine ?"></textarea>
@@ -622,7 +628,7 @@ function creerModaleReservation(){
             <div class="reservation-modal-fields">
 
                 <div class="reservation-modal-field">
-                    <label>Date souhaitée</label>
+                    <label>Date de visite souhaitée</label>
                     <input type="date" id="reservationDate">
                 </div>
 
@@ -634,7 +640,7 @@ function creerModaleReservation(){
             </div>
 
             <div class="reservation-modal-field">
-                <label>Durée souhaitée</label>
+                <label>Durée de location envisagée</label>
                 <select id="reservationDuree">
                     <option value="">Choisir une durée</option>
                     <optgroup label="Courte durée">
@@ -659,7 +665,7 @@ function creerModaleReservation(){
 
             <div class="reservation-modal-actions">
                 <button type="button" class="btn-secondary" id="reservationModalCancel">Annuler</button>
-                <button type="button" class="btn-primary" id="reservationModalSubmit">Envoyer la demande</button>
+                <button type="button" class="btn-primary" id="reservationModalSubmit">Demander la visite</button>
             </div>
 
         </div>
@@ -739,7 +745,7 @@ async function envoyerReservation(logementId){
 
     if(!accepte){
 
-        showToast("Vous devez accepter les conditions d'utilisation pour réserver.", "error");
+        showToast("Vous devez accepter les conditions d'utilisation pour continuer.", "error");
 
         return;
     }
@@ -767,7 +773,7 @@ async function envoyerReservation(logementId){
 
         });
 
-        showToast("Demande de réservation envoyée ! Direction la discussion avec le propriétaire...");
+        showToast("Demande de visite envoyée ! Le propriétaire va l'examiner — direction la discussion avec lui...");
 
         fermerModaleReservation();
 
@@ -788,7 +794,7 @@ async function envoyerReservation(logementId){
 
         if(error.status === 401){
 
-            showToast("Connectez-vous pour réserver un logement — redirection...", "error");
+            showToast("Connectez-vous pour demander une visite — redirection...", "error");
 
             fermerModaleReservation();
 
@@ -886,7 +892,11 @@ const LIBELLES_ENGAGEMENT_DUREE = {
     "1_an": "Engagement 1 an"
 };
 
-function libelleEngagementDuree(duree){
+function libelleEngagementDuree(duree, dureeAutre){
+
+    if(duree === "autre"){
+        return dureeAutre ? "Engagement " + dureeAutre : null;
+    }
 
     return LIBELLES_ENGAGEMENT_DUREE[duree] || null;
 
@@ -910,6 +920,20 @@ const ICONES_TYPE_LOGEMENT = {
 function iconeTypeLogement(type){
 
     return ICONES_TYPE_LOGEMENT[type] || "ph-house-simple";
+
+}
+
+// Le nombre saisi par le propriétaire représente une unité
+// différente selon le type de bien : des chambres pour un logement
+// résidentiel, des bureaux pour un espace professionnel. Même champ
+// en base (logement.chambres), libellé adapté à l'affichage.
+const UNITES_PIECES_PAR_TYPE = {
+    Bureau: "bureau"
+};
+
+function libeleUnitePieces(type){
+
+    return UNITES_PIECES_PAR_TYPE[type] || "chambre";
 
 }
 

@@ -101,7 +101,9 @@ async function chargerLogement(id){
     if(periodeEl){
 
         const engagement =
-        LIBELLES_ENGAGEMENT[logement.duree_location];
+        logement.duree_location === "autre"
+        ? (logement.duree_location_autre ? "Engagement " + logement.duree_location_autre : null)
+        : LIBELLES_ENGAGEMENT[logement.duree_location];
 
         periodeEl.textContent =
         (LIBELLES_DUREE[logement.duree_location] || "par mois") +
@@ -132,7 +134,7 @@ async function chargerLogement(id){
     if(contactBtn){
 
         contactBtn.textContent =
-        estReserve ? "Déjà réservé" : "Réserver ce logement";
+        estReserve ? "Déjà réservé" : "Demander une visite";
 
         contactBtn.classList.toggle("reserve-btn-indisponible", estReserve);
 
@@ -625,7 +627,7 @@ function afficherCaracteristiques(logement){
     ];
 
     if(Number(logement.chambres) > 0){
-        badges.push(`<span><i class="ph ph-bed"></i> ${logement.chambres} chambre(s)</span>`);
+        badges.push(`<span><i class="ph ph-bed"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)</span>`);
     }
 
     if(logement.nombre_personnes){

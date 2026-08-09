@@ -425,6 +425,23 @@ if(typeSelect){
 
 }
 
+const dureeLocationSelect =
+document.getElementById("duree_location");
+
+const champDureeLocationAutre =
+document.getElementById("duree_location_autre");
+
+if(dureeLocationSelect && champDureeLocationAutre){
+
+    dureeLocationSelect.addEventListener("change", () => {
+
+        champDureeLocationAutre.style.display =
+        dureeLocationSelect.value === "autre" ? "" : "none";
+
+    });
+
+}
+
 if(publishForm){
 
     publishForm.addEventListener(
@@ -450,6 +467,9 @@ if(publishForm){
 
             const dureeLocation =
             document.getElementById("duree_location").value;
+
+            const dureeLocationAutre =
+            document.getElementById("duree_location_autre").value.trim();
 
             const caution =
             document.getElementById("caution").value;
@@ -506,6 +526,13 @@ if(publishForm){
                 return;
             }
 
+            if(dureeLocation === "autre" && !dureeLocationAutre){
+
+                showToast("Merci de préciser la durée de location.", "error");
+
+                return;
+            }
+
             const maxVideosPlan =
             MAX_VIDEOS_PAR_PLAN[planActuel] || MAX_VIDEOS_PAR_PLAN.gratuit;
 
@@ -530,6 +557,7 @@ if(publishForm){
             formData.append("prix", prix);
             formData.append("chambres", chambres);
             formData.append("duree_location", dureeLocation);
+            formData.append("duree_location_autre", dureeLocation === "autre" ? dureeLocationAutre : "");
             formData.append("caution", caution);
             formData.append("nombre_personnes", nombrePersonnes);
             formData.append("nombre_etages", nombreEtages);

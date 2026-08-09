@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/../../includes/session.php';
+require_once __DIR__ . '/../../includes/uploads.php';
 
 function handleLogementsRoute(array $segments, string $method): void
 {
@@ -322,6 +323,12 @@ function createLogement(): void
         jsonError('Durée de location invalide.');
     }
 
+    $dureeLocationAutre = trim($_POST['duree_location_autre'] ?? '');
+
+    if ($dureeLocation === 'autre' && !$dureeLocationAutre) {
+        jsonError('Merci de préciser la durée de location.');
+    }
+
     // Caution facultative : vide = pas de caution demandée.
     $cautionBrute = trim($_POST['caution'] ?? '');
     $caution = null;
@@ -480,18 +487,18 @@ function createLogement(): void
             INSERT INTO logements (
                 owner_id, titre, ville, type, prix, chambres, description, image_url,
                 contact_telephone, contact_whatsapp, contact_email,
-                duree_location, caution, nombre_personnes, nombre_etages, niveau_etage,
+                duree_location, duree_location_autre, caution, nombre_personnes, nombre_etages, niveau_etage,
                 equip_wifi, equip_parking, equip_cuisine, equip_douche, equip_salon, equip_balcon,
                 equip_eau, equip_electricite, equip_climatisation,
                 profil_celibataire, profil_marie, profil_etudiant, profil_travailleur,
                 profil_senegalais, profil_etranger, audio_url
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
             $userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl,
             $contactTelephone, $contactWhatsapp, $contactEmail,
-            $dureeLocation, $caution, $nombrePersonnes, $nombreEtages, $niveauEtage,
+            $dureeLocation, ($dureeLocation === 'autre' ? $dureeLocationAutre : null), $caution, $nombrePersonnes, $nombreEtages, $niveauEtage,
             $equipements['wifi'], $equipements['parking'], $equipements['cuisine'],
             $equipements['douche'], $equipements['salon'], $equipements['balcon'],
             $equipements['eau'], $equipements['electricite'], $equipements['climatisation'],
@@ -572,7 +579,7 @@ function extraireEquipements($equipementsBruts): array
     return $resultat;
 }
 
-const DUREES_LOCATION_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an'];
+const DUREES_LOCATION_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an', 'autre'];
 const NIVEAUX_ETAGE_VALIDES = ['rdc', '1', '2', '3', '4_plus'];
 
 /**
@@ -606,7 +613,7 @@ function updateLogement(int $id): void
     $champsAutorises = [
         'titre', 'ville', 'type', 'prix', 'chambres', 'description', 'statut',
         'contact_telephone', 'contact_whatsapp', 'contact_email',
-        'duree_location', 'caution', 'nombre_personnes', 'nombre_etages', 'niveau_etage',
+        'duree_location', 'duree_location_autre', 'caution', 'nombre_personnes', 'nombre_etages', 'niveau_etage',
         'equip_wifi', 'equip_parking', 'equip_cuisine', 'equip_douche', 'equip_salon', 'equip_balcon',
         'equip_eau', 'equip_electricite', 'equip_climatisation',
         'profil_celibataire', 'profil_marie', 'profil_etudiant', 'profil_travailleur',
@@ -651,32 +658,6 @@ function deleteLogement(int $id): void
     getPdo()->prepare('DELETE FROM logements WHERE id = ?')->execute([$id]);
 
     jsonResponse(['message' => 'Logement supprimé.']);
-}
-
-function enregistrerMedia(array $fichier, array $extensionsAutorisees): ?string
-{
-    $extension = strtolower(pathinfo($fichier['name'], PATHINFO_EXTENSION));
-
-    if (!in_array($extension, $extensionsAutorisees, true)) {
-        return null;
-    }
-
-    $nomFichier = uniqid('logement_', true) . '.' . $extension;
-    $dossier = __DIR__ . '/../../uploads/logements/';
-
-    if (!is_dir($dossier)) {
-        mkdir($dossier, 0755, true);
-    }
-
-    move_uploaded_file($fichier['tmp_name'], $dossier . $nomFichier);
-
-    // Chemin public calculé depuis l'emplacement réel du front
-    // controller (dirname deux fois : api/ puis backend/) plutôt
-    // que codé en dur, pour rester valide quel que soit le
-    // dossier de montage du site.
-    $baseDossier = str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'])));
-
-    return $baseDossier . '/uploads/logements/' . $nomFichier;
 }
 
 /**

@@ -144,7 +144,7 @@ async function initDashboard(){
 
     if(modeProprietaire){
 
-        titreReservations.textContent = "Réservations reçues";
+        titreReservations.textContent = "Demandes de visite reçues";
 
         try{
             reservations = await apiFetch("/reservations/owner");
@@ -156,7 +156,7 @@ async function initDashboard(){
 
     }else{
 
-        titreReservations.textContent = "Mes réservations";
+        titreReservations.textContent = "Mes demandes de visite";
 
         try{
             reservations = await apiFetch("/reservations/mine");
@@ -259,9 +259,9 @@ function afficherAnnonces(logements){
 
                 <p>📍 ${logement.ville || ""}</p>
 
-                <p>💰 ${logement.prix} FCFA${libelleCourtDuree(logement.duree_location)}${libelleEngagementDuree(logement.duree_location) ? " · " + libelleEngagementDuree(logement.duree_location) : ""}</p>
+                <p>💰 ${logement.prix} FCFA${libelleCourtDuree(logement.duree_location)}${libelleEngagementDuree(logement.duree_location, logement.duree_location_autre) ? " · " + libelleEngagementDuree(logement.duree_location, logement.duree_location_autre) : ""}</p>
 
-                <p><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}${Number(logement.chambres) > 0 ? ` · 🛏 ${logement.chambres} chambre(s)` : ""}</p>
+                <p><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}${Number(logement.chambres) > 0 ? ` · 🛏 ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)` : ""}</p>
 
                 <div class="media-badges">
                     <span class="media-badge">📷 ${nbPhotos} photo${nbPhotos > 1 ? "s" : ""}</span>
@@ -388,13 +388,13 @@ function afficherReservations(reservations, mode){
         ? `
         <div class="empty-state">
             <i class="ph ph-calendar-check"></i>
-            <p>Vous n'avez encore reçu aucune demande de réservation.</p>
+            <p>Vous n'avez encore reçu aucune demande de visite.</p>
         </div>
         `
         : `
         <div class="empty-state">
             <i class="ph ph-calendar-check"></i>
-            <p>Vous n'avez encore fait aucune réservation.</p>
+            <p>Vous n'avez encore demandé aucune visite.</p>
             <a href="../rechercher/rechercher.html" class="btn-primary">Rechercher un logement</a>
         </div>
         `;
@@ -819,8 +819,12 @@ function afficherMessagesChat(messages){
     container.innerHTML =
     intraductionChat() +
     messages.map(m => `
-        <div class="chat-bulle ${m.est_moi ? "chat-bulle-moi" : "chat-bulle-autre"}">
-            <p>${m.message}</p>
+        <div class="chat-bulle ${m.est_moi ? "chat-bulle-moi" : "chat-bulle-autre"} ${m.audio_url ? "chat-bulle-audio" : ""}">
+            ${
+                m.audio_url
+                ? `<audio src="${m.audio_url}" controls></audio>`
+                : `<p>${m.message}</p>`
+            }
             <span>
                 ${new Date(m.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                 ${m.est_moi ? `<button type="button" class="btn-supprimer-message" data-id="${m.id}" title="Supprimer"><i class="ph ph-trash"></i></button>` : ""}
@@ -902,6 +906,187 @@ if(chatForm){
             showToast(error.message, "error");
 
         }
+
+    });
+
+}
+
+/* ==========================
+    MESSAGES VOCAUX DANS LE CHAT (comme WhatsApp)
+    Même principe que la publicité vocale du formulaire de
+    publication : maintenir le micro appuyé pour enregistrer,
+    glisser vers la corbeille pour annuler — mais ici l'envoi est
+    immédiat au relâchement, sans étape d'aperçu, comme un vrai
+    message vocal de messagerie instantanée.
+========================== */
+
+let chatMediaRecorder = null;
+let chatAudioChunks = [];
+let chatAnnulerEnregistrement = false;
+let chatPointeurActif = false;
+let chatChronoIntervalle = null;
+let chatAudioSecondes = 0;
+
+const btnChatMic =
+document.getElementById("btnChatMic");
+
+const btnChatAudioCancel =
+document.getElementById("btnChatAudioCancel");
+
+const chatAudioTimer =
+document.getElementById("chatAudioTimer");
+
+function pointeurSurElementChat(x, y, el){
+
+    const rect =
+    el.getBoundingClientRect();
+
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+
+}
+
+async function demarrerEnregistrementChat(){
+
+    let stream;
+
+    try{
+
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    }catch(error){
+
+        showToast("Impossible d'accéder au micro. Vérifiez les autorisations de votre navigateur.", "error");
+
+        chatPointeurActif = false;
+
+        return;
+    }
+
+    chatAnnulerEnregistrement = false;
+    chatAudioChunks = [];
+    chatMediaRecorder = new MediaRecorder(stream);
+
+    chatMediaRecorder.addEventListener("dataavailable", (e) => {
+
+        if(e.data.size > 0) chatAudioChunks.push(e.data);
+
+    });
+
+    chatMediaRecorder.addEventListener("stop", async () => {
+
+        stream.getTracks().forEach(track => track.stop());
+
+        if(chatAnnulerEnregistrement || chatAudioChunks.length === 0){
+            return;
+        }
+
+        const blob =
+        new Blob(chatAudioChunks, { type: chatMediaRecorder.mimeType || "audio/webm" });
+
+        const extension =
+        (chatMediaRecorder.mimeType || "").includes("mp4") ? "mp4" : "webm";
+
+        const formData =
+        new FormData();
+
+        formData.append("audio", blob, "message-vocal." + extension);
+
+        try{
+
+            await apiFetch("/messagerie/" + chatAutreUserId, {
+
+                method: "POST",
+
+                body: formData
+
+            });
+
+            dernierAffichageMessagesChat = "";
+
+            await rafraichirChat();
+
+        }catch(error){
+
+            showToast(error.message || "Impossible d'envoyer le message vocal.", "error");
+
+        }
+
+    });
+
+    chatMediaRecorder.start();
+
+    btnChatMic.classList.add("recording");
+    btnChatAudioCancel.style.display = "";
+    chatAudioTimer.style.display = "";
+
+    chatAudioSecondes = 0;
+    chatAudioTimer.textContent = "0:00";
+
+    chatChronoIntervalle = setInterval(() => {
+
+        chatAudioSecondes++;
+
+        const minutes = Math.floor(chatAudioSecondes / 60);
+        const secondes = String(chatAudioSecondes % 60).padStart(2, "0");
+
+        chatAudioTimer.textContent = minutes + ":" + secondes;
+
+    }, 1000);
+
+}
+
+function arreterEnregistrementChat(annuler){
+
+    if(!chatMediaRecorder || chatMediaRecorder.state === "inactive") return;
+
+    chatAnnulerEnregistrement = annuler;
+
+    chatMediaRecorder.stop();
+
+    clearInterval(chatChronoIntervalle);
+
+    btnChatMic.classList.remove("recording");
+    btnChatAudioCancel.style.display = "none";
+    btnChatAudioCancel.classList.remove("audio-cancel-armed");
+    chatAudioTimer.style.display = "none";
+
+}
+
+if(btnChatMic){
+
+    btnChatMic.addEventListener("pointerdown", (e) => {
+
+        e.preventDefault();
+
+        chatPointeurActif = true;
+
+        demarrerEnregistrementChat();
+
+    });
+
+    document.addEventListener("pointermove", (e) => {
+
+        if(!chatPointeurActif || !chatMediaRecorder || chatMediaRecorder.state !== "recording") return;
+
+        const surCorbeille =
+        pointeurSurElementChat(e.clientX, e.clientY, btnChatAudioCancel);
+
+        btnChatAudioCancel.classList.toggle("audio-cancel-armed", surCorbeille);
+
+    });
+
+    document.addEventListener("pointerup", (e) => {
+
+        if(!chatPointeurActif) return;
+
+        chatPointeurActif = false;
+
+        if(!chatMediaRecorder || chatMediaRecorder.state !== "recording") return;
+
+        const surCorbeille =
+        pointeurSurElementChat(e.clientX, e.clientY, btnChatAudioCancel);
+
+        arreterEnregistrementChat(surCorbeille);
 
     });
 

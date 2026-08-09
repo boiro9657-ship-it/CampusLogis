@@ -380,6 +380,20 @@
 
 }
 
+.coloc-actions .btn-discuter-coloc{
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+}
+
+.coloc-actions .btn-discuter-coloc:hover{
+
+    background:var(--primary);
+    color:white;
+
+}
+
 .coloc-actions .btn-call{
 
     background:var(--primary);

@@ -220,6 +220,7 @@ try {
         'profil_etranger'    => "TINYINT(1) NOT NULL DEFAULT 0",
         'audio_url'          => "VARCHAR(255) NULL",
         'vues'               => "INT NOT NULL DEFAULT 0",
+        'duree_location_autre' => "VARCHAR(100) NULL",
     ];
 
     foreach ($colonnesAAjouter as $colonne => $definition) {
@@ -236,6 +237,26 @@ try {
             $etapes[] = "Colonne \"$colonne\" ajoutée.";
         }
 
+    }
+
+    // "Autre" permet au propriétaire de préciser une durée de
+    // location personnalisée (texte libre dans duree_location_autre)
+    // quand aucune des options prédéfinies ne correspond. Sur une
+    // base existante, l'ENUM doit être élargi explicitement — une
+    // simple ADD COLUMN ne suffit pas à ajouter une valeur d'ENUM.
+    $typeActuelDuree = $pdo->query("
+        SELECT COLUMN_TYPE FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'logements'
+        AND COLUMN_NAME = 'duree_location'
+    ")->fetchColumn();
+
+    if ($typeActuelDuree && strpos($typeActuelDuree, "'autre'") === false) {
+        $pdo->exec("
+            ALTER TABLE logements
+            MODIFY COLUMN duree_location ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an','autre') NOT NULL DEFAULT '1_mois'
+        ");
+        $etapes[] = 'Colonne "duree_location" : valeur "autre" ajoutée.';
     }
 
     // Ajout de la colonne de validation admin sur une base déjà
@@ -366,6 +387,20 @@ try {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
     $etapes[] = 'Table "messages" prête.';
+
+    // Messages vocaux dans la messagerie (comme WhatsApp) — un
+    // message a soit du texte, soit un enregistrement audio.
+    $colonneAudioMessageExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'messages'
+        AND COLUMN_NAME = 'audio_url'
+    ")->fetchColumn();
+
+    if ($colonneAudioMessageExiste == 0) {
+        $pdo->exec("ALTER TABLE messages ADD COLUMN audio_url VARCHAR(255) NULL AFTER message");
+        $etapes[] = 'Colonne "audio_url" ajoutée à "messages".';
+    }
 
     // Migration depuis l'ancien schéma (une conversation par
     // réservation) vers le nouveau (une conversation par binôme).

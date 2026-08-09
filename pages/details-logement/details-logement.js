@@ -621,8 +621,12 @@ function afficherCaracteristiques(logement){
     if(!container) return;
 
     const badges = [
-        `<span><i class="ph ph-bed"></i> ${logement.chambres || 0} Chambre(s)/Bureau(x)</span>`
+        `<span><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}</span>`
     ];
+
+    if(Number(logement.chambres) > 0){
+        badges.push(`<span><i class="ph ph-bed"></i> ${logement.chambres} chambre(s)</span>`);
+    }
 
     if(logement.nombre_personnes){
         badges.push(`<span><i class="ph ph-users-three"></i> ${logement.nombre_personnes} personne(s)</span>`);

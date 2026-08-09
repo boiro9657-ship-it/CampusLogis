@@ -1637,6 +1637,72 @@ header.scrolled{
 
 }
 
+.reservation-modal-fields{
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+
+    margin-top:16px;
+
+}
+
+.reservation-modal-field{
+
+    margin-top:16px;
+
+}
+
+.reservation-modal-fields .reservation-modal-field{
+
+    margin-top:0;
+
+}
+
+.reservation-modal-field label{
+
+    display:block;
+
+    font-size:13px;
+    font-weight:600;
+
+    color:var(--primary);
+
+    margin-bottom:6px;
+
+}
+
+.reservation-modal-field input,
+.reservation-modal-field select{
+
+    width:100%;
+
+    padding:12px 14px;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:12px;
+
+    font-family:inherit;
+    font-size:14px;
+
+    color:#334155;
+
+    outline:none;
+
+    transition:border-color .2s, box-shadow .2s;
+
+}
+
+.reservation-modal-field input:focus,
+.reservation-modal-field select:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(20,92,61,.12);
+
+}
+
 .reservation-modal-terms{
 
     display:flex;

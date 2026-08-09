@@ -619,6 +619,39 @@ function creerModaleReservation(){
 
             <textarea id="reservationMessage" maxlength="500" placeholder="Ex : Bonjour, je suis intéressé(e) par ce logement, serait-il possible de le visiter cette semaine ?"></textarea>
 
+            <div class="reservation-modal-fields">
+
+                <div class="reservation-modal-field">
+                    <label>Date souhaitée</label>
+                    <input type="date" id="reservationDate">
+                </div>
+
+                <div class="reservation-modal-field">
+                    <label>Heure souhaitée</label>
+                    <input type="time" id="reservationHeure">
+                </div>
+
+            </div>
+
+            <div class="reservation-modal-field">
+                <label>Durée souhaitée</label>
+                <select id="reservationDuree">
+                    <option value="">Choisir une durée</option>
+                    <optgroup label="Courte durée">
+                        <option value="24h">24 heures</option>
+                        <option value="nuit">À la nuitée</option>
+                        <option value="journee">À la journée</option>
+                        <option value="semaine">À la semaine</option>
+                    </optgroup>
+                    <optgroup label="Longue durée">
+                        <option value="1_mois">1 mois</option>
+                        <option value="3_mois">3 mois</option>
+                        <option value="6_mois">6 mois</option>
+                        <option value="1_an">1 an</option>
+                    </optgroup>
+                </select>
+            </div>
+
             <label class="reservation-modal-terms">
                 <input type="checkbox" id="reservationTerms">
                 J'accepte les <a href="${racine}pages/conditions-utilisation/conditions-utilisation.html" target="_blank" rel="noopener">conditions d'utilisation</a>
@@ -633,6 +666,12 @@ function creerModaleReservation(){
     `;
 
     document.body.appendChild(overlay);
+
+    // Impossible de choisir une date de début déjà passée.
+    const champDate =
+    document.getElementById("reservationDate");
+
+    if(champDate) champDate.min = new Date().toISOString().split("T")[0];
 
     document.getElementById("reservationModalClose").addEventListener("click", fermerModaleReservation);
     document.getElementById("reservationModalCancel").addEventListener("click", fermerModaleReservation);
@@ -663,6 +702,9 @@ function reserverLogement(logementId){
 
     document.getElementById("reservationMessage").value = "";
     document.getElementById("reservationTerms").checked = false;
+    document.getElementById("reservationDate").value = "";
+    document.getElementById("reservationHeure").value = "";
+    document.getElementById("reservationDuree").value = "";
 
     overlay.classList.add("show");
 
@@ -678,6 +720,22 @@ async function envoyerReservation(logementId){
 
     const accepte =
     document.getElementById("reservationTerms").checked;
+
+    const dateSouhaitee =
+    document.getElementById("reservationDate").value;
+
+    const heureSouhaitee =
+    document.getElementById("reservationHeure").value;
+
+    const dureeSejour =
+    document.getElementById("reservationDuree").value;
+
+    if(!dateSouhaitee || !heureSouhaitee || !dureeSejour){
+
+        showToast("Merci de préciser la date, l'heure et la durée souhaitées.", "error");
+
+        return;
+    }
 
     if(!accepte){
 
@@ -701,7 +759,10 @@ async function envoyerReservation(logementId){
             body: JSON.stringify({
                 logement_id: logementId,
                 message,
-                conditions_acceptees: true
+                conditions_acceptees: true,
+                date_souhaitee: dateSouhaitee,
+                heure_souhaitee: heureSouhaitee,
+                duree_sejour: dureeSejour
             })
 
         });
@@ -828,6 +889,70 @@ const LIBELLES_ENGAGEMENT_DUREE = {
 function libelleEngagementDuree(duree){
 
     return LIBELLES_ENGAGEMENT_DUREE[duree] || null;
+
+}
+
+// Icône représentant le TYPE réel du logement (Chambre, Studio,
+// Appartement...) — même mapping que les icônes des "Catégories
+// populaires" sur l'accueil, pour rester cohérent partout sur le
+// site. Avant cet ajout, les cartes affichaient toujours une icône
+// de lit générique quel que soit le type réel de l'annonce.
+const ICONES_TYPE_LOGEMENT = {
+    Chambre: "ph-bed",
+    Studio: "ph-door-open",
+    Appartement: "ph-buildings",
+    Villa: "ph-house-line",
+    Bureau: "ph-briefcase",
+    Immeuble: "ph-building-office",
+    "Passe-temps": "ph-confetti"
+};
+
+function iconeTypeLogement(type){
+
+    return ICONES_TYPE_LOGEMENT[type] || "ph-house-simple";
+
+}
+
+// Temps écoulé depuis la publication ("il y a 2h", "il y a 3 jours"...)
+// affiché sur chaque carte, comme un fil d'actualité.
+function ilYA(dateString){
+
+    if(!dateString) return "";
+
+    const secondes =
+    Math.floor((Date.now() - new Date(dateString.replace(" ", "T"))) / 1000);
+
+    if(secondes < 60) return "à l'instant";
+
+    const minutes =
+    Math.floor(secondes / 60);
+
+    if(minutes < 60) return "il y a " + minutes + " min";
+
+    const heures =
+    Math.floor(minutes / 60);
+
+    if(heures < 24) return "il y a " + heures + "h";
+
+    const jours =
+    Math.floor(heures / 24);
+
+    if(jours < 7) return "il y a " + jours + " jour" + (jours > 1 ? "s" : "");
+
+    const semaines =
+    Math.floor(jours / 7);
+
+    if(semaines < 4) return "il y a " + semaines + " semaine" + (semaines > 1 ? "s" : "");
+
+    const mois =
+    Math.floor(jours / 30);
+
+    if(mois < 12) return "il y a " + mois + " mois";
+
+    const ans =
+    Math.floor(jours / 365);
+
+    return "il y a " + ans + " an" + (ans > 1 ? "s" : "");
 
 }
 

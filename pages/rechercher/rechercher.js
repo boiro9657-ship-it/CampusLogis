@@ -242,7 +242,10 @@ function carteRechercheHTML(logement){
 
         <div class="housing-content">
 
-            <h3>${logement.titre}</h3>
+            <div class="housing-content-top">
+                <h3>${logement.titre}</h3>
+                <span class="posted-time">${ilYA(logement.created_at)}</span>
+            </div>
 
             <p>
                 <i class="ph ph-map-pin"></i>
@@ -253,9 +256,15 @@ function carteRechercheHTML(logement){
 
             <div class="housing-info">
                 <span>
-                    <i class="ph ph-bed"></i>
-                    ${logement.chambres || 0} chambre(s)
+                    <i class="ph ${iconeTypeLogement(logement.type)}"></i>
+                    ${logement.type || ""}
                 </span>
+                ${Number(logement.chambres) > 0 ? `
+                <span>
+                    <i class="ph ph-bed"></i>
+                    ${logement.chambres} chambre(s)
+                </span>
+                ` : ""}
             </div>
 
             <div class="housing-actions">

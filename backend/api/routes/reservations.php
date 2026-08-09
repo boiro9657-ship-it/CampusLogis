@@ -35,6 +35,8 @@ function handleReservationsRoute(array $segments, string $method): void
     jsonError('Route introuvable.', 404);
 }
 
+const DUREES_SEJOUR_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an'];
+
 function creerReservation(): void
 {
     $userId = requireAuth();
@@ -43,6 +45,9 @@ function creerReservation(): void
     $logementId = $body['logement_id'] ?? null;
     $message = trim($body['message'] ?? '');
     $conditionsAcceptees = !empty($body['conditions_acceptees']);
+    $dateSouhaitee = $body['date_souhaitee'] ?? null;
+    $heureSouhaitee = $body['heure_souhaitee'] ?? null;
+    $dureeSejour = $body['duree_sejour'] ?? null;
 
     if (!$logementId) {
         jsonError('logement_id est obligatoire.');
@@ -50,6 +55,20 @@ function creerReservation(): void
 
     if (!$conditionsAcceptees) {
         jsonError('Vous devez accepter les conditions d\'utilisation pour réserver.');
+    }
+
+    if (!$dateSouhaitee || !$heureSouhaitee || !$dureeSejour) {
+        jsonError('Merci de préciser la date, l\'heure et la durée souhaitées.');
+    }
+
+    if (!in_array($dureeSejour, DUREES_SEJOUR_VALIDES, true)) {
+        jsonError('Durée souhaitée invalide.');
+    }
+
+    $dateValidee = DateTime::createFromFormat('Y-m-d', $dateSouhaitee);
+
+    if (!$dateValidee || $dateValidee->format('Y-m-d') !== $dateSouhaitee) {
+        jsonError('Date souhaitée invalide.');
     }
 
     $stmt = getPdo()->prepare('SELECT statut, owner_id FROM logements WHERE id = ?');
@@ -65,10 +84,10 @@ function creerReservation(): void
     }
 
     $stmt = getPdo()->prepare('
-        INSERT INTO reservations (logement_id, locataire_id, message, conditions_acceptees)
-        VALUES (?, ?, ?, 1)
+        INSERT INTO reservations (logement_id, locataire_id, message, conditions_acceptees, date_souhaitee, heure_souhaitee, duree_sejour)
+        VALUES (?, ?, ?, 1, ?, ?, ?)
     ');
-    $stmt->execute([$logementId, $userId, $message]);
+    $stmt->execute([$logementId, $userId, $message, $dateSouhaitee, $heureSouhaitee, $dureeSejour]);
 
     // Renvoyé pour que le frontend puisse emmener directement le
     // locataire dans l'espace de discussion avec ce propriétaire.

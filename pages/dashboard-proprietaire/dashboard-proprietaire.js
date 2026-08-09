@@ -11,6 +11,17 @@
 
 let utilisateurConnecte = null;
 
+const LIBELLES_DUREE_SEJOUR = {
+    "24h": "24 heures",
+    nuit: "à la nuitée",
+    journee: "à la journée",
+    semaine: "à la semaine",
+    "1_mois": "1 mois",
+    "3_mois": "3 mois",
+    "6_mois": "6 mois",
+    "1_an": "1 an"
+};
+
 (async () => {
 
     try{
@@ -250,7 +261,7 @@ function afficherAnnonces(logements){
 
                 <p>💰 ${logement.prix} FCFA${libelleCourtDuree(logement.duree_location)}${libelleEngagementDuree(logement.duree_location) ? " · " + libelleEngagementDuree(logement.duree_location) : ""}</p>
 
-                <p>🛏 ${logement.chambres || 0} chambre(s)</p>
+                <p><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}${Number(logement.chambres) > 0 ? ` · 🛏 ${logement.chambres} chambre(s)` : ""}</p>
 
                 <div class="media-badges">
                     <span class="media-badge">📷 ${nbPhotos} photo${nbPhotos > 1 ? "s" : ""}</span>
@@ -414,6 +425,19 @@ function afficherReservations(reservations, mode){
                 <h3>${reservation.titre}</h3>
 
                 <p>📍 ${reservation.ville || ""}${mode === "owner" ? ` — demandé par ${reservation.locataire_nom}` : ""}</p>
+
+                ${
+                    reservation.date_souhaitee
+                    ? `
+                    <p class="reservation-creneau">
+                        <i class="ph ph-calendar-check"></i>
+                        ${new Date(reservation.date_souhaitee).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                        ${reservation.heure_souhaitee ? " à " + reservation.heure_souhaitee.slice(0, 5) : ""}
+                        ${reservation.duree_sejour ? " · " + (LIBELLES_DUREE_SEJOUR[reservation.duree_sejour] || reservation.duree_sejour) : ""}
+                    </p>
+                    `
+                    : ""
+                }
 
                 ${
                     reservation.message

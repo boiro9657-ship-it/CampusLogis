@@ -365,6 +365,19 @@ tr:hover td{
 
 }
 
+.reservation-card .reservation-creneau{
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    color:var(--primary);
+    font-weight:600;
+
+    margin:6px 0;
+
+}
+
 .reservation-statut{
 
     padding:6px 14px;

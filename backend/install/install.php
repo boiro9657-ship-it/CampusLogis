@@ -319,6 +319,32 @@ try {
         $etapes[] = 'Colonne "conditions_acceptees" ajoutée.';
     }
 
+    // Le locataire précise désormais la date, l'heure et la durée
+    // souhaitées dès la demande de réservation, pour que le
+    // propriétaire ait ces informations avant d'accepter ou de
+    // refuser (au lieu de devoir les redemander par message).
+    $colonnesReservationAAjouter = [
+        'date_souhaitee'  => "DATE NULL",
+        'heure_souhaitee' => "TIME NULL",
+        'duree_sejour'    => "ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an') NULL",
+    ];
+
+    foreach ($colonnesReservationAAjouter as $colonne => $definition) {
+
+        $existe = $pdo->query("
+            SELECT COUNT(*) FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+            AND TABLE_NAME = 'reservations'
+            AND COLUMN_NAME = '$colonne'
+        ")->fetchColumn();
+
+        if ($existe == 0) {
+            $pdo->exec("ALTER TABLE reservations ADD COLUMN $colonne $definition");
+            $etapes[] = "Colonne \"$colonne\" ajoutée à \"reservations\".";
+        }
+
+    }
+
     // Espace de discussion propriétaire/locataire : une conversation
     // par binôme d'utilisateurs (pas par réservation individuelle) —
     // si un locataire réserve plusieurs fois le même logement, ou

@@ -347,14 +347,18 @@ function carteLogementHTML(logement){
 
         <div class="card-content">
 
-            <h3>${logement.titre}</h3>
+            <div class="card-content-top">
+                <h3>${logement.titre}</h3>
+                <span class="posted-time">${ilYA(logement.created_at)}</span>
+            </div>
 
             <p class="price">${prix} FCFA${libelleCourtDuree(logement.duree_location)}</p>
 
-            <p class="location">📍 ${logement.ville || ""}</p>
+            <p class="location"><i class="ph ph-map-pin"></i> ${logement.ville || ""}</p>
 
             <div class="infos">
-                <span>🛏 ${logement.chambres || 0} Chambre(s)</span>
+                <span><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}</span>
+                ${Number(logement.chambres) > 0 ? `<span><i class="ph ph-bed"></i> ${logement.chambres} chambre(s)</span>` : ""}
             </div>
 
             <div class="bottom-card">

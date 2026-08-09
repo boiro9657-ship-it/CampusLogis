@@ -49,7 +49,76 @@ if(form){
 
 }
 
+/* ==========================
+    FILTRES RAPIDES (CHIPS)
+    Raccourcis au-dessus des résultats pour filtrer en un clic,
+    sans rouvrir le formulaire du haut — synchronisés avec les
+    champs type/budget du formulaire dans les deux sens.
+========================== */
+
+const quickFilters =
+document.getElementById("quickFilters");
+
+const resultsCount =
+document.getElementById("resultsCount");
+
+if(quickFilters){
+
+    quickFilters.querySelectorAll(".chip").forEach(chip => {
+
+        chip.addEventListener("click", () => {
+
+            const groupe =
+            chip.dataset.filterGroup;
+
+            const dejaActive =
+            chip.classList.contains("active");
+
+            quickFilters.querySelectorAll(`.chip[data-filter-group="${groupe}"]`).forEach(c => c.classList.remove("active"));
+
+            if(groupe === "type" && typeSelect){
+
+                typeSelect.value = dejaActive ? "" : chip.dataset.value;
+
+            }
+
+            if(groupe === "budget" && budgetInput){
+
+                budgetInput.value = dejaActive ? "" : chip.dataset.value;
+
+            }
+
+            if(!dejaActive) chip.classList.add("active");
+
+            rechercherLogements();
+
+        });
+
+    });
+
+}
+
+// Remet les chips en phase avec les champs actuels du formulaire
+// (utile après une recherche lancée depuis le formulaire lui-même,
+// ou pré-remplie depuis l'accueil).
+function synchroniserChips(){
+
+    if(!quickFilters) return;
+
+    quickFilters.querySelectorAll(".chip").forEach(chip => {
+
+        const valeurActuelle =
+        chip.dataset.filterGroup === "type" ? typeSelect?.value : budgetInput?.value;
+
+        chip.classList.toggle("active", valeurActuelle === chip.dataset.value);
+
+    });
+
+}
+
 if(resultsContainer){
+
+    synchroniserChips();
 
     rechercherLogements();
 
@@ -92,8 +161,11 @@ async function rechercherLogements(){
 
     }
 
-    resultsContainer.innerHTML =
-    '<p class="cards-loading">Chargement des logements...</p>';
+    synchroniserChips();
+
+    resultsContainer.innerHTML = skeletonCardsHTML(6);
+
+    if(resultsCount) resultsCount.textContent = "";
 
     let logements;
 
@@ -115,6 +187,13 @@ async function rechercherLogements(){
         await afficherSuggestions(ville, type);
 
         return;
+    }
+
+    if(resultsCount){
+
+        resultsCount.textContent =
+        logements.length + " logement" + (logements.length > 1 ? "s" : "") + " trouvé" + (logements.length > 1 ? "s" : "");
+
     }
 
     resultsContainer.innerHTML =
@@ -163,8 +242,12 @@ async function afficherSuggestions(ville, type){
         resultsContainer.innerHTML =
         '<p class="cards-empty">Aucun logement disponible pour le moment. Revenez bientôt, de nouvelles annonces sont publiées régulièrement !</p>';
 
+        if(resultsCount) resultsCount.textContent = "0 logement trouvé";
+
         return;
     }
+
+    if(resultsCount) resultsCount.textContent = "0 logement trouvé pour cette recherche";
 
     resultsContainer.innerHTML = `
         <p class="cards-empty cards-empty-suggestions">
@@ -235,6 +318,8 @@ function carteRechercheHTML(logement){
             <i class="ph ph-crown-simple"></i> Premium
         </span>
         ` : ""}
+
+        ${estAnnonceRecente(logement.created_at) ? `<span class="badge-nouveau"><i class="ph ph-sparkle"></i> Nouveau</span>` : ""}
 
         <button class="favorite" data-id="${logement.id}">
             <i class="ph ph-heart"></i>

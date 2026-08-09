@@ -243,6 +243,8 @@ document.getElementById("featuredCards");
 
 if(featuredContainer){
 
+    featuredContainer.innerHTML = skeletonCardsHTML(6);
+
     chargerLogementsPopulaires();
 
 }
@@ -340,6 +342,8 @@ function carteLogementHTML(logement){
                 <i class="ph ph-crown-simple"></i> Premium
             </span>
             ` : ""}
+
+            ${estAnnonceRecente(logement.created_at) ? `<span class="badge-nouveau"><i class="ph ph-sparkle"></i> Nouveau</span>` : ""}
 
             <button class="favorite" data-id="${logement.id}">❤</button>
 

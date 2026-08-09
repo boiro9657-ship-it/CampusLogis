@@ -151,6 +151,65 @@ h1, h2, h3, h4, h5, h6{
 
 }
 
+/* Cartes fantômes affichées pendant le chargement (accueil,
+   recherche), à la place d'un écran vide — reprend à peu près le
+   gabarit d'une vraie carte pour éviter tout saut de mise en page
+   quand les résultats arrivent. */
+.card-skeleton{
+
+    background:white;
+
+    border-radius:var(--radius-lg, 20px);
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow-md);
+
+}
+
+.card-skeleton-image{
+
+    height:220px;
+
+    background:linear-gradient(90deg, var(--gray-100, #F1F5F9) 25%, var(--gray-200, #E2E8F0) 37%, var(--gray-100, #F1F5F9) 63%);
+
+    background-size:400% 100%;
+
+    animation:skeletonShimmer 1.4s ease infinite;
+
+}
+
+.card-skeleton-body{
+
+    padding:22px 25px;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
+}
+
+.card-skeleton-line{
+
+    height:14px;
+
+    border-radius:8px;
+
+    background:linear-gradient(90deg, var(--gray-100, #F1F5F9) 25%, var(--gray-200, #E2E8F0) 37%, var(--gray-100, #F1F5F9) 63%);
+
+    background-size:400% 100%;
+
+    animation:skeletonShimmer 1.4s ease infinite;
+
+}
+
+@keyframes skeletonShimmer{
+
+    0%{ background-position:100% 50%; }
+    100%{ background-position:0 50%; }
+
+}
+
 /* Bouton "Réserver" inline sur les cartes de logement (accueil
    et recherche) : même poids visuel qu'un lien texte, pas un
    bouton par défaut du navigateur. */
@@ -630,6 +689,11 @@ header.scrolled{
 
 .notif-dropdown-header{
 
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+
     padding:16px 20px;
 
     font-weight:700;
@@ -637,6 +701,37 @@ header.scrolled{
     color:var(--primary);
 
     border-bottom:1px solid #F1F5F9;
+
+}
+
+.btn-activer-notifs{
+
+    display:flex;
+    align-items:center;
+    gap:5px;
+
+    border:none;
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    font-size:12px;
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.btn-activer-notifs:hover{
+
+    background:var(--primary);
+    color:white;
 
 }
 

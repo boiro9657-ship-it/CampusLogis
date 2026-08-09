@@ -224,6 +224,44 @@ if(typeof apiFetch !== "undefined"){
     présente sur toutes les pages pour tout utilisateur connecté.
 ========================== */
 
+/**
+ * Notification native du navigateur (hors onglet TerangaHome), pour
+ * les nouveaux messages/demandes de visite — comme WhatsApp Web.
+ * Ne se déclenche que si la permission a été accordée et que
+ * l'onglet n'est pas déjà au premier plan (pas la peine de notifier
+ * quelqu'un qui regarde déjà la page).
+ */
+function notifierNavigateur(titre, corps, lien, racine){
+
+    if(typeof Notification === "undefined" || Notification.permission !== "granted") return;
+
+    if(!document.hidden) return;
+
+    try{
+
+        const notif =
+        new Notification(titre, { body: corps, icon: racine + "images/logo.jpg" });
+
+        notif.onclick = () => {
+
+            window.focus();
+
+            if(lien) window.location.href = lien;
+
+            notif.close();
+
+        };
+
+    }catch(error){
+
+        // Certains navigateurs/contextes (pages non sécurisées,
+        // permissions bloquées par le système) peuvent lever une
+        // erreur ici : la cloche de notifications reste le repli.
+
+    }
+
+}
+
 function initClocheNotifications(racine){
 
     const navButtons =
@@ -243,7 +281,12 @@ function initClocheNotifications(racine){
             <span class="notif-badge" id="notifBadge" style="display:none;"></span>
         </button>
         <div class="notif-dropdown" id="notifDropdown">
-            <div class="notif-dropdown-header">Notifications</div>
+            <div class="notif-dropdown-header">
+                Notifications
+                <button type="button" class="btn-activer-notifs" id="btnActiverNotifs" title="Activer les notifications du navigateur" style="display:none;">
+                    <i class="ph ph-bell-ringing"></i> Activer
+                </button>
+            </div>
             <div class="notif-dropdown-list" id="notifList">
                 <p class="notif-empty">Chargement...</p>
             </div>
@@ -251,6 +294,32 @@ function initClocheNotifications(racine){
     `;
 
     navButtons.insertBefore(wrap, navButtons.firstChild);
+
+    const btnActiverNotifs =
+    document.getElementById("btnActiverNotifs");
+
+    if(btnActiverNotifs && "Notification" in window){
+
+        if(Notification.permission === "default"){
+
+            btnActiverNotifs.style.display = "";
+
+        }
+
+        btnActiverNotifs.addEventListener("click", (e) => {
+
+            e.stopPropagation();
+
+            Notification.requestPermission().then(() => {
+
+                btnActiverNotifs.style.display =
+                Notification.permission === "default" ? "" : "none";
+
+            });
+
+        });
+
+    }
 
     const bellBtn =
     document.getElementById("notifBellBtn");
@@ -285,7 +354,14 @@ function initClocheNotifications(racine){
 
     chargerNotifications(racine);
 
+    setInterval(() => chargerNotifications(racine), 25000);
+
 }
+
+// Plus grand id de notification vu lors du dernier chargement — sert
+// à ne notifier (navigateur) que les nouvelles arrivées pendant que
+// la page est ouverte, jamais tout l'historique au premier chargement.
+let dernierPlusGrandIdNotif = null;
 
 async function chargerNotifications(racine){
 
@@ -298,6 +374,23 @@ async function chargerNotifications(racine){
     }catch(error){
 
         return;
+    }
+
+    if(notifications.length > 0){
+
+        const plusGrandId =
+        Math.max(...notifications.map(n => n.id));
+
+        if(dernierPlusGrandIdNotif !== null && plusGrandId > dernierPlusGrandIdNotif){
+
+            notifications
+            .filter(n => n.id > dernierPlusGrandIdNotif && !Number(n.lu))
+            .forEach(n => notifierNavigateur("TerangaHome", n.message, n.lien ? racine + n.lien : null, racine));
+
+        }
+
+        dernierPlusGrandIdNotif = plusGrandId;
+
     }
 
     const badge =
@@ -437,6 +530,13 @@ function initMessagerieIcone(racine){
 
 }
 
+// Nombre de messages non lus par conversation vu lors du dernier
+// chargement — sert à ne notifier (navigateur) que les conversations
+// dont le compteur vient d'augmenter, jamais tout l'historique au
+// premier chargement de la page.
+const dernierNonLusParConversation = new Map();
+let premierChargementConversations = true;
+
 async function chargerConversations(racine){
 
     let conversations;
@@ -449,6 +549,35 @@ async function chargerConversations(racine){
 
         return;
     }
+
+    if(!premierChargementConversations){
+
+        conversations.forEach(c => {
+
+            const avant =
+            dernierNonLusParConversation.get(c.id) || 0;
+
+            const maintenant =
+            Number(c.non_lus || 0);
+
+            if(maintenant > avant){
+
+                notifierNavigateur(
+                    c.nom_complet,
+                    c.dernier_message || "Nouveau message reçu",
+                    racine + "pages/dashboard-proprietaire/dashboard-proprietaire.html?discuter=" + c.id,
+                    racine
+                );
+
+            }
+
+        });
+
+    }
+
+    conversations.forEach(c => dernierNonLusParConversation.set(c.id, Number(c.non_lus || 0)));
+
+    premierChargementConversations = false;
 
     const badge =
     document.getElementById("msgBadge");
@@ -977,6 +1106,38 @@ function ilYA(dateString){
     Math.floor(jours / 365);
 
     return "il y a " + ans + " an" + (ans > 1 ? "s" : "");
+
+}
+
+// Annonce publiée il y a moins de 48h : sert à afficher le badge
+// "Nouveau" sur les cartes (accueil, recherche).
+function estAnnonceRecente(dateString){
+
+    if(!dateString) return false;
+
+    const heures =
+    (Date.now() - new Date(dateString.replace(" ", "T"))) / 1000 / 3600;
+
+    return heures >= 0 && heures < 48;
+
+}
+
+// Cartes fantômes affichées pendant le chargement des logements
+// (accueil, recherche), à la place d'un écran vide ou d'un simple
+// texte "Chargement..." — donne une sensation de rapidité même sur
+// une connexion lente.
+function skeletonCardsHTML(nombre){
+
+    return Array.from({ length: nombre || 6 }).map(() => `
+        <div class="card-skeleton">
+            <div class="card-skeleton-image"></div>
+            <div class="card-skeleton-body">
+                <div class="card-skeleton-line" style="width:70%"></div>
+                <div class="card-skeleton-line" style="width:45%"></div>
+                <div class="card-skeleton-line" style="width:55%"></div>
+            </div>
+        </div>
+    `).join("");
 
 }
 

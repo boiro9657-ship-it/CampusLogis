@@ -110,6 +110,25 @@
 
     <div class="container">
 
+        <div class="quick-filters" id="quickFilters">
+
+            <span class="quick-filters-label"><i class="ph ph-funnel"></i> Filtres rapides :</span>
+
+            <button type="button" class="chip" data-filter-group="type" data-value="Chambre">Chambre</button>
+            <button type="button" class="chip" data-filter-group="type" data-value="Studio">Studio</button>
+            <button type="button" class="chip" data-filter-group="type" data-value="Appartement">Appartement</button>
+            <button type="button" class="chip" data-filter-group="type" data-value="Villa">Villa</button>
+
+            <span class="quick-filters-sep"></span>
+
+            <button type="button" class="chip" data-filter-group="budget" data-value="50000">&lt; 50 000 FCFA</button>
+            <button type="button" class="chip" data-filter-group="budget" data-value="100000">&lt; 100 000 FCFA</button>
+            <button type="button" class="chip" data-filter-group="budget" data-value="200000">&lt; 200 000 FCFA</button>
+
+        </div>
+
+        <p class="results-count" id="resultsCount"></p>
+
         <div class="cards-grid" id="searchResults">
 
             <p class="cards-loading">Chargement des logements...</p>

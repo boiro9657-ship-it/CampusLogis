@@ -1085,6 +1085,41 @@
 
 }
 
+/* Badge "Nouveau" : annonce publiée il y a moins de 48h, sous le
+   bouton favori pour ne jamais le chevaucher. */
+.badge-nouveau{
+
+    position:absolute;
+
+    top:70px;
+    right:18px;
+
+    display:flex;
+    align-items:center;
+    gap:5px;
+
+    background:linear-gradient(135deg,#F59E0B,#D97706);
+    color:white;
+
+    padding:6px 13px;
+
+    border-radius:30px;
+
+    font-size:12px;
+    font-weight:700;
+
+    box-shadow:0 8px 18px rgba(217,119,6,.35);
+
+    z-index:2;
+
+}
+
+.badge-nouveau i{
+
+    font-size:12px;
+
+}
+
 /*========== FAVORI ==========*/
 
 .favorite{

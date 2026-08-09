@@ -79,6 +79,217 @@ const publishForm =
 document.getElementById("publishForm");
 
 /* ==========================
+    FORMULAIRE EN ÉTAPES
+    Le long formulaire est découpé en 4 étapes affichées une à la
+    fois (informations, description, médias, contact + aperçu),
+    avec une barre de progression — plutôt qu'un unique formulaire
+    interminable, pour paraître plus rapide et moins intimidant à
+    remplir. Validation minimale à chaque "Suivant" pour repérer les
+    champs obligatoires tôt, sans dupliquer toute la validation
+    complète qui reste dans le handler de soumission plus bas.
+========================== */
+
+let etapePublicationActuelle = 1;
+
+const NB_ETAPES_PUBLICATION = 4;
+
+function afficherEtapePublication(numero){
+
+    document.querySelectorAll(".publish-step").forEach(step => {
+
+        step.classList.toggle("active", Number(step.dataset.step) === numero);
+
+    });
+
+    document.querySelectorAll(".publish-progress-step").forEach(indicateur => {
+
+        const n = Number(indicateur.dataset.step);
+
+        indicateur.classList.toggle("active", n === numero);
+        indicateur.classList.toggle("done", n < numero);
+
+    });
+
+    etapePublicationActuelle = numero;
+
+    if(numero === NB_ETAPES_PUBLICATION) mettreAJourApercu();
+
+    publishForm.scrollIntoView({ behavior: "smooth", block: "start" });
+
+}
+
+function champsEtapeValides(numero){
+
+    if(numero === 1){
+
+        const titre = document.getElementById("titre").value.trim();
+        const ville = document.getElementById("ville").value.trim();
+        const prix = document.getElementById("prix").value;
+        const dureeLocation = document.getElementById("duree_location").value;
+        const dureeLocationAutre = document.getElementById("duree_location_autre").value.trim();
+
+        if(!titre || !ville || !prix){
+
+            showToast("Merci de remplir le titre, la ville et le prix avant de continuer.", "error");
+
+            return false;
+        }
+
+        if(Number(prix) < 10000){
+
+            showToast("Le prix minimum est de 10 000 FCFA.", "error");
+
+            return false;
+        }
+
+        if(dureeLocation === "autre" && !dureeLocationAutre){
+
+            showToast("Merci de préciser la durée de location.", "error");
+
+            return false;
+        }
+
+    }
+
+    if(numero === 3){
+
+        const photos = document.getElementById("photos").files;
+
+        if(!photos || photos.length === 0){
+
+            showToast("Veuillez sélectionner au moins une photo avant de continuer.", "error");
+
+            return false;
+        }
+
+    }
+
+    return true;
+
+}
+
+document.querySelectorAll(".btn-step-suivant").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        if(!champsEtapeValides(etapePublicationActuelle)) return;
+
+        afficherEtapePublication(Number(btn.dataset.next));
+
+    });
+
+});
+
+document.querySelectorAll(".btn-step-precedent").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        afficherEtapePublication(Number(btn.dataset.prev));
+
+    });
+
+});
+
+/* ==========================
+    APERÇU DE LA CARTE
+    Reproduit fidèlement la carte affichée à l'accueil/recherche à
+    partir des champs déjà saisis (et de la première photo choisie),
+    entièrement côté client — recalculé à l'arrivée sur la dernière
+    étape, pour que le propriétaire voie le résultat avant de publier.
+========================== */
+
+function mettreAJourApercu(){
+
+    const wrap =
+    document.getElementById("publishPreviewCard");
+
+    if(!wrap) return;
+
+    const titre =
+    document.getElementById("titre").value.trim() || "Titre de votre annonce";
+
+    const ville =
+    document.getElementById("ville").value.trim() || "Ville non précisée";
+
+    const type =
+    document.getElementById("type").value;
+
+    const prixValeur =
+    document.getElementById("prix").value;
+
+    const prix =
+    prixValeur ? Number(prixValeur).toLocaleString("fr-FR") : "—";
+
+    const chambres =
+    document.getElementById("chambres").value;
+
+    const dureeLocation =
+    document.getElementById("duree_location").value;
+
+    const dureeLocationAutre =
+    document.getElementById("duree_location_autre").value.trim();
+
+    const engagement =
+    libelleEngagementDuree(dureeLocation, dureeLocationAutre);
+
+    const dureeCourte =
+    libelleCourtDuree(dureeLocation);
+
+    const photos =
+    document.getElementById("photos").files;
+
+    const rendreCarte = (imageSrc) => {
+
+        wrap.innerHTML = `
+        <div class="publish-preview-card">
+
+            <div class="publish-preview-card-image">
+
+                ${imageSrc ? `<img src="${imageSrc}" alt="${titre}">` : `<div class="publish-preview-card-placeholder"><i class="ph ph-image"></i></div>`}
+
+                <span class="badge-nouveau"><i class="ph ph-sparkle"></i> Nouveau</span>
+
+            </div>
+
+            <div class="publish-preview-card-content">
+
+                <h4>${titre}</h4>
+
+                <p class="publish-preview-price">${prix} FCFA${dureeCourte}</p>
+
+                <p class="publish-preview-loc"><i class="ph ph-map-pin"></i> ${ville}</p>
+
+                <div class="publish-preview-infos">
+                    <span><i class="ph ${iconeTypeLogement(type)}"></i> ${type}</span>
+                    ${Number(chambres) > 0 ? `<span><i class="ph ph-bed"></i> ${chambres} ${libeleUnitePieces(type)}(s)</span>` : ""}
+                </div>
+
+                ${engagement ? `<p class="publish-preview-engagement"><i class="ph ph-calendar-check"></i> ${engagement}</p>` : ""}
+
+            </div>
+
+        </div>
+        `;
+
+    };
+
+    if(photos && photos.length > 0){
+
+        const lecteur = new FileReader();
+
+        lecteur.onload = (e) => rendreCarte(e.target.result);
+
+        lecteur.readAsDataURL(photos[0]);
+
+    }else{
+
+        rendreCarte(null);
+
+    }
+
+}
+
+/* ==========================
     PUBLICITÉ VOCALE : ENREGISTREMENT MICRO
     Remplace un champ de fichier à choisir par un vrai
     enregistrement depuis le micro du navigateur (MediaRecorder) —

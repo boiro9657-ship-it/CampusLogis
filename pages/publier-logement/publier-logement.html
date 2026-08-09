@@ -169,6 +169,38 @@
 
 <form class="publish-card" id="publishForm" style="display:none;">
 
+    <div class="publish-progress" id="publishProgress">
+
+        <div class="publish-progress-step active" data-step="1">
+            <span class="publish-progress-circle">1</span>
+            <span class="publish-progress-label">Informations</span>
+        </div>
+
+        <div class="publish-progress-line"></div>
+
+        <div class="publish-progress-step" data-step="2">
+            <span class="publish-progress-circle">2</span>
+            <span class="publish-progress-label">Description</span>
+        </div>
+
+        <div class="publish-progress-line"></div>
+
+        <div class="publish-progress-step" data-step="3">
+            <span class="publish-progress-circle">3</span>
+            <span class="publish-progress-label">Photos & vidéos</span>
+        </div>
+
+        <div class="publish-progress-line"></div>
+
+        <div class="publish-progress-step" data-step="4">
+            <span class="publish-progress-circle">4</span>
+            <span class="publish-progress-label">Contact & aperçu</span>
+        </div>
+
+    </div>
+
+    <div class="publish-step active" data-step="1">
+
     <div class="form-group">
 
         <label>Titre du logement</label>
@@ -307,6 +339,15 @@
 
     </div>
 
+    <div class="publish-step-nav">
+        <span></span>
+        <button type="button" class="btn-step-suivant" data-next="2">Suivant <i class="ph ph-arrow-right"></i></button>
+    </div>
+
+    </div>
+
+    <div class="publish-step" data-step="2">
+
     <div class="form-section">
 
         <h3>Profil de locataire recherché (facultatif)</h3>
@@ -357,6 +398,15 @@
             placeholder="Description du logement"></textarea>
 
     </div>
+
+    <div class="publish-step-nav">
+        <button type="button" class="btn-step-precedent" data-prev="1"><i class="ph ph-arrow-left"></i> Précédent</button>
+        <button type="button" class="btn-step-suivant" data-next="3">Suivant <i class="ph ph-arrow-right"></i></button>
+    </div>
+
+    </div>
+
+    <div class="publish-step" data-step="3">
 
     <div class="form-group">
 
@@ -432,6 +482,15 @@
         </p>
 
     </div>
+
+    <div class="publish-step-nav">
+        <button type="button" class="btn-step-precedent" data-prev="2"><i class="ph ph-arrow-left"></i> Précédent</button>
+        <button type="button" class="btn-step-suivant" data-next="4">Suivant <i class="ph ph-arrow-right"></i></button>
+    </div>
+
+    </div>
+
+    <div class="publish-step" data-step="4">
 
     <div class="form-section">
 
@@ -511,9 +570,25 @@
 
     </div>
 
+    <div class="publish-preview">
+
+        <h3><i class="ph ph-eye"></i> Aperçu de votre annonce</h3>
+        <p class="form-hint">Voici à quoi ressemblera votre annonce dans les résultats de recherche.</p>
+
+        <div class="publish-preview-card-wrap" id="publishPreviewCard"></div>
+
+    </div>
+
+    <div class="publish-step-nav">
+        <button type="button" class="btn-step-precedent" data-prev="3"><i class="ph ph-arrow-left"></i> Précédent</button>
+        <span></span>
+    </div>
+
     <button type="submit" class="publish-btn">
         Publier le logement
     </button>
+
+    </div>
 
 </form>
 

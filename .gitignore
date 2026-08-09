@@ -17,3 +17,9 @@ backend/uploads/messages/*
 backend/config/mail.php
 backend/config/google.php
 backend/config/paydunya.php
+
+# Export des vraies données (comptes, annonces) pour migration vers
+# un nouvel hébergeur : contient des mots de passe hachés et des
+# numéros de téléphone, à importer directement via phpMyAdmin,
+# jamais commité.
+backend/install/migration/

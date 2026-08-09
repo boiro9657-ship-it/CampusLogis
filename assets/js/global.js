@@ -784,7 +784,11 @@ function creerModaleReservation(){
                         <option value="6_mois">6 mois</option>
                         <option value="1_an">1 an</option>
                     </optgroup>
+                    <option value="autre">Autre (préciser)</option>
                 </select>
+
+                <input type="text" id="reservationDureeAutre" placeholder="Ex : 2 semaines, 10 jours..." maxlength="100" style="display:none; margin-top:10px;">
+
             </div>
 
             <label class="reservation-modal-terms">
@@ -807,6 +811,23 @@ function creerModaleReservation(){
     document.getElementById("reservationDate");
 
     if(champDate) champDate.min = new Date().toISOString().split("T")[0];
+
+    const champDureeReservation =
+    document.getElementById("reservationDuree");
+
+    const champDureeReservationAutre =
+    document.getElementById("reservationDureeAutre");
+
+    if(champDureeReservation && champDureeReservationAutre){
+
+        champDureeReservation.addEventListener("change", () => {
+
+            champDureeReservationAutre.style.display =
+            champDureeReservation.value === "autre" ? "" : "none";
+
+        });
+
+    }
 
     document.getElementById("reservationModalClose").addEventListener("click", fermerModaleReservation);
     document.getElementById("reservationModalCancel").addEventListener("click", fermerModaleReservation);
@@ -840,6 +861,8 @@ function reserverLogement(logementId){
     document.getElementById("reservationDate").value = "";
     document.getElementById("reservationHeure").value = "";
     document.getElementById("reservationDuree").value = "";
+    document.getElementById("reservationDureeAutre").value = "";
+    document.getElementById("reservationDureeAutre").style.display = "none";
 
     overlay.classList.add("show");
 
@@ -865,9 +888,19 @@ async function envoyerReservation(logementId){
     const dureeSejour =
     document.getElementById("reservationDuree").value;
 
+    const dureeSejourAutre =
+    document.getElementById("reservationDureeAutre").value.trim();
+
     if(!dateSouhaitee || !heureSouhaitee || !dureeSejour){
 
         showToast("Merci de préciser la date, l'heure et la durée souhaitées.", "error");
+
+        return;
+    }
+
+    if(dureeSejour === "autre" && !dureeSejourAutre){
+
+        showToast("Merci de préciser la durée souhaitée.", "error");
 
         return;
     }
@@ -897,7 +930,8 @@ async function envoyerReservation(logementId){
                 conditions_acceptees: true,
                 date_souhaitee: dateSouhaitee,
                 heure_souhaitee: heureSouhaitee,
-                duree_sejour: dureeSejour
+                duree_sejour: dureeSejour,
+                duree_sejour_autre: dureeSejour === "autre" ? dureeSejourAutre : ""
             })
 
         });

@@ -35,7 +35,7 @@ function handleReservationsRoute(array $segments, string $method): void
     jsonError('Route introuvable.', 404);
 }
 
-const DUREES_SEJOUR_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an'];
+const DUREES_SEJOUR_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an', 'autre'];
 
 function creerReservation(): void
 {
@@ -48,6 +48,7 @@ function creerReservation(): void
     $dateSouhaitee = $body['date_souhaitee'] ?? null;
     $heureSouhaitee = $body['heure_souhaitee'] ?? null;
     $dureeSejour = $body['duree_sejour'] ?? null;
+    $dureeSejourAutre = trim($body['duree_sejour_autre'] ?? '');
 
     if (!$logementId) {
         jsonError('logement_id est obligatoire.');
@@ -63,6 +64,10 @@ function creerReservation(): void
 
     if (!in_array($dureeSejour, DUREES_SEJOUR_VALIDES, true)) {
         jsonError('Durée souhaitée invalide.');
+    }
+
+    if ($dureeSejour === 'autre' && !$dureeSejourAutre) {
+        jsonError('Merci de préciser la durée souhaitée.');
     }
 
     $dateValidee = DateTime::createFromFormat('Y-m-d', $dateSouhaitee);
@@ -84,10 +89,10 @@ function creerReservation(): void
     }
 
     $stmt = getPdo()->prepare('
-        INSERT INTO reservations (logement_id, locataire_id, message, conditions_acceptees, date_souhaitee, heure_souhaitee, duree_sejour)
-        VALUES (?, ?, ?, 1, ?, ?, ?)
+        INSERT INTO reservations (logement_id, locataire_id, message, conditions_acceptees, date_souhaitee, heure_souhaitee, duree_sejour, duree_sejour_autre)
+        VALUES (?, ?, ?, 1, ?, ?, ?, ?)
     ');
-    $stmt->execute([$logementId, $userId, $message, $dateSouhaitee, $heureSouhaitee, $dureeSejour]);
+    $stmt->execute([$logementId, $userId, $message, $dateSouhaitee, $heureSouhaitee, $dureeSejour, $dureeSejour === 'autre' ? $dureeSejourAutre : null]);
 
     // Renvoyé pour que le frontend puisse emmener directement le
     // locataire dans l'espace de discussion avec ce propriétaire.

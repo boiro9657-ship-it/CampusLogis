@@ -345,9 +345,10 @@ try {
     // propriétaire ait ces informations avant d'accepter ou de
     // refuser (au lieu de devoir les redemander par message).
     $colonnesReservationAAjouter = [
-        'date_souhaitee'  => "DATE NULL",
-        'heure_souhaitee' => "TIME NULL",
-        'duree_sejour'    => "ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an') NULL",
+        'date_souhaitee'     => "DATE NULL",
+        'heure_souhaitee'    => "TIME NULL",
+        'duree_sejour'       => "ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an') NULL",
+        'duree_sejour_autre' => "VARCHAR(100) NULL",
     ];
 
     foreach ($colonnesReservationAAjouter as $colonne => $definition) {
@@ -364,6 +365,20 @@ try {
             $etapes[] = "Colonne \"$colonne\" ajoutée à \"reservations\".";
         }
 
+    }
+
+    // Le locataire peut préciser lui-même une durée hors des choix
+    // standards (comme le propriétaire peut le faire à la publication).
+    $typeDureeSejour = $pdo->query("
+        SELECT COLUMN_TYPE FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'reservations'
+        AND COLUMN_NAME = 'duree_sejour'
+    ")->fetchColumn();
+
+    if ($typeDureeSejour !== false && strpos($typeDureeSejour, "'autre'") === false) {
+        $pdo->exec("ALTER TABLE reservations MODIFY COLUMN duree_sejour ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an','autre') NULL");
+        $etapes[] = 'Colonne duree_sejour : valeur "autre" ajoutée.';
     }
 
     // Espace de discussion propriétaire/locataire : une conversation

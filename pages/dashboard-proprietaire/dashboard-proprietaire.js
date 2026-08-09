@@ -433,7 +433,7 @@ function afficherReservations(reservations, mode){
                         <i class="ph ph-calendar-check"></i>
                         ${new Date(reservation.date_souhaitee).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
                         ${reservation.heure_souhaitee ? " à " + reservation.heure_souhaitee.slice(0, 5) : ""}
-                        ${reservation.duree_sejour ? " · " + (LIBELLES_DUREE_SEJOUR[reservation.duree_sejour] || reservation.duree_sejour) : ""}
+                        ${reservation.duree_sejour ? " · " + (reservation.duree_sejour === "autre" ? (reservation.duree_sejour_autre || "Autre durée") : (LIBELLES_DUREE_SEJOUR[reservation.duree_sejour] || reservation.duree_sejour)) : ""}
                     </p>
                     `
                     : ""

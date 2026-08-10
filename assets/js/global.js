@@ -1242,47 +1242,46 @@ function demarrerCarrousels(container){
 
             if(slide.type === "video" && video){
 
-                const memeVideoDejaChargee =
-                video.getAttribute("src") === slide.url;
+                if(video.getAttribute("src") !== slide.url){
 
-                if(!memeVideoDejaChargee){
+                    // Nouvelle vidéo : on lance son chargement une
+                    // seule fois. Ne JAMAIS remettre à zéro / mettre
+                    // en pause une vidéo déjà en cours de chargement
+                    // ailleurs dans cette fonction — sur une connexion
+                    // lente, ça l'empêchait de jamais finir de charger
+                    // (chaque passage du carrousel repartait de zéro),
+                    // donc elle ne s'affichait jamais.
                     video.src = slide.url;
+                    video.play().catch(() => {});
+
                 }
 
-                video.currentTime = 0;
-                video.play().catch(() => {});
+                const passerEnVideo = () => {
 
-                // Garde la photo affichée tant que la vidéo n'a pas
-                // assez chargé pour montrer une vraie image — sur une
-                // connexion lente, basculer tout de suite affichait un
-                // cadre noir vide le temps du chargement, donnant
-                // l'impression que la vidéo ne s'affichait jamais.
-                if(memeVideoDejaChargee && video.readyState >= 2){
+                    if(slides[index] !== slide) return;
 
                     img.style.display = "none";
                     video.style.display = "";
 
+                };
+
+                if(video.readyState >= 2){
+
+                    passerEnVideo();
+
                 }else{
 
-                    video.addEventListener("loadeddata", () => {
-
-                        if(slides[index] !== slide) return;
-
-                        img.style.display = "none";
-                        video.style.display = "";
-
-                    }, { once: true });
+                    video.addEventListener("loadeddata", passerEnVideo, { once: true });
 
                 }
 
             }else{
 
-                if(video){
-
-                    video.pause();
-                    video.style.display = "none";
-
-                }
+                // La vidéo n'est que masquée (pas mise en pause) pour
+                // continuer à charger en arrière-plan pendant qu'une
+                // photo est affichée — elle sera prête plus tôt au
+                // prochain passage du carrousel.
+                if(video) video.style.display = "none";
 
                 img.style.display = "";
                 img.src = slide.url;

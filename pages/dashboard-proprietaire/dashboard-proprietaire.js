@@ -261,7 +261,7 @@ function afficherAnnonces(logements){
 
                 <p>💰 ${logement.prix} FCFA${libelleCourtDuree(logement.duree_location)}${libelleEngagementDuree(logement.duree_location, logement.duree_location_autre) ? " · " + libelleEngagementDuree(logement.duree_location, logement.duree_location_autre) : ""}</p>
 
-                <p><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}${Number(logement.chambres) > 0 ? ` · 🛏 ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)` : ""}</p>
+                <p><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}${Number(logement.chambres) > 0 ? ` · <i class="ph ${iconePieces(logement.type)}"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)` : ""}</p>
 
                 <div class="media-badges">
                     <span class="media-badge">📷 ${nbPhotos} photo${nbPhotos > 1 ? "s" : ""}</span>

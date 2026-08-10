@@ -362,7 +362,7 @@ function carteLogementHTML(logement){
 
             <div class="infos">
                 <span><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}</span>
-                ${Number(logement.chambres) > 0 ? `<span><i class="ph ph-bed"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)</span>` : ""}
+                ${Number(logement.chambres) > 0 ? `<span><i class="ph ${iconePieces(logement.type)}"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)</span>` : ""}
             </div>
 
             <div class="bottom-card">

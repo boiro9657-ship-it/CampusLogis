@@ -627,7 +627,7 @@ function afficherCaracteristiques(logement){
     ];
 
     if(Number(logement.chambres) > 0){
-        badges.push(`<span><i class="ph ph-bed"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)</span>`);
+        badges.push(`<span><i class="ph ${iconePieces(logement.type)}"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)</span>`);
     }
 
     if(logement.nombre_personnes){

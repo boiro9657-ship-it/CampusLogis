@@ -261,7 +261,7 @@ function mettreAJourApercu(){
 
                 <div class="publish-preview-infos">
                     <span><i class="ph ${iconeTypeLogement(type)}"></i> ${type}</span>
-                    ${Number(chambres) > 0 ? `<span><i class="ph ph-bed"></i> ${chambres} ${libeleUnitePieces(type)}(s)</span>` : ""}
+                    ${Number(chambres) > 0 ? `<span><i class="ph ${iconePieces(type)}"></i> ${chambres} ${libeleUnitePieces(type)}(s)</span>` : ""}
                 </div>
 
                 ${engagement ? `<p class="publish-preview-engagement"><i class="ph ph-calendar-check"></i> ${engagement}</p>` : ""}

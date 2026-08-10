@@ -1094,9 +1094,22 @@ const UNITES_PIECES_PAR_TYPE = {
     Bureau: "bureau"
 };
 
+// Même logique que UNITES_PIECES_PAR_TYPE, mais pour l'icône
+// affichée à côté du nombre — un bureau ne se représente pas par un
+// lit.
+const ICONES_PIECES_PAR_TYPE = {
+    Bureau: "ph-briefcase"
+};
+
 function libeleUnitePieces(type){
 
     return UNITES_PIECES_PAR_TYPE[type] || "chambre";
+
+}
+
+function iconePieces(type){
+
+    return ICONES_PIECES_PAR_TYPE[type] || "ph-bed";
 
 }
 
@@ -1197,8 +1210,12 @@ function demarrerCarrousels(container){
         const videos =
         (img.dataset.videos || "").split("|").filter(Boolean).map(url => ({ type: "video", url }));
 
+        // La vidéo passe juste après la photo de couverture (pas en
+        // toute fin de liste) : avec plusieurs photos, attendre la
+        // fin du cycle pour la voir prenait bien trop longtemps —
+        // elle risquait de ne jamais être vue lors d'un survol rapide.
         const slides =
-        photos.concat(videos);
+        [photos[0], ...videos, ...photos.slice(1)].filter(Boolean);
 
         if(slides.length <= 1) return;
 

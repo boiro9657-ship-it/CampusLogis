@@ -346,7 +346,7 @@ function carteRechercheHTML(logement){
                 </span>
                 ${Number(logement.chambres) > 0 ? `
                 <span>
-                    <i class="ph ph-bed"></i>
+                    <i class="ph ${iconePieces(logement.type)}"></i>
                     ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)
                 </span>
                 ` : ""}

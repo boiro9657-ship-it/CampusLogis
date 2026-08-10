@@ -30,7 +30,9 @@ function envoyerEmail(string $destinataire, string $sujet, string $corpsHtml): b
         $mail->SMTPAuth = true;
         $mail->Username = $config['username'];
         $mail->Password = $config['password'];
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->SMTPSecure = ($config['encryption'] ?? 'tls') === 'ssl'
+            ? PHPMailer::ENCRYPTION_SMTPS
+            : PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = $config['port'];
         $mail->CharSet = 'UTF-8';
 

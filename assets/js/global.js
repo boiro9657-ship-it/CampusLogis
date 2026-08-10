@@ -1242,16 +1242,38 @@ function demarrerCarrousels(container){
 
             if(slide.type === "video" && video){
 
-                img.style.display = "none";
+                const memeVideoDejaChargee =
+                video.getAttribute("src") === slide.url;
 
-                video.style.display = "";
-
-                if(video.getAttribute("src") !== slide.url){
+                if(!memeVideoDejaChargee){
                     video.src = slide.url;
                 }
 
                 video.currentTime = 0;
                 video.play().catch(() => {});
+
+                // Garde la photo affichée tant que la vidéo n'a pas
+                // assez chargé pour montrer une vraie image — sur une
+                // connexion lente, basculer tout de suite affichait un
+                // cadre noir vide le temps du chargement, donnant
+                // l'impression que la vidéo ne s'affichait jamais.
+                if(memeVideoDejaChargee && video.readyState >= 2){
+
+                    img.style.display = "none";
+                    video.style.display = "";
+
+                }else{
+
+                    video.addEventListener("loadeddata", () => {
+
+                        if(slides[index] !== slide) return;
+
+                        img.style.display = "none";
+                        video.style.display = "";
+
+                    }, { once: true });
+
+                }
 
             }else{
 

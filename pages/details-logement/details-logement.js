@@ -796,7 +796,12 @@ function afficherGalerie(medias){
 
             if(media.type === "video"){
 
-                return `<video src="${media.url}" controls></video>`;
+                return `
+                <div class="gallery-video-thumb">
+                    <video src="${media.url}" muted playsinline preload="metadata"></video>
+                    <i class="ph ph-play-circle"></i>
+                </div>
+                `;
 
             }
 
@@ -835,3 +840,160 @@ document.querySelectorAll(selecteurActionsEnAttente).forEach(el => {
 });
 
 }
+
+/* ==========================
+    GALERIE — PLEIN ÉCRAN (LIGHTBOX)
+    Toucher/cliquer une photo ou vidéo (grande image ou vignette)
+    l'ouvre en grand, avec navigation précédent/suivant — flèches,
+    clavier, ou glissement au doigt sur mobile — à travers toutes
+    les photos et vidéos de l'annonce. Écoute sur le conteneur
+    plutôt que sur chaque élément individuellement, pour continuer
+    à fonctionner une fois la galerie reconstruite par
+    afficherGalerie() avec les vrais médias du logement.
+========================== */
+
+(() => {
+
+    const conteneurGalerie =
+    document.getElementById("details-gallery");
+
+    const lightbox =
+    document.getElementById("galleryLightbox");
+
+    if(!conteneurGalerie || !lightbox) return;
+
+    const contenu =
+    document.getElementById("lightboxContent");
+
+    const compteur =
+    document.getElementById("lightboxCounter");
+
+    const SELECTEUR_ELEMENTS =
+    ".gallery-main img, .gallery-side img, .gallery-side .gallery-video-thumb";
+
+    let indexActuel = 0;
+
+    function elementsGalerie(){
+
+        return Array.from(conteneurGalerie.querySelectorAll(SELECTEUR_ELEMENTS));
+
+    }
+
+    function mediaDepuisElement(el){
+
+        if(el.classList.contains("gallery-video-thumb")){
+
+            return { type: "video", url: el.querySelector("video").currentSrc || el.querySelector("video").src };
+
+        }
+
+        return { type: "image", url: el.src };
+
+    }
+
+    function afficherMedia(index){
+
+        const elements =
+        elementsGalerie();
+
+        if(elements.length === 0) return;
+
+        indexActuel = (index + elements.length) % elements.length;
+
+        const media =
+        mediaDepuisElement(elements[indexActuel]);
+
+        contenu.innerHTML =
+        media.type === "video"
+        ? `<video src="${media.url}" controls autoplay playsinline></video>`
+        : `<img src="${media.url}" alt="Photo du logement">`;
+
+        compteur.textContent =
+        (indexActuel + 1) + " / " + elements.length;
+
+    }
+
+    function ouvrirLightbox(index){
+
+        afficherMedia(index);
+
+        lightbox.classList.add("show");
+
+        document.body.style.overflow = "hidden";
+
+    }
+
+    function fermerLightbox(){
+
+        lightbox.classList.remove("show");
+
+        contenu.innerHTML = "";
+
+        document.body.style.overflow = "";
+
+    }
+
+    conteneurGalerie.addEventListener("click", (e) => {
+
+        const cible =
+        e.target.closest("img, .gallery-video-thumb");
+
+        if(!cible) return;
+
+        const index =
+        elementsGalerie().indexOf(cible);
+
+        if(index === -1) return;
+
+        ouvrirLightbox(index);
+
+    });
+
+    document.getElementById("lightboxClose").addEventListener("click", fermerLightbox);
+
+    document.getElementById("lightboxPrev").addEventListener("click", () => afficherMedia(indexActuel - 1));
+    document.getElementById("lightboxNext").addEventListener("click", () => afficherMedia(indexActuel + 1));
+
+    lightbox.addEventListener("click", (e) => {
+
+        if(e.target === lightbox) fermerLightbox();
+
+    });
+
+    document.addEventListener("keydown", (e) => {
+
+        if(!lightbox.classList.contains("show")) return;
+
+        if(e.key === "Escape") fermerLightbox();
+        if(e.key === "ArrowLeft") afficherMedia(indexActuel - 1);
+        if(e.key === "ArrowRight") afficherMedia(indexActuel + 1);
+
+    });
+
+    // Glissement au doigt (mobile) pour naviguer entre les médias.
+    let toucheDepartX = null;
+
+    contenu.addEventListener("touchstart", (e) => {
+
+        toucheDepartX = e.touches[0].clientX;
+
+    }, { passive: true });
+
+    contenu.addEventListener("touchend", (e) => {
+
+        if(toucheDepartX === null) return;
+
+        const delta =
+        e.changedTouches[0].clientX - toucheDepartX;
+
+        if(Math.abs(delta) > 50){
+
+            afficherMedia(indexActuel + (delta < 0 ? 1 : -1));
+
+        }
+
+        toucheDepartX = null;
+
+    });
+
+})();

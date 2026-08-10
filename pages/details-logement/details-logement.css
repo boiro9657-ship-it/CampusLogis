@@ -157,8 +157,7 @@
 
 }
 
-.gallery-side img,
-.gallery-side video{
+.gallery-side img{
 
     width:100%;
 
@@ -179,6 +178,239 @@
 .gallery-side img:hover{
 
     transform:scale(1.03);
+
+}
+
+.gallery-video-thumb{
+
+    position:relative;
+
+    height:240px;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+    background:#000;
+
+}
+
+.gallery-video-thumb video{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    pointer-events:none;
+
+}
+
+.gallery-video-thumb i{
+
+    position:absolute;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    color:white;
+
+    font-size:48px;
+
+    text-shadow:0 4px 14px rgba(0,0,0,.4);
+
+    pointer-events:none;
+
+}
+
+.gallery-video-thumb:hover video{
+
+    transform:scale(1.03);
+
+}
+
+/* ==========================
+    GALERIE — PLEIN ÉCRAN (LIGHTBOX)
+    Toucher/cliquer une photo ou vidéo de la galerie l'ouvre en
+    grand, avec navigation précédent/suivant (flèches, clavier, ou
+    glissement au doigt sur mobile) à travers tous les médias de
+    l'annonce — photos et vidéos confondues.
+========================== */
+
+.gallery-lightbox{
+
+    display:none;
+
+    position:fixed;
+    inset:0;
+
+    z-index:1000;
+
+    background:rgba(15,23,42,.96);
+
+    align-items:center;
+    justify-content:center;
+
+}
+
+.gallery-lightbox.show{
+
+    display:flex;
+
+}
+
+.lightbox-content{
+
+    max-width:90vw;
+    max-height:88vh;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+}
+
+.lightbox-content img,
+.lightbox-content video{
+
+    max-width:90vw;
+    max-height:88vh;
+
+    width:auto;
+    height:auto;
+
+    object-fit:contain;
+
+    border-radius:12px;
+
+}
+
+.lightbox-close{
+
+    position:absolute;
+
+    top:24px;
+    right:24px;
+
+    width:46px;
+    height:46px;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(255,255,255,.12);
+    color:white;
+
+    font-size:22px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.lightbox-close:hover{
+
+    background:rgba(255,255,255,.25);
+
+}
+
+.lightbox-nav{
+
+    position:absolute;
+
+    top:50%;
+    transform:translateY(-50%);
+
+    width:52px;
+    height:52px;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(255,255,255,.12);
+    color:white;
+
+    font-size:24px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.lightbox-nav:hover{
+
+    background:rgba(255,255,255,.25);
+
+}
+
+.lightbox-prev{
+
+    left:24px;
+
+}
+
+.lightbox-next{
+
+    right:24px;
+
+}
+
+.lightbox-counter{
+
+    position:absolute;
+
+    bottom:24px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    color:white;
+
+    background:rgba(255,255,255,.12);
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    font-size:14px;
+    font-weight:600;
+
+}
+
+@media(max-width:700px){
+
+    .lightbox-nav{
+
+        width:42px;
+        height:42px;
+
+        font-size:20px;
+
+    }
+
+    .lightbox-prev{ left:10px; }
+    .lightbox-next{ right:10px; }
+
+    .lightbox-close{
+
+        top:14px;
+        right:14px;
+
+    }
 
 }
 

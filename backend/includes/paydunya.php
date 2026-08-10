@@ -41,7 +41,7 @@ function paydunyaHeaders(): array
         'Content-Type: application/json',
         'PAYDUNYA-MASTER-KEY: ' . $config['master_key'],
         'PAYDUNYA-PRIVATE-KEY: ' . $cles['private_key'],
-        'PAYDUNYA-TOKEN: ' . $config['token'],
+        'PAYDUNYA-TOKEN: ' . $cles['token'],
         'PAYDUNYA-PUBLIC-KEY: ' . $cles['public_key'],
     ];
 }

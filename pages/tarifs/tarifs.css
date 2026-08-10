@@ -65,6 +65,16 @@
     max-width:1200px;
 
     margin:0 auto;
+}
+
+/* Le temps que Premium/Pro soient réactivés (paiement PayDunya pas
+   encore validé) : une seule carte Gratuit, centrée, plutôt qu'une
+   grille à 3 colonnes avec 2 cases vides. */
+.pricing-grid-solo{
+
+    grid-template-columns:1fr;
+
+    max-width:380px;
 
 }
 

@@ -256,12 +256,25 @@ const MAX_VIDEOS_PRO = 8;
 // comptes sont au plan Gratuit par défaut.
 const LIMITE_ANNONCES_GRATUIT_PAR_JOUR = 2;
 
+// Le temps que les paiements PayDunya soient validés, aucun compte
+// n'est facturé : toutes les limites liées au plan (annonces/jour,
+// vidéos, publicité vocale) sont désactivées pour attirer un
+// maximum d'utilisateurs sans donner l'impression de frais cachés.
+// Repasser à false une fois les paiements activés pour revenir aux
+// limites normales par plan — voir aussi publier-logement.js
+// (FONCTIONNALITES_LIBRES_LANCEMENT) côté client.
+const FONCTIONNALITES_LIBRES_LANCEMENT = true;
+
 /**
  * Bloque la publication si le compte est au plan Gratuit et a déjà
  * atteint la limite du jour — Premium/Pro ne sont pas limités.
  */
 function verifierLimitePlanGratuit(int $userId): void
 {
+    if (FONCTIONNALITES_LIBRES_LANCEMENT) {
+        return;
+    }
+
     $pdo = getPdo();
 
     $stmt = $pdo->prepare('SELECT plan FROM utilisateurs WHERE id = ?');
@@ -404,6 +417,11 @@ function createLogement(): void
     $stmt->execute([$userId]);
     $planActuel = $stmt->fetchColumn() ?: 'gratuit';
 
+    // Pendant le lancement (voir FONCTIONNALITES_LIBRES_LANCEMENT),
+    // tous les comptes sont traités comme le plan Pro pour les
+    // limites ci-dessous, même si leur plan enregistré reste Gratuit.
+    $planEffectif = FONCTIONNALITES_LIBRES_LANCEMENT ? 'pro' : $planActuel;
+
     // Publicité vocale : réservée aux plans Premium et Pro. Le
     // champ est masqué/désactivé côté client pour un compte
     // Gratuit, mais revérifié ici pour ne pas dépendre uniquement
@@ -413,7 +431,7 @@ function createLogement(): void
 
     if ($fichierAudio && ($fichierAudio['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
 
-        if ($planActuel === 'gratuit') {
+        if ($planEffectif === 'gratuit') {
             jsonError('La publicité vocale est réservée aux plans Premium et Pro.', 403);
         }
 
@@ -441,7 +459,7 @@ function createLogement(): void
         'pro'     => MAX_VIDEOS_PRO,
     ];
 
-    $maxVideos = $maxVideosParPlan[$planActuel] ?? MAX_VIDEOS_GRATUIT;
+    $maxVideos = $maxVideosParPlan[$planEffectif] ?? MAX_VIDEOS_GRATUIT;
 
     $photos = array_slice($photos, 0, MAX_PHOTOS);
     $videos = array_slice($videos, 0, $maxVideos);

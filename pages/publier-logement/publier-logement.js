@@ -16,6 +16,13 @@ const MAX_VIDEOS_PAR_PLAN = {
     pro: 8,
 };
 
+// Le temps que les paiements PayDunya soient validés, aucun compte
+// n'est facturé : tout le monde profite des avantages du plan Pro
+// gratuitement (vidéos, publicité vocale...), quel que soit le plan
+// réellement enregistré. Repasser à false une fois les paiements
+// activés pour revenir aux limites normales par plan.
+const FONCTIONNALITES_LIBRES_LANCEMENT = true;
+
 (async () => {
 
     let utilisateur;
@@ -33,11 +40,16 @@ const MAX_VIDEOS_PAR_PLAN = {
     }
 
     // Publicité vocale réservée aux plans Premium/Pro : débloque
-    // l'enregistrement uniquement si le compte a réellement ce plan.
+    // l'enregistrement uniquement si le compte a réellement ce plan
+    // (ou si toutes les fonctionnalités sont offertes pendant le
+    // lancement, voir FONCTIONNALITES_LIBRES_LANCEMENT plus haut).
     planActuel =
     utilisateur.plan || "gratuit";
 
-    if(planActuel !== "gratuit"){
+    const planEffectif =
+    FONCTIONNALITES_LIBRES_LANCEMENT ? "pro" : planActuel;
+
+    if(planEffectif !== "gratuit"){
 
         const labelVideos =
         document.getElementById("labelVideos");
@@ -46,13 +58,15 @@ const MAX_VIDEOS_PAR_PLAN = {
         document.getElementById("hintVideosPlan");
 
         const maxVideosCePlan =
-        MAX_VIDEOS_PAR_PLAN[planActuel] || MAX_VIDEOS_PAR_PLAN.gratuit;
+        MAX_VIDEOS_PAR_PLAN[planEffectif] || MAX_VIDEOS_PAR_PLAN.gratuit;
 
         if(labelVideos) labelVideos.textContent = "Vidéos (facultatif, jusqu'à " + maxVideosCePlan + ")";
 
         if(hintVideosPlan){
             hintVideosPlan.style.display = "";
-            hintVideosPlan.innerHTML = `<i class="ph ph-crown-simple"></i> Avec votre plan ${planActuel === "pro" ? "Pro" : "Premium"}, publiez jusqu'à ${maxVideosCePlan} vidéos par annonce.`;
+            hintVideosPlan.innerHTML = FONCTIONNALITES_LIBRES_LANCEMENT
+                ? `<i class="ph ph-gift"></i> Offert pendant le lancement : publiez jusqu'à ${maxVideosCePlan} vidéos par annonce.`
+                : `<i class="ph ph-crown-simple"></i> Avec votre plan ${planEffectif === "pro" ? "Pro" : "Premium"}, publiez jusqu'à ${maxVideosCePlan} vidéos par annonce.`;
         }
 
         const btnMic =
@@ -745,7 +759,7 @@ if(publishForm){
             }
 
             const maxVideosPlan =
-            MAX_VIDEOS_PAR_PLAN[planActuel] || MAX_VIDEOS_PAR_PLAN.gratuit;
+            MAX_VIDEOS_PAR_PLAN[FONCTIONNALITES_LIBRES_LANCEMENT ? "pro" : planActuel] || MAX_VIDEOS_PAR_PLAN.gratuit;
 
             if(videos.length > maxVideosPlan){
 

@@ -11,6 +11,12 @@
 
 let utilisateurConnecte = null;
 
+// Pendant le lancement (avant l'activation des paiements PayDunya),
+// les statistiques de consultation sont offertes à tous les comptes,
+// pas seulement Premium/Pro — voir publier-logement.js pour le même
+// interrupteur appliqué aux vidéos et à la publicité vocale.
+const FONCTIONNALITES_LIBRES_LANCEMENT = true;
+
 const LIBELLES_DUREE_SEJOUR = {
     "24h": "24 heures",
     nuit: "à la nuitée",
@@ -276,7 +282,7 @@ function afficherAnnonces(logements){
                         : ""
                     }
                     ${
-                        utilisateurConnecte && utilisateurConnecte.plan !== "gratuit"
+                        FONCTIONNALITES_LIBRES_LANCEMENT || (utilisateurConnecte && utilisateurConnecte.plan !== "gratuit")
                         ? `<span class="media-badge media-badge-vues">👁 ${Number(logement.vues || 0)} consultation${Number(logement.vues || 0) > 1 ? "s" : ""}</span>`
                         : `<span class="media-badge media-badge-vues-verrou"><i class="ph ph-lock-simple"></i> Statistiques Premium/Pro</span>`
                     }

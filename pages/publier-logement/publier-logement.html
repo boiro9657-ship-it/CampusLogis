@@ -56,7 +56,7 @@
 
     <h1>Publier un logement</h1>
 
-    <p>Choisissez la formule qui vous convient, ou publiez gratuitement en quelques minutes.</p>
+    <p>Publiez gratuitement en quelques minutes, avec toutes les fonctionnalités.</p>
 
 </div>
 
@@ -80,11 +80,18 @@
 </div>
 -->
 
+<!-- Écran de choix de plan masqué : le temps que les paiements
+     PayDunya soient validés, la publication est entièrement libre
+     et gratuite pour tous (voir FONCTIONNALITES_LIBRES_LANCEMENT
+     dans publier-logement.js) — afficher une carte "Gratuit" à côté
+     de rien donnait l'impression de frais cachés. Retirer ce
+     commentaire (et remettre "display:none" sur #publishForm)
+     pour réactiver le choix de plan. -->
+<!--
 <section id="planChoice" class="plan-choice-section">
 
     <div class="container">
 
-        <!-- Premium/Pro masqués : voir commentaire ci-dessus. -->
         <div class="pricing-grid pricing-grid-solo">
 
             <div class="pricing-card">
@@ -116,7 +123,6 @@
 
             </div>
 
-            <!--
             <div class="pricing-card pricing-card-featured" id="cartePremium">
 
                 <span class="pricing-recommended">
@@ -175,7 +181,6 @@
                 </button>
 
             </div>
-            -->
 
         </div>
 
@@ -186,8 +191,9 @@
     </div>
 
 </section>
+-->
 
-<form class="publish-card" id="publishForm" style="display:none;">
+<form class="publish-card" id="publishForm">
 
     <div class="publish-progress" id="publishProgress">
 

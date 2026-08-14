@@ -65,6 +65,35 @@ if(registerForm){
 
             });
 
+        }catch(error){
+
+            showToast(error.message, "error");
+
+            submitBtn.disabled = false;
+
+            return;
+        }
+
+        // Connexion automatique juste après l'inscription, pour
+        // enchaîner directement sur l'animation de bienvenue puis le
+        // tableau de bord — sans repasser par l'écran de connexion.
+        try{
+
+            await apiFetch("/auth/login", {
+
+                method: "POST",
+
+                body: JSON.stringify({ email, mot_de_passe: password })
+
+            });
+
+            afficherAnimationBienvenue(role);
+
+        }catch(error){
+
+            // Cas limite (compte créé mais connexion auto impossible) :
+            // on retombe sur l'ancien comportement plutôt que de
+            // bloquer l'utilisateur.
             showToast("Compte créé avec succès ! Vous pouvez vous connecter.");
 
             setTimeout(()=>{
@@ -74,16 +103,93 @@ if(registerForm){
 
             }, 1500);
 
-        }catch(error){
-
-            showToast(error.message, "error");
-
-        }finally{
-
-            submitBtn.disabled = false;
-
         }
 
     });
+
+}
+
+/* ==========================
+    ANIMATION DE BIENVENUE
+========================== */
+
+const MESSAGES_BIENVENUE = {
+
+    locataire: [
+        "🎉 Félicitations ! Votre inscription est confirmée.",
+        "🏠 Votre prochain chez-vous vous attend peut-être déjà sur TerangaHome.",
+        "🔎 Explorez les logements disponibles et trouvez celui qui vous correspond."
+    ],
+
+    proprietaire: [
+        "🎉 Félicitations ! Votre compte propriétaire est prêt.",
+        "🏠 Votre logement mérite d'être découvert par ceux qui le recherchent.",
+        "🚀 Publiez votre première annonce et donnez-lui de la visibilité sur TerangaHome."
+    ]
+
+};
+
+const DUREE_AFFICHAGE_MESSAGE = 2200;
+const DUREE_TRANSITION_MESSAGE = 400;
+
+function attendre(ms){
+
+    return new Promise(resolve => setTimeout(resolve, ms));
+
+}
+
+async function afficherAnimationBienvenue(role){
+
+    const overlay = document.getElementById("welcomeOverlay");
+    const texte = document.getElementById("welcomeMessage");
+    const dots = document.querySelectorAll("#welcomeDots .welcome-dot");
+    const cta = document.getElementById("welcomeCta");
+
+    if(!overlay || !texte) return;
+
+    const messages =
+    MESSAGES_BIENVENUE[role] || MESSAGES_BIENVENUE.locataire;
+
+    overlay.classList.add("show");
+
+    await attendre(400);
+
+    for(let i = 0; i < messages.length; i++){
+
+        dots.forEach((dot, index) => dot.classList.toggle("active", index === i));
+
+        texte.classList.remove("visible");
+
+        if(i > 0) await attendre(DUREE_TRANSITION_MESSAGE);
+
+        texte.textContent = messages[i];
+
+        // Force le navigateur à reconnaître le nouvel état avant de
+        // rajouter la classe, sinon la transition ne se rejoue pas.
+        void texte.offsetWidth;
+
+        texte.classList.add("visible");
+
+        await attendre(DUREE_AFFICHAGE_MESSAGE);
+
+    }
+
+    if(role === "proprietaire"){
+
+        cta?.classList.add("show");
+
+        return;
+    }
+
+    texte.classList.remove("visible");
+
+    await attendre(DUREE_TRANSITION_MESSAGE);
+
+    overlay.classList.remove("show");
+
+    await attendre(400);
+
+    window.location.href =
+    "../dashboard-proprietaire/dashboard-proprietaire.html";
 
 }

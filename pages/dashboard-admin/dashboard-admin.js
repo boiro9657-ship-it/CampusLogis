@@ -182,7 +182,7 @@ async function chargerAnnonces(){
     logements.map(l => `
         <tr>
             <td>${l.titre}</td>
-            <td>${l.proprietaire_nom || "Démonstration"}</td>
+            <td>${l.proprietaire_nom || (l.publie_par_admin_id ? "Sans compte (via TerangaHome)" : "Démonstration")}</td>
             <td>${l.ville || ""}</td>
             <td>${Number(l.prix).toLocaleString("fr-FR")} F</td>
             <td>
@@ -195,6 +195,8 @@ async function chargerAnnonces(){
                     ${libellesValidation[l.statut_validation] || l.statut_validation}
                 </span>
             </td>
+            <td>👁 ${Number(l.vues || 0)}</td>
+            <td><i class="ph ph-whatsapp-logo"></i> ${Number(l.whatsapp_clics_total || 0)}</td>
             <td>
                 ${
                     l.statut_validation !== "approuve"
@@ -270,6 +272,118 @@ async function validerAnnonce(id, statutValidation){
     }
 
 }
+
+/* ==========================
+    PUBLIER UNE ANNONCE POUR UN PROPRIÉTAIRE SANS COMPTE
+========================== */
+
+const annonceAdminOverlay =
+document.getElementById("annonceAdminModalOverlay");
+
+const btnOuvrirAnnonceAdmin =
+document.getElementById("btnOuvrirAnnonceAdmin");
+
+const formAnnonceAdmin =
+document.getElementById("formAnnonceAdmin");
+
+function ouvrirModaleAnnonceAdmin(){
+
+    if(!annonceAdminOverlay) return;
+
+    formAnnonceAdmin.reset();
+
+    annonceAdminOverlay.classList.add("show");
+
+}
+
+function fermerModaleAnnonceAdmin(){
+
+    if(!annonceAdminOverlay) return;
+
+    annonceAdminOverlay.classList.remove("show");
+
+}
+
+btnOuvrirAnnonceAdmin?.addEventListener("click", ouvrirModaleAnnonceAdmin);
+document.getElementById("annonceAdminModalClose")?.addEventListener("click", fermerModaleAnnonceAdmin);
+document.getElementById("annonceAdminAnnuler")?.addEventListener("click", fermerModaleAnnonceAdmin);
+
+annonceAdminOverlay?.addEventListener("click", (e) => {
+
+    if(e.target === annonceAdminOverlay) fermerModaleAnnonceAdmin();
+
+});
+
+formAnnonceAdmin?.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const photos =
+    document.getElementById("admPhotos").files;
+
+    if(photos.length === 0){
+
+        showToast("Au moins une photo est obligatoire.", "error");
+
+        return;
+    }
+
+    if(photos.length > 8){
+
+        showToast("8 photos maximum par annonce.", "error");
+
+        return;
+    }
+
+    const formData =
+    new FormData();
+
+    formData.append("titre", document.getElementById("admTitre").value.trim());
+    formData.append("ville", document.getElementById("admVille").value.trim());
+    formData.append("type", document.getElementById("admType").value);
+    formData.append("prix", document.getElementById("admPrix").value);
+    formData.append("chambres", document.getElementById("admChambres").value);
+    formData.append("duree_location", document.getElementById("admDureeLocation").value);
+    formData.append("contact_whatsapp", document.getElementById("admWhatsapp").value.trim());
+    formData.append("contact_telephone", document.getElementById("admTelephone").value.trim());
+    formData.append("description", document.getElementById("admDescription").value.trim());
+
+    for(const fichier of photos){
+        formData.append("photos[]", fichier);
+    }
+
+    const submitBtn =
+    formAnnonceAdmin.querySelector("button[type=submit]");
+
+    submitBtn.disabled = true;
+
+    try{
+
+        await apiFetch("/admin/logements", {
+
+            method: "POST",
+
+            body: formData
+
+        });
+
+        showToast("Annonce publiée avec succès.");
+
+        fermerModaleAnnonceAdmin();
+
+        chargerAnnonces();
+
+    }catch(error){
+
+        showToast(error.message || "Impossible de publier l'annonce.", "error");
+
+    }finally{
+
+        submitBtn.disabled = false;
+
+    }
+
+});
 
 /* ==========================
     RÉSERVATIONS

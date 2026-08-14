@@ -7,8 +7,8 @@
     <meta name="description" content="Gérez les utilisateurs, annonces, réservations et messages de TerangaHome.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
-    <link rel="stylesheet" href="../../assets/css/global.css?v=20260810g">
-    <link rel="stylesheet" href="./dashboard-admin.css?v=20260810g">
+    <link rel="stylesheet" href="../../assets/css/global.css?v=20260810h">
+    <link rel="stylesheet" href="./dashboard-admin.css?v=20260810h">
 
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -194,6 +194,9 @@
 
     <div class="section-header">
         <h2>Annonces</h2>
+        <button type="button" class="btn-primary" id="btnOuvrirAnnonceAdmin">
+            <i class="ph ph-plus-circle"></i> Publier pour un propriétaire
+        </button>
     </div>
 
     <div class="table-card">
@@ -205,6 +208,8 @@
                 <th>Prix</th>
                 <th>Statut</th>
                 <th>Validation</th>
+                <th>Vues</th>
+                <th>Clics WhatsApp</th>
                 <th></th>
             </tr>
         </table>
@@ -450,12 +455,128 @@
     <i class="ph ph-arrow-up"></i>
 </button>
 
+<!-- ===========================
+     PUBLIER UNE ANNONCE POUR UN PROPRIÉTAIRE SANS COMPTE
+=========================== -->
+
+<div class="reservation-modal-overlay" id="annonceAdminModalOverlay">
+
+    <div class="reservation-modal admin-annonce-modal">
+
+        <button type="button" class="reservation-modal-close" id="annonceAdminModalClose" aria-label="Fermer">
+            <i class="ph ph-x"></i>
+        </button>
+
+        <h3><i class="ph ph-plus-circle"></i> Publier une annonce pour un propriétaire</h3>
+
+        <p class="reservation-modal-hint">
+            Pour un propriétaire qui n'a pas de compte TerangaHome. Aucun compte n'est créé —
+            le numéro WhatsApp devient le seul moyen de le contacter, il est donc obligatoire.
+            L'annonce est publiée immédiatement, sans étape de validation supplémentaire.
+        </p>
+
+        <form id="formAnnonceAdmin">
+
+            <div class="reservation-modal-fields">
+
+                <div class="reservation-modal-field">
+                    <label>Titre de l'annonce</label>
+                    <input type="text" id="admTitre" required placeholder="Ex : Chambre meublée à Sacré-Cœur">
+                </div>
+
+                <div class="reservation-modal-field">
+                    <label>Ville / Quartier</label>
+                    <input type="text" id="admVille" required placeholder="Ex : Dakar - Sacré-Cœur">
+                </div>
+
+            </div>
+
+            <div class="reservation-modal-fields">
+
+                <div class="reservation-modal-field">
+                    <label>Type de logement</label>
+                    <select id="admType">
+                        <option value="Chambre">Chambre</option>
+                        <option value="Studio">Studio</option>
+                        <option value="Appartement">Appartement</option>
+                        <option value="Villa">Villa</option>
+                        <option value="Bureau">Bureau</option>
+                        <option value="Immeuble">Immeuble</option>
+                        <option value="Passe-temps">Passe-temps</option>
+                    </select>
+                </div>
+
+                <div class="reservation-modal-field">
+                    <label>Prix (FCFA, min. 10 000)</label>
+                    <input type="number" id="admPrix" min="10000" required placeholder="Ex : 75000">
+                </div>
+
+            </div>
+
+            <div class="reservation-modal-fields">
+
+                <div class="reservation-modal-field">
+                    <label>Nombre de chambres / bureaux</label>
+                    <input type="number" id="admChambres" min="0" placeholder="Ex : 2">
+                </div>
+
+                <div class="reservation-modal-field">
+                    <label>Durée de location</label>
+                    <select id="admDureeLocation">
+                        <option value="par_heure">À l'heure</option>
+                        <option value="24h">24 heures</option>
+                        <option value="nuit">À la nuitée</option>
+                        <option value="journee">À la journée</option>
+                        <option value="semaine">À la semaine</option>
+                        <option value="1_mois" selected>Au mois</option>
+                        <option value="3_mois">3 mois (minimum)</option>
+                        <option value="6_mois">6 mois (minimum)</option>
+                        <option value="1_an">À l'année</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="reservation-modal-field">
+                <label>Numéro WhatsApp du propriétaire (obligatoire)</label>
+                <input type="tel" id="admWhatsapp" required placeholder="Ex : 77 123 45 67 ou +221 77 123 45 67">
+                <p class="reservation-modal-hint" style="margin-top:6px; margin-bottom:0;">
+                    Seul moyen de contact pour cette annonce — vérifie qu'il est correct.
+                </p>
+            </div>
+
+            <div class="reservation-modal-field">
+                <label>Téléphone (facultatif, si différent du WhatsApp)</label>
+                <input type="tel" id="admTelephone" placeholder="Ex : 33 800 00 00">
+            </div>
+
+            <div class="reservation-modal-field">
+                <label>Description (facultatif)</label>
+                <textarea id="admDescription" placeholder="Description du logement"></textarea>
+            </div>
+
+            <div class="reservation-modal-field">
+                <label>Photos (1 à 8, la première sera la couverture)</label>
+                <input type="file" id="admPhotos" accept="image/*" multiple required>
+            </div>
+
+            <div class="reservation-modal-actions">
+                <button type="button" class="btn-secondary" id="annonceAdminAnnuler">Annuler</button>
+                <button type="submit" class="btn-primary">Publier l'annonce</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
 <div id="toast"></div>
 
 <script>window.API_BASE = "../../backend/api";</script>
-<script src="../../assets/js/api.js?v=20260810g"></script>
-<script src="../../assets/js/global.js?v=20260810g"></script>
-<script src="./dashboard-admin.js?v=20260810g"></script>
+<script src="../../assets/js/api.js?v=20260810h"></script>
+<script src="../../assets/js/global.js?v=20260810h"></script>
+<script src="./dashboard-admin.js?v=20260810h"></script>
 
 </body>
 

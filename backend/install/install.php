@@ -226,6 +226,12 @@ try {
         'salons'             => "INT NULL",
         'cuisines'           => "INT NULL",
         'superficie'         => "DECIMAL(8,2) NULL",
+        // Renseigné uniquement quand un membre de l'équipe TerangaHome
+        // publie une annonce pour un propriétaire sans compte (voir
+        // creerLogementAdmin()) — permet de savoir qui a publié quoi,
+        // sans confondre avec owner_id (le vrai propriétaire, absent
+        // dans ce cas précis).
+        'publie_par_admin_id' => "INT NULL",
     ];
 
     foreach ($colonnesAAjouter as $colonne => $definition) {
@@ -551,6 +557,25 @@ try {
     ");
     $etapes[] = 'Table "visites" prête.';
 
+    // Un clic sur "Contacter sur WhatsApp" = une demande de contact
+    // générée pour cette annonce. Suit le même principe que
+    // "visites" (aucune authentification requise, empreinte IP
+    // hachée) mais rattaché à un logement précis, avec en plus
+    // l'utilisateur connecté quand il y en a un.
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS whatsapp_clics (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            logement_id INT NOT NULL,
+            ip_hash VARCHAR(64) NOT NULL,
+            user_id INT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (logement_id) REFERENCES logements(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE SET NULL,
+            INDEX idx_logement_id (logement_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "whatsapp_clics" prête.';
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS paiements (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -587,12 +612,15 @@ try {
         $etapes[] = 'Colonne "origine" ajoutée à "paiements".';
     }
 
-    // Pas d'annonces de démonstration : seules de vraies annonces,
-    // publiées par de vrais propriétaires contactables, doivent
-    // apparaître sur le site. D'anciennes installations peuvent
-    // avoir des annonces sans propriétaire (owner_id NULL) issues
-    // d'une version antérieure ; on les retire ici, une seule fois.
-    $pdo->exec("DELETE FROM logements WHERE owner_id IS NULL");
+    // Pas d'annonces de démonstration : seules de vraies annonces
+    // contactables doivent apparaître sur le site. Une annonce sans
+    // propriétaire (owner_id NULL) reste légitime si l'équipe
+    // TerangaHome l'a publiée pour le compte d'un propriétaire sans
+    // compte (voir creerLogementAdmin() dans logements.php) — dans
+    // ce cas un contact_whatsapp est toujours renseigné. Seules les
+    // annonces orphelines SANS AUCUN moyen de contact (résidu d'une
+    // version antérieure du site) sont supprimées ici.
+    $pdo->exec("DELETE FROM logements WHERE owner_id IS NULL AND (contact_whatsapp IS NULL OR contact_whatsapp = '')");
 
     // Compte administrateur par défaut, créé une seule fois (si
     // aucun admin n'existe encore). Pas d'auto-inscription admin

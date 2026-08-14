@@ -8,6 +8,10 @@
 require_once __DIR__ . '/../../includes/session.php';
 require_once __DIR__ . '/../../includes/mail.php';
 require_once __DIR__ . '/notifications.php';
+// Réutilise creerLogementAdmin() et les helpers de traitement des
+// médias/équipements (extraireFichiers, enregistrerMedia...) sans
+// dupliquer cette logique — voir creerLogementAdmin() plus bas.
+require_once __DIR__ . '/logements.php';
 
 function handleAdminRoute(array $segments, string $method): void
 {
@@ -28,6 +32,11 @@ function handleAdminRoute(array $segments, string $method): void
 
     if ($resource === 'logements' && $method === 'GET' && $id === null) {
         listTousLogements();
+        return;
+    }
+
+    if ($resource === 'logements' && $method === 'POST' && $id === null) {
+        creerLogementAdmin();
         return;
     }
 
@@ -99,8 +108,14 @@ function supprimerUtilisateur(int $id): void
 
 function listTousLogements(): void
 {
+    // "l.vues" existe déjà (compteur de consultations, incrémenté
+    // dans getLogement()) ; "whatsapp_clics_total" est calculé ici
+    // pour donner à l'admin, par annonce, le nombre de demandes de
+    // contact générées via le bouton WhatsApp (voir
+    // enregistrerClicWhatsapp() dans logements.php).
     $stmt = getPdo()->query('
-        SELECT l.*, u.nom_complet AS proprietaire_nom
+        SELECT l.*, u.nom_complet AS proprietaire_nom,
+            (SELECT COUNT(*) FROM whatsapp_clics w WHERE w.logement_id = l.id) AS whatsapp_clics_total
         FROM logements l
         LEFT JOIN utilisateurs u ON u.id = l.owner_id
         ORDER BY l.created_at DESC

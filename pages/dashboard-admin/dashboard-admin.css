@@ -2,6 +2,17 @@
    DASHBOARD-ADMIN.CSS — page tableau de bord admin uniquement
    ========================================================== */
 
+/* Le formulaire "Publier une annonce pour un propriétaire" a plus
+   de champs qu'une modale de réservation classique : un peu plus
+   large, et défilable si l'écran est petit. */
+.admin-annonce-modal{
+
+    max-width:620px;
+    max-height:88vh;
+    overflow-y:auto;
+
+}
+
 #admin-dashboard{
 
     margin-top:var(--header-height, 84px);

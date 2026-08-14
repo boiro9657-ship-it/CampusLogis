@@ -466,7 +466,7 @@ function brancherContactProprietaire(logement){
     logement.contact_whatsapp || logement.contact_telephone || logement.proprietaire_telephone;
 
     brancherBoutonContact(btnCall, telephoneEffectif, (numero) => "tel:+" + numero, "Le propriétaire n'a pas renseigné de numéro de téléphone.");
-    brancherBoutonContact(btnWhatsapp, whatsappEffectif, (numero) => "https://wa.me/" + numero, "Le propriétaire n'a pas renseigné de numéro WhatsApp.");
+    brancherBoutonWhatsapp(btnWhatsapp, whatsappEffectif, logement);
 
     if(btnMessage){
 
@@ -512,6 +512,90 @@ function brancherBoutonContact(btn, telephone, construireHref, messageErreur){
     }
 
     btn.href = construireHref(formaterNumeroInternational(telephone));
+
+}
+
+/**
+ * Branche le bouton WhatsApp avec un message prérempli (type/titre
+ * du bien, URL de l'annonce, référence) et enregistre côté serveur
+ * une demande de contact au moment du clic — sans jamais bloquer ni
+ * retarder l'ouverture de WhatsApp (voir enregistrerClicWhatsapp()
+ * plus bas, qui utilise navigator.sendBeacon en tâche de fond).
+ */
+function brancherBoutonWhatsapp(btn, telephone, logement){
+
+    if(!btn) return;
+
+    if(!telephone){
+
+        btn.addEventListener("click", (e) => {
+
+            e.preventDefault();
+
+            showToast("Le propriétaire n'a pas renseigné de numéro WhatsApp.", "error");
+
+        });
+
+        return;
+    }
+
+    const numero =
+    formaterNumeroInternational(telephone);
+
+    const message =
+    construireMessageWhatsapp(logement);
+
+    btn.href = "https://wa.me/" + numero + "?text=" + encodeURIComponent(message);
+    btn.target = "_blank";
+    btn.rel = "noopener";
+
+    btn.addEventListener("click", () => enregistrerClicWhatsapp(logement.id));
+
+}
+
+/**
+ * Message WhatsApp prérempli envoyé au propriétaire : reprend le
+ * titre/type du bien, l'URL de l'annonce et une référence unique
+ * (TH-<id>), pour que le propriétaire sache immédiatement de quelle
+ * annonce il s'agit même sans avoir le site ouvert.
+ */
+function construireMessageWhatsapp(logement){
+
+    const nomBien =
+    logement.titre || logement.type || "ce logement";
+
+    const reference =
+    "TH-" + logement.id;
+
+    return "Bonjour, j'ai vu votre annonce sur TerangaHome 🏠 et je suis intéressé(e) par votre logement \"" + nomBien + "\". "
+    + "Voici l'annonce : " + window.location.href + " (Réf. " + reference + "). "
+    + "Je souhaiterais avoir plus d'informations. Merci.";
+
+}
+
+/**
+ * Enregistre côté serveur qu'un visiteur a cliqué sur "Contacter
+ * sur WhatsApp" pour cette annonce — permet de compter, en plus des
+ * vues (déjà comptées par l'API au chargement de la page), les
+ * demandes de contact réellement générées. navigator.sendBeacon
+ * envoie la requête en arrière-plan sans jamais retarder la
+ * navigation vers WhatsApp qui suit ce clic ; si indisponible, un
+ * simple fetch "best effort" prend le relais.
+ */
+function enregistrerClicWhatsapp(logementId){
+
+    const url =
+    window.API_BASE + "/logements/" + logementId + "/whatsapp-clic";
+
+    if(navigator.sendBeacon){
+
+        navigator.sendBeacon(url, new Blob([JSON.stringify({})], { type: "application/json" }));
+
+    }else{
+
+        fetch(url, { method: "POST", credentials: "include" }).catch(() => {});
+
+    }
 
 }
 

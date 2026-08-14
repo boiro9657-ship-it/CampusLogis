@@ -42,6 +42,11 @@ function handleLogementsRoute(array $segments, string $method): void
         return;
     }
 
+    if ($method === 'POST' && is_numeric($first) && ($segments[1] ?? null) === 'whatsapp-clic') {
+        enregistrerClicWhatsapp((int) $first);
+        return;
+    }
+
     if ($method === 'GET' && is_numeric($first)) {
         getLogement((int) $first);
         return;
@@ -67,14 +72,19 @@ function handleLogementsRoute(array $segments, string $method): void
 
 function listLogements(): void
 {
-    // "owner_id IS NOT NULL" garantit que toute annonce publique
-    // a un vrai propriétaire contactable — aucune annonce fictive
-    // ou orpheline ne doit apparaître sur le site. Les logements
-    // déjà réservés restent affichés (avec un badge "Déjà réservé"
-    // côté client) plutôt que d'être masqués : le propriétaire ne
-    // perd pas la visibilité de son annonce, et un locataire tombant
-    // dessus comprend pourquoi il ne peut pas la réserver.
-    $conditions = ["statut_validation = 'approuve'", "owner_id IS NOT NULL"];
+    // Une annonce publique doit toujours rester contactable d'une
+    // manière ou d'une autre : soit elle a un vrai compte
+    // propriétaire (owner_id), soit — pour les annonces publiées
+    // par l'équipe TerangaHome au nom d'un propriétaire sans compte,
+    // voir creerLogementAdmin() — elle a un contact_whatsapp
+    // renseigné et validé à la publication. Aucune annonce
+    // réellement injoignable ne doit apparaître sur le site. Les
+    // logements déjà réservés restent affichés (avec un badge "Déjà
+    // réservé" côté client) plutôt que d'être masqués : le
+    // propriétaire ne perd pas la visibilité de son annonce, et un
+    // locataire tombant dessus comprend pourquoi il ne peut pas la
+    // réserver.
+    $conditions = ["statut_validation = 'approuve'", "(owner_id IS NOT NULL OR contact_whatsapp IS NOT NULL)"];
     $params = [];
 
     if (!empty($_GET['ville'])) {
@@ -683,6 +693,227 @@ function extraireProfils($profilsBruts): array
     }
 
     return $resultat;
+}
+
+/**
+ * Valide et normalise un numéro WhatsApp saisi par l'équipe
+ * TerangaHome pour une annonce sans compte propriétaire (voir
+ * creerLogementAdmin() ci-dessous) — c'est alors le SEUL moyen de
+ * contacter l'annonce, d'où une validation plus stricte que le
+ * champ contact_whatsapp facultatif des annonces classiques
+ * (createLogement(), jamais validé au-delà d'un simple trim()).
+ * Renvoie un numéro international sans "+" (même format que
+ * formaterNumeroInternational() côté client, ex. "221771234567"),
+ * ou null si le numéro est manifestement invalide.
+ */
+function validerNumeroWhatsapp(string $numero): ?string
+{
+    $chiffres = preg_replace('/\D/', '', $numero);
+
+    if ($chiffres === '') {
+        return null;
+    }
+
+    if (str_starts_with($chiffres, '00')) {
+        $chiffres = substr($chiffres, 2);
+    }
+
+    // Pas d'indicatif reconnu : on suppose un numéro sénégalais
+    // (plateforme nationale), en retirant un éventuel "0" initial
+    // avant d'ajouter "221" — même logique que côté client.
+    if (!str_starts_with($chiffres, '221')) {
+
+        if (str_starts_with($chiffres, '0')) {
+            $chiffres = substr($chiffres, 1);
+        }
+
+        $chiffres = '221' . $chiffres;
+    }
+
+    // Un numéro sénégalais complet fait 221 + 9 chiffres = 12
+    // chiffres. Reste permissif jusqu'à 15 chiffres pour ne pas
+    // bloquer un propriétaire basé à l'étranger avec un autre
+    // indicatif, mais rejette tout ce qui est trop court pour être
+    // un vrai numéro mobile.
+    $longueur = strlen($chiffres);
+
+    if ($longueur < 10 || $longueur > 15) {
+        return null;
+    }
+
+    return $chiffres;
+}
+
+/**
+ * Publie une annonce au nom d'un propriétaire qui n'a pas de
+ * compte TerangaHome — réservé à l'équipe (requireAdmin()).
+ * owner_id reste NULL (aucun compte réel), publie_par_admin_id
+ * trace quel membre de l'équipe a publié l'annonce, et
+ * contact_whatsapp devient le seul moyen de contact : obligatoire
+ * et validé plus strictement qu'à la création classique. Approuvée
+ * automatiquement (l'équipe la publie elle-même, pas besoin d'une
+ * validation a posteriori par un autre admin).
+ */
+function creerLogementAdmin(): void
+{
+    $adminId = requireAdmin();
+
+    $titre = trim($_POST['titre'] ?? '');
+    $ville = trim($_POST['ville'] ?? '');
+    $type = $_POST['type'] ?? null;
+    $prix = $_POST['prix'] ?? null;
+    $chambres = $_POST['chambres'] ?? null;
+    $description = trim($_POST['description'] ?? '');
+
+    if (!$titre || !$ville || !$prix) {
+        jsonError('Titre, ville et prix sont obligatoires.');
+    }
+
+    if ((float) $prix < 10000) {
+        jsonError('Le prix minimum est de 10 000 FCFA.');
+    }
+
+    $whatsappBrut = trim($_POST['contact_whatsapp'] ?? '');
+    $contactWhatsapp = $whatsappBrut !== '' ? validerNumeroWhatsapp($whatsappBrut) : null;
+
+    if (!$contactWhatsapp) {
+        jsonError('Un numéro WhatsApp valide est obligatoire pour publier une annonce sans compte propriétaire.');
+    }
+
+    $contactTelephone = trim($_POST['contact_telephone'] ?? '') ?: null;
+    $contactEmail = trim($_POST['contact_email'] ?? '') ?: null;
+
+    if ($contactEmail !== null && !filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
+        jsonError('L\'email de contact fourni est invalide.');
+    }
+
+    $dureeLocation = $_POST['duree_location'] ?? '1_mois';
+
+    if (!in_array($dureeLocation, DUREES_LOCATION_VALIDES, true)) {
+        jsonError('Durée de location invalide.');
+    }
+
+    $equipements = extraireEquipements($_POST['equipements'] ?? []);
+    $profils = extraireProfils($_POST['profils'] ?? []);
+
+    $photos = extraireFichiers($_FILES['photos'] ?? null);
+    $videos = extraireFichiers($_FILES['videos'] ?? null);
+
+    $photos = array_slice($photos, 0, MAX_PHOTOS);
+    $videos = array_slice($videos, 0, MAX_VIDEOS_PRO);
+
+    $medias = [];
+    $imageUrl = null;
+
+    foreach ($photos as $fichier) {
+
+        $url = enregistrerMedia($fichier, ['jpg', 'jpeg', 'png', 'webp']);
+
+        if ($url) {
+            $medias[] = ['type' => 'image', 'url' => $url];
+
+            if ($imageUrl === null) {
+                $imageUrl = $url;
+            }
+        }
+    }
+
+    foreach ($videos as $fichier) {
+
+        $url = enregistrerMedia($fichier, ['mp4', 'webm', 'mov']);
+
+        if ($url) {
+            $medias[] = ['type' => 'video', 'url' => $url];
+        }
+    }
+
+    if ($imageUrl === null) {
+        jsonError('Au moins une photo valide est obligatoire (formats acceptés : jpg, png, webp).');
+    }
+
+    $pdo = getPdo();
+
+    $pdo->beginTransaction();
+
+    try {
+
+        $stmt = $pdo->prepare('
+            INSERT INTO logements (
+                owner_id, publie_par_admin_id, titre, ville, type, prix, chambres, description, image_url,
+                contact_telephone, contact_whatsapp, contact_email,
+                duree_location,
+                equip_wifi, equip_parking, equip_cuisine, equip_douche, equip_salon, equip_balcon,
+                equip_eau, equip_electricite, equip_climatisation,
+                profil_celibataire, profil_marie, profil_etudiant, profil_travailleur,
+                profil_senegalais, profil_etranger,
+                statut_validation
+            )
+            VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ');
+        $stmt->execute([
+            $adminId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl,
+            $contactTelephone, $contactWhatsapp, $contactEmail,
+            $dureeLocation,
+            $equipements['wifi'], $equipements['parking'], $equipements['cuisine'],
+            $equipements['douche'], $equipements['salon'], $equipements['balcon'],
+            $equipements['eau'], $equipements['electricite'], $equipements['climatisation'],
+            $profils['celibataire'], $profils['marie'], $profils['etudiant'], $profils['travailleur'],
+            $profils['senegalais'], $profils['etranger'],
+            'approuve',
+        ]);
+
+        $logementId = $pdo->lastInsertId();
+
+        $stmtMedia = $pdo->prepare('
+            INSERT INTO logement_medias (logement_id, type, url, position)
+            VALUES (?, ?, ?, ?)
+        ');
+
+        foreach ($medias as $position => $media) {
+            $stmtMedia->execute([$logementId, $media['type'], $media['url'], $position]);
+        }
+
+        $pdo->commit();
+
+    } catch (Throwable $e) {
+
+        $pdo->rollBack();
+        throw $e;
+
+    }
+
+    jsonResponse([
+        'id'      => $logementId,
+        'message' => 'Annonce publiée avec succès pour le propriétaire.',
+    ], 201);
+}
+
+/**
+ * Enregistre un clic sur "Contacter sur WhatsApp" pour une annonce
+ * — une demande de contact générée. Pas d'authentification requise
+ * (même principe que /visites) : un visiteur non connecté doit
+ * pouvoir contacter un propriétaire. L'utilisateur connecté est
+ * quand même tracé s'il y en a un, l'empreinte IP servant de repli
+ * pour les visiteurs anonymes.
+ */
+function enregistrerClicWhatsapp(int $logementId): void
+{
+    $stmt = getPdo()->prepare('SELECT id FROM logements WHERE id = ?');
+    $stmt->execute([$logementId]);
+
+    if (!$stmt->fetch()) {
+        jsonError('Logement introuvable.', 404);
+    }
+
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'inconnu';
+    $ipHash = hash('sha256', $ip . 'terangahome_sel_visite');
+    $userId = $_SESSION['user_id'] ?? null;
+
+    getPdo()->prepare('
+        INSERT INTO whatsapp_clics (logement_id, ip_hash, user_id) VALUES (?, ?, ?)
+    ')->execute([$logementId, $ipHash, $userId]);
+
+    jsonResponse(['message' => 'ok'], 201);
 }
 
 function updateLogement(int $id): void

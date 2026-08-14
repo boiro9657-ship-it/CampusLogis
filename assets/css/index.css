@@ -848,8 +848,28 @@
 .cards{
 
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    grid-template-columns:repeat(3,1fr);
     gap:35px;
+
+}
+
+@media (max-width:1024px){
+
+    .cards{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    .cards{
+
+        grid-template-columns:1fr;
+
+    }
 
 }
 
@@ -1249,31 +1269,11 @@
 
     display:flex;
 
-    flex-wrap:wrap;
+    flex-direction:column;
 
-    justify-content:space-between;
+    gap:10px;
 
-    align-items:center;
-
-    gap:10px 16px;
-
-}
-
-.bottom-card a{
-
-    text-decoration:none;
-
-    color:var(--primary);
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-.bottom-card a:hover{
-
-    color:var(--secondary);
+    margin-top:18px;
 
 }
 

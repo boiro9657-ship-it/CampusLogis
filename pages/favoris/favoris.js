@@ -69,41 +69,10 @@ async function chargerFavoris(){
     }
 
     favorisContainer.innerHTML =
-    logements.map(logement => {
+    logements.map(carteFavoriHTML).join("");
 
-        const image =
-        logement.image_url || "../../images/logement1.jpg";
-
-        const prix =
-        Number(logement.prix).toLocaleString("fr-FR");
-
-        return `
-        <div class="similar-card">
-
-            <img
-            src="${image}"
-            alt="${logement.titre}">
-
-            <div class="similar-content">
-
-                <h3>${logement.titre}</h3>
-
-                <p>📍 ${logement.ville || ""} — ${prix} FCFA${libelleCourtDuree(logement.duree_location)}${libelleEngagementDuree(logement.duree_location, logement.duree_location_autre) ? " · " + libelleEngagementDuree(logement.duree_location, logement.duree_location_autre) : ""}</p>
-
-                <button class="favorite active" data-id="${logement.id}">
-                    ❤️ Retirer des favoris
-                </button>
-
-                <a href="../details-logement/details-logement.html?id=${logement.id}">
-                    Voir les détails
-                </a>
-
-            </div>
-
-        </div>
-        `;
-
-    }).join("");
+    attacherBoutonsReservation(favorisContainer);
+    demarrerCarrousels(favorisContainer);
 
     // Retirer un favori depuis cette page recharge simplement
     // la liste, pour ne pas laisser une carte "fantôme" active.
@@ -118,5 +87,103 @@ async function chargerFavoris(){
         });
 
     });
+
+}
+
+// Même gabarit de carte que l'accueil/la recherche (carrousel,
+// chips de caractéristiques, badge durée, boutons Visite/Détails),
+// pour que "Favoris" ne soit pas une version appauvrie des autres
+// pages — seul le cœur change (toujours actif, retire le favori).
+function carteFavoriHTML(logement){
+
+    const planProprietaire =
+    logement.owner_plan || "gratuit";
+
+    const estPro =
+    planProprietaire === "pro";
+
+    const estPremium =
+    planProprietaire === "premium";
+
+    const photos =
+    (logement.photos ? logement.photos.split("|") : [logement.image_url]).filter(Boolean);
+
+    const videos =
+    (logement.videos ? logement.videos.split("|") : []).filter(Boolean);
+
+    const image =
+    photos[0] || "../../images/logement1.jpg";
+
+    const prix =
+    Number(logement.prix).toLocaleString("fr-FR");
+
+    const estReserve =
+    logement.statut === "reserve";
+
+    const dureeBadge =
+    libelleDureeCarte(logement.duree_location, logement.duree_location_autre);
+
+    return `
+    <div class="card ${estPro ? "card-pro" : estPremium ? "card-premium" : ""}">
+
+        <div class="card-image">
+
+            <img src="${image}" data-photos="${photos.join("|")}" data-videos="${videos.join("|")}" class="carousel-img" loading="lazy" alt="${logement.titre}">
+
+            <video class="carousel-video" muted loop playsinline style="display:none;"></video>
+
+            <div class="carousel-dots"></div>
+
+            ${videos.length > 0 ? `<span class="badge-video-card"><i class="ph ph-play-circle"></i> Vidéo</span>` : ""}
+
+            ${dureeBadge ? `<span class="badge-engagement"><i class="ph ${iconeDuree(logement.duree_location)}"></i> ${dureeBadge}</span>` : ""}
+
+            <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
+
+            ${estPro ? `<span class="badge-pro"><i class="ph ph-medal"></i> Pro</span>` : estPremium ? `<span class="badge-premium"><i class="ph ph-crown-simple"></i> Premium</span>` : ""}
+
+            <button class="favorite active" data-id="${logement.id}" title="Retirer des favoris">❤</button>
+
+        </div>
+
+        <div class="card-content">
+
+            <div class="card-content-top">
+                <h3>${logement.titre}</h3>
+                <span class="posted-time">${ilYA(logement.created_at)}</span>
+            </div>
+
+            <p class="location"><i class="ph ph-map-pin"></i> ${logement.ville || ""}</p>
+
+            <p class="price">${prix} FCFA${libelleCourtDuree(logement.duree_location)}</p>
+
+            <div class="feature-chips">
+                ${Number(logement.chambres) > 0 ? `<span class="feature-chip"><i class="ph ${iconePieces(logement.type)}"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)</span>` : ""}
+                ${Number(logement.salles_bain) > 0 ? `<span class="feature-chip"><i class="ph ${ICONE_SALLES_BAIN}"></i> ${logement.salles_bain} salle${logement.salles_bain > 1 ? "s" : ""} de bain</span>` : ""}
+                ${Number(logement.superficie) > 0 ? `<span class="feature-chip"><i class="ph ${ICONE_SUPERFICIE}"></i> ${Number(logement.superficie)} m²</span>` : ""}
+            </div>
+
+            <div class="infos">
+                <span><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}</span>
+            </div>
+
+            <span class="badge-verifie"><i class="ph ph-shield-check"></i> Propriétaire vérifié</span>
+
+            <div class="bottom-card">
+
+                <button class="btn-reserver ${estReserve ? "btn-reserver-reserve" : ""}" data-id="${logement.id}" data-statut="${logement.statut || "disponible"}">
+                    <i class="ph ph-calendar-check"></i> ${estReserve ? "Déjà réservé" : "Demander une visite"}
+                </button>
+
+                <a href="../details-logement/details-logement.html?id=${logement.id}" class="btn-details">
+                    Voir les détails <i class="ph ph-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+    `;
 
 }

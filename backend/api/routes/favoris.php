@@ -32,12 +32,18 @@ function listFavoris(): void
 {
     $userId = requireAuth();
 
-    $stmt = getPdo()->prepare('
-        SELECT l.* FROM favoris f
+    $stmt = getPdo()->prepare("
+        SELECT l.*, u.plan AS owner_plan,
+            (SELECT GROUP_CONCAT(url ORDER BY position SEPARATOR '|')
+             FROM logement_medias m WHERE m.logement_id = l.id AND m.type = 'image') AS photos,
+            (SELECT GROUP_CONCAT(url ORDER BY position SEPARATOR '|')
+             FROM logement_medias m WHERE m.logement_id = l.id AND m.type = 'video') AS videos
+        FROM favoris f
         JOIN logements l ON l.id = f.logement_id
+        LEFT JOIN utilisateurs u ON u.id = l.owner_id
         WHERE f.user_id = ?
         ORDER BY f.created_at DESC
-    ');
+    ");
     $stmt->execute([$userId]);
 
     jsonResponse($stmt->fetchAll());

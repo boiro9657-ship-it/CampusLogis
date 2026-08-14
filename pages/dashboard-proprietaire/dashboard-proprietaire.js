@@ -25,7 +25,8 @@ const LIBELLES_DUREE_SEJOUR = {
     "1_mois": "1 mois",
     "3_mois": "3 mois",
     "6_mois": "6 mois",
-    "1_an": "1 an"
+    "1_an": "1 an",
+    par_heure: "à l'heure"
 };
 
 (async () => {
@@ -217,10 +218,12 @@ function afficherAnnonces(logements){
 
             <i class="ph ph-house-simple"></i>
 
-            <p>Vous n'avez encore publié aucune annonce.</p>
+            <h3>Votre logement mérite d'être vu&nbsp;! 🏠</h3>
+
+            <p>Publiez votre première annonce et faites-la découvrir à des milliers de locataires partout au Sénégal.</p>
 
             <a href="../publier-logement/publier-logement.html" class="btn-primary">
-                + Publier mon premier logement
+                Publier votre premier logement
             </a>
 
         </div>

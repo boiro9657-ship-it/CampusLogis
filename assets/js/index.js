@@ -313,8 +313,8 @@ function carteLogementHTML(logement){
     const estReserve =
     logement.statut === "reserve";
 
-    const engagement =
-    libelleEngagementDuree(logement.duree_location, logement.duree_location_autre);
+    const dureeBadge =
+    libelleDureeCarte(logement.duree_location, logement.duree_location_autre);
 
     return `
     <div class="card ${estPro ? "card-pro" : estPremium ? "card-premium" : ""}">
@@ -329,7 +329,7 @@ function carteLogementHTML(logement){
 
             ${videos.length > 0 ? `<span class="badge-video-card"><i class="ph ph-play-circle"></i> Vidéo</span>` : ""}
 
-            ${engagement ? `<span class="badge-engagement"><i class="ph ph-calendar-check"></i> ${engagement}</span>` : ""}
+            ${dureeBadge ? `<span class="badge-engagement"><i class="ph ${iconeDuree(logement.duree_location)}"></i> ${dureeBadge}</span>` : ""}
 
             <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
 
@@ -356,23 +356,31 @@ function carteLogementHTML(logement){
                 <span class="posted-time">${ilYA(logement.created_at)}</span>
             </div>
 
+            <p class="location"><i class="ph ph-map-pin"></i> ${logement.ville || ""}</p>
+
             <p class="price">${prix} FCFA${libelleCourtDuree(logement.duree_location)}</p>
 
-            <p class="location"><i class="ph ph-map-pin"></i> ${logement.ville || ""}</p>
+            <div class="feature-chips">
+                ${Number(logement.chambres) > 0 ? `<span class="feature-chip"><i class="ph ${iconePieces(logement.type)}"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)</span>` : ""}
+                ${Number(logement.salles_bain) > 0 ? `<span class="feature-chip"><i class="ph ${ICONE_SALLES_BAIN}"></i> ${logement.salles_bain} salle${logement.salles_bain > 1 ? "s" : ""} de bain</span>` : ""}
+                ${Number(logement.superficie) > 0 ? `<span class="feature-chip"><i class="ph ${ICONE_SUPERFICIE}"></i> ${Number(logement.superficie)} m²</span>` : ""}
+            </div>
 
             <div class="infos">
                 <span><i class="ph ${iconeTypeLogement(logement.type)}"></i> ${logement.type || ""}</span>
-                ${Number(logement.chambres) > 0 ? `<span><i class="ph ${iconePieces(logement.type)}"></i> ${logement.chambres} ${libeleUnitePieces(logement.type)}(s)</span>` : ""}
+                ${dureeBadge ? `<span><i class="ph ${iconeDuree(logement.duree_location)}"></i> ${dureeBadge.replace("Location : ", "")}</span>` : ""}
             </div>
+
+            <span class="badge-verifie"><i class="ph ph-shield-check"></i> Propriétaire vérifié</span>
 
             <div class="bottom-card">
 
                 <button class="btn-reserver ${estReserve ? "btn-reserver-reserve" : ""}" data-id="${logement.id}" data-statut="${logement.statut || "disponible"}">
-                    ${estReserve ? "Déjà réservé" : "Demander une visite"}
+                    <i class="ph ph-calendar-check"></i> ${estReserve ? "Déjà réservé" : "Demander une visite"}
                 </button>
 
-                <a href="pages/details-logement/details-logement.html?id=${logement.id}">
-                    Voir les détails →
+                <a href="pages/details-logement/details-logement.html?id=${logement.id}" class="btn-details">
+                    Voir les détails <i class="ph ph-arrow-right"></i>
                 </a>
 
             </div>

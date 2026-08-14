@@ -637,6 +637,23 @@
     margin-bottom:25px;
 }
 
+.form-group.form-row{
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+@media (max-width:640px){
+
+    .form-group.form-row{
+
+        grid-template-columns:1fr;
+        gap:25px;
+    }
+
+}
+
 .form-group label{
 
     display:block;

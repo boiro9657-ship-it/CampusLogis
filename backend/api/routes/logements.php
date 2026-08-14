@@ -369,6 +369,70 @@ function createLogement(): void
         $nombrePersonnes = (int) $nombrePersonnesBrute;
     }
 
+    // Caractéristiques facultatives du logement (salles de bain,
+    // toilettes, salons, cuisines, superficie) — mêmes règles que
+    // "nombre_personnes" ci-dessus : vide = non précisé, jamais
+    // obligatoire.
+    $salleBainBrute = trim($_POST['salles_bain'] ?? '');
+    $sallesBain = null;
+
+    if ($salleBainBrute !== '') {
+
+        if (!ctype_digit($salleBainBrute) || (int) $salleBainBrute < 0) {
+            jsonError('Le nombre de salles de bain doit être un nombre valide.');
+        }
+
+        $sallesBain = (int) $salleBainBrute;
+    }
+
+    $toilettesBrute = trim($_POST['toilettes'] ?? '');
+    $toilettes = null;
+
+    if ($toilettesBrute !== '') {
+
+        if (!ctype_digit($toilettesBrute) || (int) $toilettesBrute < 0) {
+            jsonError('Le nombre de toilettes doit être un nombre valide.');
+        }
+
+        $toilettes = (int) $toilettesBrute;
+    }
+
+    $salonsBrute = trim($_POST['salons'] ?? '');
+    $salons = null;
+
+    if ($salonsBrute !== '') {
+
+        if (!ctype_digit($salonsBrute) || (int) $salonsBrute < 0) {
+            jsonError('Le nombre de salons doit être un nombre valide.');
+        }
+
+        $salons = (int) $salonsBrute;
+    }
+
+    $cuisinesBrute = trim($_POST['cuisines'] ?? '');
+    $cuisines = null;
+
+    if ($cuisinesBrute !== '') {
+
+        if (!ctype_digit($cuisinesBrute) || (int) $cuisinesBrute < 0) {
+            jsonError('Le nombre de cuisines doit être un nombre valide.');
+        }
+
+        $cuisines = (int) $cuisinesBrute;
+    }
+
+    $superficieBrute = trim($_POST['superficie'] ?? '');
+    $superficie = null;
+
+    if ($superficieBrute !== '') {
+
+        if (!is_numeric($superficieBrute) || (float) $superficieBrute <= 0) {
+            jsonError('La superficie doit être un nombre valide.');
+        }
+
+        $superficie = (float) $superficieBrute;
+    }
+
     // Un immeuble se décrit par son nombre total d'étages ; les
     // autres types de logement se décrivent par le niveau d'étage
     // auquel se trouve le logement (rez-de-chaussée, 1er...).
@@ -506,17 +570,19 @@ function createLogement(): void
                 owner_id, titre, ville, type, prix, chambres, description, image_url,
                 contact_telephone, contact_whatsapp, contact_email,
                 duree_location, duree_location_autre, caution, nombre_personnes, nombre_etages, niveau_etage,
+                salles_bain, toilettes, salons, cuisines, superficie,
                 equip_wifi, equip_parking, equip_cuisine, equip_douche, equip_salon, equip_balcon,
                 equip_eau, equip_electricite, equip_climatisation,
                 profil_celibataire, profil_marie, profil_etudiant, profil_travailleur,
                 profil_senegalais, profil_etranger, audio_url
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
         $stmt->execute([
             $userId, $titre, $ville, $type, $prix, $chambres, $description, $imageUrl,
             $contactTelephone, $contactWhatsapp, $contactEmail,
             $dureeLocation, ($dureeLocation === 'autre' ? $dureeLocationAutre : null), $caution, $nombrePersonnes, $nombreEtages, $niveauEtage,
+            $sallesBain, $toilettes, $salons, $cuisines, $superficie,
             $equipements['wifi'], $equipements['parking'], $equipements['cuisine'],
             $equipements['douche'], $equipements['salon'], $equipements['balcon'],
             $equipements['eau'], $equipements['electricite'], $equipements['climatisation'],
@@ -597,7 +663,7 @@ function extraireEquipements($equipementsBruts): array
     return $resultat;
 }
 
-const DUREES_LOCATION_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an', 'autre'];
+const DUREES_LOCATION_VALIDES = ['24h', 'nuit', 'journee', 'semaine', '1_mois', '3_mois', '6_mois', '1_an', 'autre', 'par_heure'];
 const NIVEAUX_ETAGE_VALIDES = ['rdc', '1', '2', '3', '4_plus'];
 
 /**
@@ -632,6 +698,7 @@ function updateLogement(int $id): void
         'titre', 'ville', 'type', 'prix', 'chambres', 'description', 'statut',
         'contact_telephone', 'contact_whatsapp', 'contact_email',
         'duree_location', 'duree_location_autre', 'caution', 'nombre_personnes', 'nombre_etages', 'niveau_etage',
+        'salles_bain', 'toilettes', 'salons', 'cuisines', 'superficie',
         'equip_wifi', 'equip_parking', 'equip_cuisine', 'equip_douche', 'equip_salon', 'equip_balcon',
         'equip_eau', 'equip_electricite', 'equip_climatisation',
         'profil_celibataire', 'profil_marie', 'profil_etudiant', 'profil_travailleur',

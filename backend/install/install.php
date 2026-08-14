@@ -221,6 +221,11 @@ try {
         'audio_url'          => "VARCHAR(255) NULL",
         'vues'               => "INT NOT NULL DEFAULT 0",
         'duree_location_autre' => "VARCHAR(100) NULL",
+        'salles_bain'        => "INT NULL",
+        'toilettes'          => "INT NULL",
+        'salons'             => "INT NULL",
+        'cuisines'           => "INT NULL",
+        'superficie'         => "DECIMAL(8,2) NULL",
     ];
 
     foreach ($colonnesAAjouter as $colonne => $definition) {
@@ -257,6 +262,24 @@ try {
             MODIFY COLUMN duree_location ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an','autre') NOT NULL DEFAULT '1_mois'
         ");
         $etapes[] = 'Colonne "duree_location" : valeur "autre" ajoutée.';
+    }
+
+    // "Par heure" : durée courte supplémentaire (ex. logement de
+    // passage), même principe d'élargissement d'ENUM que "autre"
+    // ci-dessus.
+    $typeActuelDuree = $pdo->query("
+        SELECT COLUMN_TYPE FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'logements'
+        AND COLUMN_NAME = 'duree_location'
+    ")->fetchColumn();
+
+    if ($typeActuelDuree && strpos($typeActuelDuree, "'par_heure'") === false) {
+        $pdo->exec("
+            ALTER TABLE logements
+            MODIFY COLUMN duree_location ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an','autre','par_heure') NOT NULL DEFAULT '1_mois'
+        ");
+        $etapes[] = 'Colonne "duree_location" : valeur "par_heure" ajoutée.';
     }
 
     // Ajout de la colonne de validation admin sur une base déjà
@@ -379,6 +402,18 @@ try {
     if ($typeDureeSejour !== false && strpos($typeDureeSejour, "'autre'") === false) {
         $pdo->exec("ALTER TABLE reservations MODIFY COLUMN duree_sejour ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an','autre') NULL");
         $etapes[] = 'Colonne duree_sejour : valeur "autre" ajoutée.';
+    }
+
+    $typeDureeSejour = $pdo->query("
+        SELECT COLUMN_TYPE FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'reservations'
+        AND COLUMN_NAME = 'duree_sejour'
+    ")->fetchColumn();
+
+    if ($typeDureeSejour !== false && strpos($typeDureeSejour, "'par_heure'") === false) {
+        $pdo->exec("ALTER TABLE reservations MODIFY COLUMN duree_sejour ENUM('24h','nuit','journee','semaine','1_mois','3_mois','6_mois','1_an','autre','par_heure') NULL");
+        $etapes[] = 'Colonne duree_sejour : valeur "par_heure" ajoutée.';
     }
 
     // Espace de discussion propriétaire/locataire : une conversation

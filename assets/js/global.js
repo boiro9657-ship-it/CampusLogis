@@ -773,6 +773,7 @@ function creerModaleReservation(){
                 <select id="reservationDuree">
                     <option value="">Choisir une durée</option>
                     <optgroup label="Courte durée">
+                        <option value="par_heure">À l'heure</option>
                         <option value="24h">24 heures</option>
                         <option value="nuit">À la nuitée</option>
                         <option value="journee">À la journée</option>
@@ -1036,7 +1037,8 @@ const LIBELLES_COURTS_DUREE = {
     "1_mois": "/mois",
     "3_mois": "/mois",
     "6_mois": "/mois",
-    "1_an": "/mois"
+    "1_an": "/mois",
+    par_heure: "/heure"
 };
 
 function libelleCourtDuree(duree){
@@ -1062,6 +1064,51 @@ function libelleEngagementDuree(duree, dureeAutre){
     }
 
     return LIBELLES_ENGAGEMENT_DUREE[duree] || null;
+
+}
+
+// Contrairement à libelleEngagementDuree() ci-dessus (uniquement les
+// engagements longue durée), ce badge s'affiche pour TOUTES les
+// durées de location sur l'image de la carte, avec une icône dédiée
+// — ex. "Location : à l'heure", "Location : 1 an min.".
+const LIBELLES_DUREE_CARTE = {
+    "24h": "Location : 24h",
+    nuit: "Location : à la nuitée",
+    journee: "Location : à la journée",
+    semaine: "Location : à la semaine",
+    "1_mois": "Location : au mois",
+    "3_mois": "Location : 3 mois min.",
+    "6_mois": "Location : 6 mois min.",
+    "1_an": "Location : 1 an min.",
+    par_heure: "Location : à l'heure"
+};
+
+const ICONES_DUREE = {
+    "24h": "ph-clock-countdown",
+    nuit: "ph-moon-stars",
+    journee: "ph-sun",
+    semaine: "ph-calendar-blank",
+    "1_mois": "ph-calendar-check",
+    "3_mois": "ph-calendar-check",
+    "6_mois": "ph-calendar-check",
+    "1_an": "ph-calendar-check",
+    par_heure: "ph-timer",
+    autre: "ph-calendar-dots"
+};
+
+function libelleDureeCarte(duree, dureeAutre){
+
+    if(duree === "autre"){
+        return dureeAutre ? "Location : " + dureeAutre : null;
+    }
+
+    return LIBELLES_DUREE_CARTE[duree] || null;
+
+}
+
+function iconeDuree(duree){
+
+    return ICONES_DUREE[duree] || "ph-calendar-check";
 
 }
 
@@ -1112,6 +1159,12 @@ function iconePieces(type){
     return ICONES_PIECES_PAR_TYPE[type] || "ph-bed";
 
 }
+
+// Icônes des caractéristiques affichées en "chips" sur les cartes
+// (salles de bain, superficie) — regroupées ici pour rester
+// cohérentes partout où ces caractéristiques apparaissent.
+const ICONE_SALLES_BAIN = "ph-shower";
+const ICONE_SUPERFICIE = "ph-ruler";
 
 // Temps écoulé depuis la publication ("il y a 2h", "il y a 3 jours"...)
 // affiché sur chaque carte, comme un fil d'actualité.

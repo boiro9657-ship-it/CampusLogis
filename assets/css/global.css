@@ -210,24 +210,34 @@ h1, h2, h3, h4, h5, h6{
 
 }
 
-/* Bouton "Réserver" inline sur les cartes de logement (accueil
-   et recherche) : même poids visuel qu'un lien texte, pas un
-   bouton par défaut du navigateur. */
+/* Bouton "Demander une visite" — CTA principal des cartes de
+   logement (accueil, recherche, favoris) : bouton plein, pleine
+   largeur, empilé au-dessus de "Voir les détails" (voir
+   .btn-details ci-dessous). */
 .btn-reserver{
 
-    background:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    width:100%;
+
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
 
     border:none;
 
-    padding:0;
+    padding:14px 20px;
 
-    color:var(--primary);
+    border-radius:var(--radius-md);
+
+    color:white;
 
     font-weight:600;
 
     font-family:inherit;
 
-    font-size:inherit;
+    font-size:.95rem;
 
     cursor:pointer;
 
@@ -239,19 +249,131 @@ h1, h2, h3, h4, h5, h6{
 
 .btn-reserver:hover{
 
-    color:var(--secondary);
+    filter:brightness(1.08);
+
+    transform:translateY(-2px);
 
 }
 
 .btn-reserver-reserve{
 
+    background:var(--gray-200);
+
     color:var(--gray-500);
+
+    cursor:not-allowed;
 
 }
 
 .btn-reserver-reserve:hover{
 
-    color:#D97706;
+    filter:none;
+    transform:none;
+
+}
+
+/* Bouton "Voir les détails" — CTA secondaire, même largeur que
+   .btn-reserver juste au-dessus, style contour pour bien marquer
+   la hiérarchie visuelle (visite = action principale). */
+.btn-details{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    width:100%;
+
+    background:white;
+
+    border:1.5px solid var(--primary);
+
+    padding:12px 20px;
+
+    border-radius:var(--radius-md);
+
+    color:var(--primary);
+
+    font-weight:600;
+
+    font-size:.95rem;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+}
+
+.btn-details:hover{
+
+    background:var(--primary-light);
+
+}
+
+/* "Chips" de caractéristiques (chambres, salles de bain,
+   superficie...) sur les cartes de logement — accueil, recherche,
+   favoris. */
+.feature-chips{
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+
+    margin:14px 0;
+
+}
+
+.feature-chip{
+
+    display:flex;
+    align-items:center;
+    gap:6px;
+
+    background:var(--primary-light);
+    color:var(--primary-dark);
+
+    padding:7px 13px;
+
+    border-radius:var(--radius-full);
+
+    font-size:.82rem;
+    font-weight:600;
+
+}
+
+.feature-chip i{
+
+    font-size:14px;
+    color:var(--secondary-dark);
+
+}
+
+/* Badge "Propriétaire vérifié" — rappelle que toute annonce
+   affichée a déjà été validée par l'équipe TerangaHome avant
+   publication (voir statut_validation côté backend). */
+.badge-verifie{
+
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    background:var(--primary-light);
+    color:var(--primary-dark);
+
+    padding:7px 13px;
+
+    border-radius:var(--radius-full);
+
+    font-size:.8rem;
+    font-weight:600;
+
+    margin-bottom:14px;
+
+}
+
+.badge-verifie i{
+
+    color:var(--secondary-dark);
 
 }
 

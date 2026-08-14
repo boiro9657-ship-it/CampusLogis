@@ -708,6 +708,21 @@ if(publishForm){
             const niveauEtage =
             document.getElementById("niveau_etage").value;
 
+            const sallesBain =
+            document.getElementById("salles_bain").value;
+
+            const toilettes =
+            document.getElementById("toilettes").value;
+
+            const salons =
+            document.getElementById("salons").value;
+
+            const cuisines =
+            document.getElementById("cuisines").value;
+
+            const superficie =
+            document.getElementById("superficie").value;
+
             const description =
             document.getElementById("description").value.trim();
 
@@ -787,6 +802,11 @@ if(publishForm){
             formData.append("nombre_personnes", nombrePersonnes);
             formData.append("nombre_etages", nombreEtages);
             formData.append("niveau_etage", niveauEtage);
+            formData.append("salles_bain", sallesBain);
+            formData.append("toilettes", toilettes);
+            formData.append("salons", salons);
+            formData.append("cuisines", cuisines);
+            formData.append("superficie", superficie);
             formData.append("description", description);
 
             const contactTelephone = document.getElementById("contact_telephone").value.trim();

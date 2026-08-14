@@ -7,9 +7,9 @@
     <meta name="description" content="Publiez gratuitement votre annonce de logement sur TerangaHome et touchez des locataires partout au Sénégal.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
-    <link rel="stylesheet" href="../../assets/css/global.css?v=20260810f">
-    <link rel="stylesheet" href="../tarifs/tarifs.css?v=20260810f">
-    <link rel="stylesheet" href="./publier-logement.css?v=20260810f">
+    <link rel="stylesheet" href="../../assets/css/global.css?v=20260810g">
+    <link rel="stylesheet" href="../tarifs/tarifs.css?v=20260810g">
+    <link rel="stylesheet" href="./publier-logement.css?v=20260810g">
 
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -284,6 +284,7 @@
 
         <select id="duree_location">
             <optgroup label="Courte durée">
+                <option value="par_heure">À l'heure</option>
                 <option value="24h">24 heures</option>
                 <option value="nuit">À la nuitée</option>
                 <option value="journee">À la journée</option>
@@ -324,6 +325,41 @@
             type="number"
             id="chambres"
             placeholder="Nombre de chambres ou de bureaux">
+
+    </div>
+
+    <div class="form-group form-row">
+
+        <div>
+            <label>Salles de bain</label>
+            <input type="number" id="salles_bain" min="0" placeholder="Ex : 2">
+        </div>
+
+        <div>
+            <label>Toilettes</label>
+            <input type="number" id="toilettes" min="0" placeholder="Ex : 2">
+        </div>
+
+    </div>
+
+    <div class="form-group form-row">
+
+        <div>
+            <label>Salons</label>
+            <input type="number" id="salons" min="0" placeholder="Ex : 1">
+        </div>
+
+        <div>
+            <label>Cuisines</label>
+            <input type="number" id="cuisines" min="0" placeholder="Ex : 1">
+        </div>
+
+    </div>
+
+    <div class="form-group">
+
+        <label>Superficie (m²)</label>
+        <input type="number" id="superficie" min="0" step="0.1" placeholder="Ex : 120">
 
     </div>
 
@@ -716,10 +752,10 @@
 <div id="toast"></div>
 
 <script>window.API_BASE = "../../backend/api";</script>
-<script src="../../assets/js/api.js?v=20260810f"></script>
-<script src="../../assets/js/global.js?v=20260810f"></script>
-<script src="../../assets/js/senegal-locations.js?v=20260810f"></script>
-<script src="./publier-logement.js?v=20260810f"></script>
+<script src="../../assets/js/api.js?v=20260810g"></script>
+<script src="../../assets/js/global.js?v=20260810g"></script>
+<script src="../../assets/js/senegal-locations.js?v=20260810g"></script>
+<script src="./publier-logement.js?v=20260810g"></script>
 
 </body>
 

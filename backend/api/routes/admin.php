@@ -51,6 +51,11 @@ function handleAdminRoute(array $segments, string $method): void
         return;
     }
 
+    if ($resource === 'logements' && $method === 'PUT' && is_numeric($id) && ($segments[2] ?? null) === null) {
+        updateLogementAdmin((int) $id);
+        return;
+    }
+
     if ($resource === 'reservations' && $method === 'GET' && $id === null) {
         listToutesReservations();
         return;
@@ -130,6 +135,26 @@ function supprimerLogementAdmin(int $id): void
     getPdo()->prepare('DELETE FROM logements WHERE id = ?')->execute([$id]);
 
     jsonResponse(['message' => 'Logement supprimé.']);
+}
+
+/**
+ * Modifie N'IMPORTE QUELLE annonce (propriétaire réel ou publiée par
+ * l'équipe sans compte) — réutilise la même logique/validation que
+ * l'édition côté propriétaire (appliquerMiseAJourLogement(), définie
+ * dans logements.php), seule l'autorisation diffère : ici requireAdmin()
+ * déjà vérifié en tête de handleAdminRoute(), pas de vérification de
+ * propriété.
+ */
+function updateLogementAdmin(int $id): void
+{
+    $stmt = getPdo()->prepare('SELECT id FROM logements WHERE id = ?');
+    $stmt->execute([$id]);
+
+    if (!$stmt->fetch()) {
+        jsonError('Logement introuvable.', 404);
+    }
+
+    appliquerMiseAJourLogement($id, getJsonBody());
 }
 
 function validerLogementAdmin(int $id): void

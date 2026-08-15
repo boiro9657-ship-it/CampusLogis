@@ -286,7 +286,7 @@ function afficherAnnonces(logements){
                     }
                     ${
                         FONCTIONNALITES_LIBRES_LANCEMENT || (utilisateurConnecte && utilisateurConnecte.plan !== "gratuit")
-                        ? `<span class="media-badge media-badge-vues">👁 ${Number(logement.vues || 0)} consultation${Number(logement.vues || 0) > 1 ? "s" : ""}</span>`
+                        ? `<span class="media-badge media-badge-vues">👁 <span class="stat-value">${Number(logement.vues || 0)} consultation${Number(logement.vues || 0) > 1 ? "s" : ""}</span></span>`
                         : `<span class="media-badge media-badge-vues-verrou"><i class="ph ph-lock-simple"></i> Statistiques Premium/Pro</span>`
                     }
                 </div>
@@ -295,6 +295,10 @@ function afficherAnnonces(logements){
 
                 <a href="../details-logement/details-logement.html?id=${logement.id}" class="btn-voir">
                 👁 Voir l'annonce
+                </a>
+
+                <a href="../publier-logement/publier-logement.html?id=${logement.id}" class="btn-modifier">
+                <i class="ph ph-pencil-simple"></i> Modifier
                 </a>
 
                 ${

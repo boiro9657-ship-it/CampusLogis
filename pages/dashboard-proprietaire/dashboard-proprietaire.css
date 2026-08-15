@@ -1189,7 +1189,8 @@ tr:hover td{
 }
 
 .property-content button,
-.property-content .btn-voir{
+.property-content .btn-voir,
+.property-content .btn-modifier{
 
     display:inline-block;
 
@@ -1218,6 +1219,24 @@ tr:hover td{
 .property-content .btn-voir:hover{
 
     background:var(--primary-dark);
+    transform:translateY(-2px);
+
+}
+
+.property-content .btn-modifier{
+
+    background:var(--secondary);
+    color:white;
+
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+}
+
+.property-content .btn-modifier:hover{
+
+    background:var(--secondary-dark);
     transform:translateY(-2px);
 
 }

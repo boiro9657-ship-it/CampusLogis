@@ -7,8 +7,8 @@
     <meta name="description" content="Gérez les utilisateurs, annonces, réservations et messages de TerangaHome.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23145C3D'/%3E%3Cpath d='M28 52L50 32l22 20' stroke='%236FBE44' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M34 48v18a2 2 0 0 0 2 2h28a2 2 0 0 0 2-2V48' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 
-    <link rel="stylesheet" href="../../assets/css/global.css?v=20260810h">
-    <link rel="stylesheet" href="./dashboard-admin.css?v=20260810h">
+    <link rel="stylesheet" href="../../assets/css/global.css?v=20260815b">
+    <link rel="stylesheet" href="./dashboard-admin.css?v=20260815b">
 
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -115,43 +115,47 @@
 
             <p>Gérez les utilisateurs, annonces, réservations et messages de TerangaHome.</p>
 
+            <button type="button" class="btn-toggle-stats">
+                <i class="ph ph-eye-slash"></i> Masquer les statistiques
+            </button>
+
         </div>
 
         <div class="stats-grid">
 
             <div class="stat-card">
                 <i class="ph ph-users"></i>
-                <h2 id="statUtilisateurs">0</h2>
+                <h2 id="statUtilisateurs" class="stat-value">0</h2>
                 <p>Utilisateurs</p>
             </div>
 
             <div class="stat-card">
                 <i class="ph ph-buildings"></i>
-                <h2 id="statAnnonces">0</h2>
+                <h2 id="statAnnonces" class="stat-value">0</h2>
                 <p>Annonces</p>
             </div>
 
             <div class="stat-card">
                 <i class="ph ph-hourglass"></i>
-                <h2 id="statEnAttente">0</h2>
+                <h2 id="statEnAttente" class="stat-value">0</h2>
                 <p>En attente de validation</p>
             </div>
 
             <div class="stat-card">
                 <i class="ph ph-calendar-check"></i>
-                <h2 id="statReservations">0</h2>
+                <h2 id="statReservations" class="stat-value">0</h2>
                 <p>Réservations</p>
             </div>
 
             <div class="stat-card">
                 <i class="ph ph-envelope-simple"></i>
-                <h2 id="statMessages">0</h2>
+                <h2 id="statMessages" class="stat-value">0</h2>
                 <p>Messages</p>
             </div>
 
             <div class="stat-card">
                 <i class="ph ph-chats-circle"></i>
-                <h2 id="statCommentaires">0</h2>
+                <h2 id="statCommentaires" class="stat-value">0</h2>
                 <p>Commentaires</p>
             </div>
 
@@ -294,25 +298,25 @@
 
         <div class="stat-card">
             <i class="ph ph-eye"></i>
-            <h2 id="statVuesTotal">0</h2>
+            <h2 id="statVuesTotal" class="stat-value">0</h2>
             <p>Pages vues (total)</p>
         </div>
 
         <div class="stat-card">
             <i class="ph ph-user-circle"></i>
-            <h2 id="statVisiteursUniques">0</h2>
+            <h2 id="statVisiteursUniques" class="stat-value">0</h2>
             <p>Visiteurs uniques</p>
         </div>
 
         <div class="stat-card">
             <i class="ph ph-calendar"></i>
-            <h2 id="statVuesAujourdhui">0</h2>
+            <h2 id="statVuesAujourdhui" class="stat-value">0</h2>
             <p>Vues aujourd'hui</p>
         </div>
 
         <div class="stat-card">
             <i class="ph ph-calendar-blank"></i>
-            <h2 id="statVuesSemaine">0</h2>
+            <h2 id="statVuesSemaine" class="stat-value">0</h2>
             <p>Vues (7 derniers jours)</p>
         </div>
 
@@ -574,9 +578,9 @@
 <div id="toast"></div>
 
 <script>window.API_BASE = "../../backend/api";</script>
-<script src="../../assets/js/api.js?v=20260810h"></script>
-<script src="../../assets/js/global.js?v=20260810h"></script>
-<script src="./dashboard-admin.js?v=20260810h"></script>
+<script src="../../assets/js/api.js?v=20260815b"></script>
+<script src="../../assets/js/global.js?v=20260815b"></script>
+<script src="./dashboard-admin.js?v=20260815b"></script>
 
 </body>
 

@@ -1198,6 +1198,58 @@ header.scrolled{
 
 }
 
+/* ==========================================================
+   MASQUER/AFFICHER LES STATISTIQUES
+   Tableaux de bord admin et propriétaire uniquement — voir
+   appliquerEtatMasqueStats() dans global.js.
+   ========================================================== */
+
+body.stats-masquees .stat-value{
+
+    filter:blur(6px);
+
+    user-select:none;
+
+}
+
+.stat-value{
+
+    transition:filter .2s ease;
+
+}
+
+.btn-toggle-stats{
+
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    margin-top:18px;
+
+    background:white;
+    border:1.5px solid var(--gray-200);
+
+    padding:10px 18px;
+
+    border-radius:var(--radius-full);
+
+    color:var(--gray-600);
+    font-weight:600;
+    font-size:.9rem;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.btn-toggle-stats:hover{
+
+    border-color:var(--primary);
+    color:var(--primary);
+
+}
+
 .breadcrumb a:hover{
 
     color:var(--primary);

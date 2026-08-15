@@ -23,6 +23,56 @@ if(typeof apiFetch !== "undefined"){
 }
 
 /* ==========================
+    MASQUER/AFFICHER LES STATISTIQUES
+    Préférence partagée (localStorage) entre le tableau de bord admin
+    et le tableau de bord propriétaire — un bouton .btn-toggle-stats
+    sur l'une ou l'autre page bascule le même réglage, appliqué à
+    tout élément marqué .stat-value (nombre flouté en un clic,
+    ré-affiché en un autre, sans recharger la page).
+========================== */
+
+const CLE_STATS_MASQUEES = "terangahome_stats_masquees";
+
+function statsSontMasquees(){
+
+    return localStorage.getItem(CLE_STATS_MASQUEES) === "1";
+
+}
+
+function appliquerEtatMasqueStats(){
+
+    const masquees =
+    statsSontMasquees();
+
+    document.body.classList.toggle("stats-masquees", masquees);
+
+    document.querySelectorAll(".btn-toggle-stats").forEach(btn => {
+
+        btn.innerHTML = masquees
+            ? '<i class="ph ph-eye"></i> Afficher les statistiques'
+            : '<i class="ph ph-eye-slash"></i> Masquer les statistiques';
+
+    });
+
+}
+
+function basculerMasqueStats(){
+
+    localStorage.setItem(CLE_STATS_MASQUEES, statsSontMasquees() ? "0" : "1");
+
+    appliquerEtatMasqueStats();
+
+}
+
+appliquerEtatMasqueStats();
+
+document.querySelectorAll(".btn-toggle-stats").forEach(btn => {
+
+    btn.addEventListener("click", basculerMasqueStats);
+
+});
+
+/* ==========================
         OMBRE NAVBAR AU SCROLL
 ========================== */
 

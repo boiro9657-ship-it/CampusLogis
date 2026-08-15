@@ -916,27 +916,30 @@ function enregistrerClicWhatsapp(int $logementId): void
     jsonResponse(['message' => 'ok'], 201);
 }
 
-function updateLogement(int $id): void
+const CHAMPS_LOGEMENT_MODIFIABLES = [
+    'titre', 'ville', 'type', 'prix', 'chambres', 'description', 'statut',
+    'contact_telephone', 'contact_whatsapp', 'contact_email',
+    'duree_location', 'duree_location_autre', 'caution', 'nombre_personnes', 'nombre_etages', 'niveau_etage',
+    'salles_bain', 'toilettes', 'salons', 'cuisines', 'superficie',
+    'equip_wifi', 'equip_parking', 'equip_cuisine', 'equip_douche', 'equip_salon', 'equip_balcon',
+    'equip_eau', 'equip_electricite', 'equip_climatisation',
+    'profil_celibataire', 'profil_marie', 'profil_etudiant', 'profil_travailleur',
+    'profil_senegalais', 'profil_etranger', 'audio_url',
+];
+
+/**
+ * Logique de mise à jour partagée par updateLogement() (propriétaire,
+ * sur SES annonces uniquement) et updateLogementAdmin() (équipe
+ * TerangaHome, sur N'IMPORTE QUELLE annonce, y compris celles sans
+ * propriétaire) — seule la vérification d'autorisation diffère entre
+ * les deux, jamais la validation des champs.
+ */
+function appliquerMiseAJourLogement(int $id, array $body): void
 {
-    requireOwner($id);
-
-    $body = getJsonBody();
-
     $champs = [];
     $params = [];
 
-    $champsAutorises = [
-        'titre', 'ville', 'type', 'prix', 'chambres', 'description', 'statut',
-        'contact_telephone', 'contact_whatsapp', 'contact_email',
-        'duree_location', 'duree_location_autre', 'caution', 'nombre_personnes', 'nombre_etages', 'niveau_etage',
-        'salles_bain', 'toilettes', 'salons', 'cuisines', 'superficie',
-        'equip_wifi', 'equip_parking', 'equip_cuisine', 'equip_douche', 'equip_salon', 'equip_balcon',
-        'equip_eau', 'equip_electricite', 'equip_climatisation',
-        'profil_celibataire', 'profil_marie', 'profil_etudiant', 'profil_travailleur',
-        'profil_senegalais', 'profil_etranger', 'audio_url',
-    ];
-
-    foreach ($champsAutorises as $champ) {
+    foreach (CHAMPS_LOGEMENT_MODIFIABLES as $champ) {
         if (array_key_exists($champ, $body)) {
             $champs[] = "$champ = ?";
             $params[] = $body[$champ];
@@ -959,12 +962,49 @@ function updateLogement(int $id): void
         jsonError('La caution doit être un montant valide.');
     }
 
+    // Une annonce sans compte propriétaire ne peut être contactée que
+    // via son contact_whatsapp — on ne laisse jamais ce champ devenir
+    // vide/invalide sur une telle annonce, sous peine de la rendre
+    // injoignable (voir aussi la condition d'affichage dans
+    // listLogements()).
+    if (array_key_exists('contact_whatsapp', $body)) {
+
+        $stmt = getPdo()->prepare('SELECT owner_id FROM logements WHERE id = ?');
+        $stmt->execute([$id]);
+        $logementActuel = $stmt->fetch();
+
+        if ($logementActuel && $logementActuel['owner_id'] === null) {
+
+            $whatsappValide = $body['contact_whatsapp'] ? validerNumeroWhatsapp((string) $body['contact_whatsapp']) : null;
+
+            if (!$whatsappValide) {
+                jsonError('Cette annonce n\'a pas de propriétaire inscrit : un numéro WhatsApp valide est obligatoire.');
+            }
+
+            $body['contact_whatsapp'] = $whatsappValide;
+
+            // Remplace la valeur déjà poussée dans $params à la même
+            // position (contact_whatsapp validé plutôt que brut).
+            $index = array_search('contact_whatsapp = ?', $champs, true);
+            if ($index !== false) {
+                $params[$index] = $whatsappValide;
+            }
+        }
+    }
+
     $params[] = $id;
 
     $sql = 'UPDATE logements SET ' . implode(', ', $champs) . ' WHERE id = ?';
     getPdo()->prepare($sql)->execute($params);
 
     jsonResponse(['message' => 'Logement mis à jour.']);
+}
+
+function updateLogement(int $id): void
+{
+    requireOwner($id);
+
+    appliquerMiseAJourLogement($id, getJsonBody());
 }
 
 function deleteLogement(int $id): void

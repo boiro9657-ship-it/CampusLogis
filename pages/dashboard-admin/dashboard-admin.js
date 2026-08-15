@@ -144,6 +144,10 @@ async function chargerUtilisateurs(){
     ANNONCES
 ========================== */
 
+// Dernière liste chargée, réutilisée pour pré-remplir la modale
+// d'édition sans refaire d'appel réseau au clic sur "Modifier".
+let dernierLogementsAdmin = [];
+
 async function chargerAnnonces(){
 
     let logements = [];
@@ -158,6 +162,8 @@ async function chargerAnnonces(){
 
         return;
     }
+
+    dernierLogementsAdmin = logements;
 
     document.getElementById("statAnnonces").textContent =
     logements.length;
@@ -195,8 +201,8 @@ async function chargerAnnonces(){
                     ${libellesValidation[l.statut_validation] || l.statut_validation}
                 </span>
             </td>
-            <td>👁 ${Number(l.vues || 0)}</td>
-            <td><i class="ph ph-whatsapp-logo"></i> ${Number(l.whatsapp_clics_total || 0)}</td>
+            <td>👁 <span class="stat-value">${Number(l.vues || 0)}</span></td>
+            <td><i class="ph ph-whatsapp-logo"></i> <span class="stat-value">${Number(l.whatsapp_clics_total || 0)}</span></td>
             <td>
                 ${
                     l.statut_validation !== "approuve"
@@ -208,6 +214,7 @@ async function chargerAnnonces(){
                     ? `<button class="btn-rejeter" data-id="${l.id}">Rejeter</button>`
                     : ""
                 }
+                <button class="btn-modifier-ligne" data-id="${l.id}">Modifier</button>
                 <button class="btn-supprimer-ligne" data-id="${l.id}">Supprimer</button>
             </td>
         </tr>
@@ -244,6 +251,19 @@ async function chargerAnnonces(){
     table.querySelectorAll(".btn-rejeter").forEach(btn => {
 
         btn.addEventListener("click", () => validerAnnonce(btn.dataset.id, "rejete"));
+
+    });
+
+    table.querySelectorAll(".btn-modifier-ligne").forEach(btn => {
+
+        btn.addEventListener("click", () => {
+
+            const logement =
+            dernierLogementsAdmin.find(l => String(l.id) === btn.dataset.id);
+
+            if(logement) ouvrirModaleAnnonceAdmin(logement);
+
+        });
 
     });
 
@@ -286,11 +306,68 @@ document.getElementById("btnOuvrirAnnonceAdmin");
 const formAnnonceAdmin =
 document.getElementById("formAnnonceAdmin");
 
-function ouvrirModaleAnnonceAdmin(){
+// null = création d'une nouvelle annonce ; sinon id de l'annonce en
+// cours de modification (voir .btn-modifier-ligne plus haut).
+let idAnnonceAdminEnEdition = null;
+
+function ouvrirModaleAnnonceAdmin(logement){
 
     if(!annonceAdminOverlay) return;
 
     formAnnonceAdmin.reset();
+
+    const titreModal =
+    document.querySelector("#annonceAdminModalOverlay h3");
+
+    const submitBtn =
+    formAnnonceAdmin.querySelector("button[type=submit]");
+
+    const champPhotos =
+    document.getElementById("admPhotos");
+
+    const champWhatsapp =
+    document.getElementById("admWhatsapp");
+
+    if(logement){
+
+        idAnnonceAdminEnEdition = logement.id;
+
+        if(titreModal) titreModal.innerHTML = '<i class="ph ph-pencil-simple"></i> Modifier l\'annonce';
+        if(submitBtn) submitBtn.textContent = "Enregistrer les modifications";
+
+        // Médias non modifiables depuis cette modale pour l'instant :
+        // champ facultatif ici (les photos déjà publiées restent
+        // inchangées si aucune nouvelle photo n'est choisie)... en
+        // réalité l'API d'édition ne touche jamais aux médias, donc
+        // ce champ est simplement ignoré en mode édition.
+        if(champPhotos) champPhotos.required = false;
+
+        // Le WhatsApp n'est obligatoire que pour une annonce SANS
+        // compte propriétaire (seul moyen de contact) — pour une
+        // annonce avec un vrai compte, c'est un champ facultatif
+        // comme les autres, exactement comme côté propriétaire.
+        if(champWhatsapp) champWhatsapp.required = !logement.owner_id;
+
+        document.getElementById("admTitre").value = logement.titre || "";
+        document.getElementById("admVille").value = logement.ville || "";
+        document.getElementById("admType").value = logement.type || "Chambre";
+        document.getElementById("admPrix").value = logement.prix || "";
+        document.getElementById("admChambres").value = logement.chambres || "";
+        document.getElementById("admDureeLocation").value = logement.duree_location || "1_mois";
+        document.getElementById("admWhatsapp").value = logement.contact_whatsapp || "";
+        document.getElementById("admTelephone").value = logement.contact_telephone || "";
+        document.getElementById("admDescription").value = logement.description || "";
+
+    }else{
+
+        idAnnonceAdminEnEdition = null;
+
+        if(titreModal) titreModal.innerHTML = '<i class="ph ph-plus-circle"></i> Publier une annonce pour un propriétaire';
+        if(submitBtn) submitBtn.textContent = "Publier l'annonce";
+        if(champPhotos) champPhotos.required = true;
+        if(champWhatsapp) champWhatsapp.required = true;
+
+    }
 
     annonceAdminOverlay.classList.add("show");
 
@@ -304,7 +381,7 @@ function fermerModaleAnnonceAdmin(){
 
 }
 
-btnOuvrirAnnonceAdmin?.addEventListener("click", ouvrirModaleAnnonceAdmin);
+btnOuvrirAnnonceAdmin?.addEventListener("click", () => ouvrirModaleAnnonceAdmin(null));
 document.getElementById("annonceAdminModalClose")?.addEventListener("click", fermerModaleAnnonceAdmin);
 document.getElementById("annonceAdminAnnuler")?.addEventListener("click", fermerModaleAnnonceAdmin);
 
@@ -318,6 +395,55 @@ formAnnonceAdmin?.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
+    const submitBtn =
+    formAnnonceAdmin.querySelector("button[type=submit]");
+
+    // ---- Mode édition : PUT en JSON, aucun média. ----
+    if(idAnnonceAdminEnEdition){
+
+        submitBtn.disabled = true;
+
+        try{
+
+            await apiFetch("/admin/logements/" + idAnnonceAdminEnEdition, {
+
+                method: "PUT",
+
+                body: JSON.stringify({
+                    titre: document.getElementById("admTitre").value.trim(),
+                    ville: document.getElementById("admVille").value.trim(),
+                    type: document.getElementById("admType").value,
+                    prix: document.getElementById("admPrix").value,
+                    chambres: document.getElementById("admChambres").value || null,
+                    duree_location: document.getElementById("admDureeLocation").value,
+                    contact_whatsapp: document.getElementById("admWhatsapp").value.trim() || null,
+                    contact_telephone: document.getElementById("admTelephone").value.trim() || null,
+                    description: document.getElementById("admDescription").value.trim(),
+                })
+
+            });
+
+            showToast("Annonce mise à jour avec succès.");
+
+            fermerModaleAnnonceAdmin();
+
+            chargerAnnonces();
+
+        }catch(error){
+
+            showToast(error.message || "Impossible de mettre à jour l'annonce.", "error");
+
+        }finally{
+
+            submitBtn.disabled = false;
+
+        }
+
+        return;
+
+    }
+
+    // ---- Mode création : POST en FormData (avec photos). ----
     const photos =
     document.getElementById("admPhotos").files;
 
@@ -351,9 +477,6 @@ formAnnonceAdmin?.addEventListener("submit", async (e) => {
     for(const fichier of photos){
         formData.append("photos[]", fichier);
     }
-
-    const submitBtn =
-    formAnnonceAdmin.querySelector("button[type=submit]");
 
     submitBtn.disabled = true;
 
@@ -623,8 +746,8 @@ async function chargerStatsVisites(){
     stats.derniers_jours.map(j => `
         <tr>
             <td>${new Date(j.jour).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}</td>
-            <td>${j.vues}</td>
-            <td>${j.uniques}</td>
+            <td class="stat-value">${j.vues}</td>
+            <td class="stat-value">${j.uniques}</td>
         </tr>
     `).join("");
 

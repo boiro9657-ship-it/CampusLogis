@@ -23,6 +23,13 @@ const MAX_VIDEOS_PAR_PLAN = {
 // activés pour revenir aux limites normales par plan.
 const FONCTIONNALITES_LIBRES_LANCEMENT = true;
 
+// Présence de "?id=" = mode édition d'une annonce existante plutôt
+// que création : détermine tout du long ce fichier (pré-remplissage,
+// étape "Photos & vidéos" ignorée — non modifiables pour l'instant,
+// soumission en PUT JSON au lieu de POST FormData...).
+const idEnEdition =
+new URLSearchParams(window.location.search).get("id");
+
 (async () => {
 
     let utilisateur;
@@ -87,7 +94,113 @@ const FONCTIONNALITES_LIBRES_LANCEMENT = true;
 
     }
 
+    if(idEnEdition){
+        await preRemplirFormulaireEdition(idEnEdition, utilisateur);
+    }
+
 })();
+
+/**
+ * Charge une annonce existante et pré-remplit le formulaire avec ses
+ * valeurs — l'étape "Photos & vidéos" (3) n'est pas modifiable pour
+ * l'instant (l'API de mise à jour ne touche pas aux médias), elle est
+ * donc entièrement sautée en mode édition plutôt que montrée à moitié
+ * fonctionnelle.
+ */
+async function preRemplirFormulaireEdition(id, utilisateur){
+
+    let logement;
+
+    try{
+
+        logement = await apiFetch("/logements/" + id);
+
+    }catch(error){
+
+        showToast("Impossible de charger cette annonce.", "error");
+
+        window.location.href = "../dashboard-proprietaire/dashboard-proprietaire.html";
+
+        return;
+    }
+
+    if(Number(logement.owner_id) !== Number(utilisateur.id)){
+
+        showToast("Vous ne pouvez modifier que vos propres annonces.", "error");
+
+        window.location.href = "../dashboard-proprietaire/dashboard-proprietaire.html";
+
+        return;
+    }
+
+    const definir = (id, valeur) => {
+        const el = document.getElementById(id);
+        if(el) el.value = valeur ?? "";
+    };
+
+    definir("titre", logement.titre);
+    definir("ville", logement.ville);
+    definir("type", logement.type);
+    definir("prix", logement.prix);
+    definir("chambres", logement.chambres);
+    definir("duree_location", logement.duree_location);
+    definir("duree_location_autre", logement.duree_location_autre);
+    definir("caution", logement.caution);
+    definir("nombre_personnes", logement.nombre_personnes);
+    definir("nombre_etages", logement.nombre_etages);
+    definir("niveau_etage", logement.niveau_etage);
+    definir("salles_bain", logement.salles_bain);
+    definir("toilettes", logement.toilettes);
+    definir("salons", logement.salons);
+    definir("cuisines", logement.cuisines);
+    definir("superficie", logement.superficie);
+    definir("description", logement.description);
+    definir("contact_telephone", logement.contact_telephone);
+    definir("contact_whatsapp", logement.contact_whatsapp);
+    definir("contact_email", logement.contact_email);
+
+    // Réaffiche les champs liés au type (étages/niveau) et à "autre"
+    // durée exactement comme si l'utilisateur venait de les choisir.
+    if(typeof basculerChampsEtage === "function") basculerChampsEtage();
+
+    const champDureeAutre =
+    document.getElementById("duree_location_autre");
+
+    if(champDureeAutre){
+        champDureeAutre.style.display = logement.duree_location === "autre" ? "" : "none";
+    }
+
+    document.querySelectorAll('input[name="equipements[]"]').forEach(checkbox => {
+        checkbox.checked = Number(logement["equip_" + checkbox.value]) === 1;
+    });
+
+    document.querySelectorAll('input[name="profils[]"]').forEach(checkbox => {
+        checkbox.checked = Number(logement["profil_" + checkbox.value]) === 1;
+    });
+
+    // Étape 3 (photos/vidéos/audio) non modifiable pour l'instant :
+    // sautée entièrement du parcours plutôt que montrée à moitié
+    // fonctionnelle. Les médias déjà publiés restent inchangés.
+    document.querySelector('.btn-step-suivant[data-next="3"]')?.setAttribute("data-next", "4");
+    document.querySelector('.btn-step-precedent[data-prev="3"]')?.setAttribute("data-prev", "2");
+    document.querySelector('.publish-progress-step[data-step="3"]')?.style.setProperty("display", "none");
+
+    const titrePage =
+    document.querySelector(".publish-header h1");
+
+    if(titrePage) titrePage.textContent = "Modifier l'annonce";
+
+    const sousTitre =
+    document.querySelector(".publish-header p");
+
+    if(sousTitre) sousTitre.textContent = "Les photos et vidéos déjà publiées restent inchangées.";
+
+    const boutonPublier =
+    document.querySelector(".publish-btn");
+
+    if(boutonPublier) boutonPublier.textContent = "Enregistrer les modifications";
+
+}
 
 const publishForm =
 document.getElementById("publishForm");
@@ -752,18 +865,25 @@ if(publishForm){
                 return;
             }
 
-            if(!photos || photos.length === 0){
+            // Étape "Photos & vidéos" sautée en mode édition (voir
+            // preRemplirFormulaireEdition) : ces validations ne
+            // s'appliquent qu'à une publication.
+            if(!idEnEdition){
 
-                showToast("Veuillez sélectionner au moins une photo.", "error");
+                if(!photos || photos.length === 0){
 
-                return;
-            }
+                    showToast("Veuillez sélectionner au moins une photo.", "error");
 
-            if(photos.length > 8){
+                    return;
+                }
 
-                showToast("8 photos maximum par annonce.", "error");
+                if(photos.length > 8){
 
-                return;
+                    showToast("8 photos maximum par annonce.", "error");
+
+                    return;
+                }
+
             }
 
             if(dureeLocation === "autre" && !dureeLocationAutre){
@@ -773,20 +893,87 @@ if(publishForm){
                 return;
             }
 
-            const maxVideosPlan =
-            MAX_VIDEOS_PAR_PLAN[FONCTIONNALITES_LIBRES_LANCEMENT ? "pro" : planActuel] || MAX_VIDEOS_PAR_PLAN.gratuit;
+            if(!idEnEdition){
 
-            if(videos.length > maxVideosPlan){
+                const maxVideosPlan =
+                MAX_VIDEOS_PAR_PLAN[FONCTIONNALITES_LIBRES_LANCEMENT ? "pro" : planActuel] || MAX_VIDEOS_PAR_PLAN.gratuit;
 
-                showToast(maxVideosPlan + " vidéos maximum avec votre plan actuel.", "error");
+                if(videos.length > maxVideosPlan){
 
-                return;
+                    showToast(maxVideosPlan + " vidéos maximum avec votre plan actuel.", "error");
+
+                    return;
+                }
+
             }
 
             const submitBtn =
             publishForm.querySelector(".publish-btn");
 
             submitBtn.disabled = true;
+
+            const contactTelephone = document.getElementById("contact_telephone").value.trim();
+            const contactWhatsapp = document.getElementById("contact_whatsapp").value.trim();
+            const contactEmail = document.getElementById("contact_email").value.trim();
+
+            // Mode édition : PUT en JSON (aucun média), pas de FormData.
+            if(idEnEdition){
+
+                const corpsJson = {
+                    titre, ville, type, prix,
+                    chambres: chambres === "" ? null : Number(chambres),
+                    duree_location: dureeLocation,
+                    duree_location_autre: dureeLocation === "autre" ? dureeLocationAutre : "",
+                    caution: caution === "" ? null : caution,
+                    nombre_personnes: nombrePersonnes === "" ? null : nombrePersonnes,
+                    nombre_etages: nombreEtages === "" ? null : nombreEtages,
+                    niveau_etage: niveauEtage || null,
+                    salles_bain: sallesBain === "" ? null : sallesBain,
+                    toilettes: toilettes === "" ? null : toilettes,
+                    salons: salons === "" ? null : salons,
+                    cuisines: cuisines === "" ? null : cuisines,
+                    superficie: superficie === "" ? null : superficie,
+                    description,
+                    contact_telephone: contactTelephone || null,
+                    contact_whatsapp: contactWhatsapp || null,
+                    contact_email: contactEmail || null,
+                };
+
+                ["wifi", "parking", "cuisine", "douche", "salon", "balcon", "eau", "electricite", "climatisation"].forEach(cle => {
+                    corpsJson["equip_" + cle] = document.querySelector(`input[name="equipements[]"][value="${cle}"]`)?.checked ? 1 : 0;
+                });
+
+                ["celibataire", "marie", "etudiant", "travailleur", "senegalais", "etranger"].forEach(cle => {
+                    corpsJson["profil_" + cle] = document.querySelector(`input[name="profils[]"][value="${cle}"]`)?.checked ? 1 : 0;
+                });
+
+                try{
+
+                    await apiFetch("/logements/" + idEnEdition, {
+
+                        method: "PUT",
+
+                        body: JSON.stringify(corpsJson)
+
+                    });
+
+                    showToast("Annonce mise à jour avec succès !");
+
+                    setTimeout(() => {
+                        window.location.href = "../dashboard-proprietaire/dashboard-proprietaire.html";
+                    }, 1200);
+
+                }catch(error){
+
+                    showToast(error.message, "error");
+
+                    submitBtn.disabled = false;
+
+                }
+
+                return;
+
+            }
 
             const formData =
             new FormData();
@@ -808,10 +995,6 @@ if(publishForm){
             formData.append("cuisines", cuisines);
             formData.append("superficie", superficie);
             formData.append("description", description);
-
-            const contactTelephone = document.getElementById("contact_telephone").value.trim();
-            const contactWhatsapp = document.getElementById("contact_whatsapp").value.trim();
-            const contactEmail = document.getElementById("contact_email").value.trim();
 
             formData.append("contact_telephone", contactTelephone);
             formData.append("contact_whatsapp", contactWhatsapp);

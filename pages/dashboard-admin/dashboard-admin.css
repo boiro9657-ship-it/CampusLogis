@@ -231,7 +231,8 @@ tr:hover td{
 
 .btn-supprimer-ligne,
 .btn-approuver,
-.btn-rejeter{
+.btn-rejeter,
+.btn-modifier-ligne{
 
     border:none;
 
@@ -289,6 +290,20 @@ tr:hover td{
 .btn-rejeter:hover{
 
     background:#D97706;
+    color:white;
+
+}
+
+.btn-modifier-ligne{
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+}
+
+.btn-modifier-ligne:hover{
+
+    background:var(--primary);
     color:white;
 
 }

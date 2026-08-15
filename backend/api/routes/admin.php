@@ -11,6 +11,7 @@ require_once __DIR__ . '/notifications.php';
 // Réutilise creerLogementAdmin() et les helpers de traitement des
 // médias/équipements (extraireFichiers, enregistrerMedia...) sans
 // dupliquer cette logique — voir creerLogementAdmin() plus bas.
+// require_once amène aussi includes/uploads.php avec lui.
 require_once __DIR__ . '/logements.php';
 
 function handleAdminRoute(array $segments, string $method): void

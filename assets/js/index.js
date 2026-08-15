@@ -265,7 +265,7 @@ async function chargerLogementsPopulaires(){
         return;
     }
 
-    logements = (logements || []).slice(0, 6);
+    logements = logements || [];
 
     if(logements.length === 0){
 
@@ -275,8 +275,19 @@ async function chargerLogementsPopulaires(){
         return;
     }
 
+    // Section "populaires" volontairement limitée à un aperçu de 6
+    // logements — le bouton "Voir tous les logements" (vers la page
+    // Rechercher, qui n'a aucune limite) n'apparaît que s'il y a
+    // vraiment plus à voir, pour ne pas induire en erreur.
+    const featuredMore =
+    document.getElementById("featuredMore");
+
+    if(featuredMore){
+        featuredMore.style.display = logements.length > 6 ? "" : "none";
+    }
+
     featuredContainer.innerHTML =
-    logements.map(carteLogementHTML).join("");
+    logements.slice(0, 6).map(carteLogementHTML).join("");
 
     attacherBoutonsFavoris(featuredContainer);
     attacherBoutonsReservation(featuredContainer);

@@ -873,6 +873,23 @@
 
 }
 
+.featured-more{
+
+    display:flex;
+    justify-content:center;
+
+    margin-top:45px;
+
+}
+
+.featured-more .btn-primary{
+
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+
+}
+
 .card{
 
     background:#fff;

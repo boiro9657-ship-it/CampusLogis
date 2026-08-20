@@ -1345,7 +1345,10 @@ function demarrerCarrousels(container){
 
             if(slide.type === "video" && video){
 
-                if(video.getAttribute("src") !== slide.url){
+                const memeVideoDejaChargee =
+                video.getAttribute("src") === slide.url;
+
+                if(!memeVideoDejaChargee){
 
                     // Nouvelle vidéo : on lance son chargement une
                     // seule fois. Ne JAMAIS remettre à zéro / mettre
@@ -1368,11 +1371,21 @@ function demarrerCarrousels(container){
 
                 };
 
-                if(video.readyState >= 2){
+                if(memeVideoDejaChargee && video.readyState >= 2){
 
                     passerEnVideo();
 
                 }else{
+
+                    // Tant que CETTE vidéo n'est pas prête — que ce
+                    // soit la toute première ou qu'on enchaîne d'une
+                    // vidéo à une autre — on retombe sur la photo de
+                    // couverture. Changer le "src" d'une vidéo vide
+                    // instantanément son image affichée : sans ce
+                    // repli, enchaîner deux vidéos laissait un cadre
+                    // noir/vide le temps du chargement de la seconde.
+                    video.style.display = "none";
+                    img.style.display = "";
 
                     video.addEventListener("loadeddata", passerEnVideo, { once: true });
 

@@ -7,7 +7,19 @@
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/response.php';
 
+// PHP verrouille le fichier de session en écriture pendant toute la
+// durée d'une requête tant que la session reste ouverte — sur une
+// page qui déclenche plusieurs appels API en parallèle (ex. les
+// tableaux de bord), ces requêtes finissaient donc par s'exécuter
+// une par une côté serveur au lieu d'être vraiment simultanées
+// (pages qui s'attardent à charger, requêtes qui expirent parfois).
+// La quasi-totalité des routes ne fait que LIRE $_SESSION['user_id']
+// (voir requireAuth() ci-dessous) : on referme donc le verrou tout
+// de suite après l'avoir lu. Les rares routes qui ÉCRIVENT dans la
+// session (connexion, déconnexion, callback Google — voir auth.php)
+// rouvrent explicitement la session juste avant d'écrire.
 session_start();
+session_write_close();
 
 /**
  * Bloque l'accès (401) si aucun utilisateur n'est connecté.

@@ -131,7 +131,12 @@ function loginUser(): void
         jsonError('Email ou mot de passe incorrect.', 401);
     }
 
+    // La session a été refermée juste après son ouverture (voir
+    // session.php) — on la rouvre ici, le temps d'écrire l'identité
+    // du compte qui vient de se connecter.
+    session_start();
     $_SESSION['user_id'] = $utilisateur['id'];
+    session_write_close();
 
     jsonResponse([
         'id'          => $utilisateur['id'],
@@ -143,6 +148,7 @@ function loginUser(): void
 
 function logoutUser(): void
 {
+    session_start();
     $_SESSION = [];
     session_destroy();
 
@@ -484,7 +490,9 @@ function callbackGoogle(): void
         }
     }
 
+    session_start();
     $_SESSION['user_id'] = $utilisateur['id'];
+    session_write_close();
 
     header('Location: ' . $appConfig['site_url'] . '/index.html');
     exit;

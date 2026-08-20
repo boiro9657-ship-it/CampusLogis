@@ -138,9 +138,10 @@ function listLogements(): void
  * Derniers vrais commentaires laissés sur des annonces, réutilisés
  * comme témoignages sur la page d'accueil — jamais d'avis inventé,
  * uniquement de vrais commentaires de vrais utilisateurs, avec leur
- * vraie photo de profil. Les messages très courts (ex. "ok") sont
- * écartés : pas pertinents à mettre en avant, sans rien inventer
- * pour autant.
+ * vraie photo de profil. Seuls les messages franchement trop courts
+ * pour vouloir dire quoi que ce soit (ex. "ok", "👍") sont écartés ;
+ * un mot comme "Super" reste un vrai avis, pas du bruit — pas
+ * question d'en exiger un roman pour l'afficher.
  */
 function listTemoignages(): void
 {
@@ -153,7 +154,7 @@ function listTemoignages(): void
         FROM commentaires c
         JOIN utilisateurs u ON u.id = c.user_id
         JOIN logements l ON l.id = c.logement_id
-        WHERE CHAR_LENGTH(c.message) >= 20
+        WHERE CHAR_LENGTH(c.message) >= 5
         AND l.statut_validation = 'approuve'
         ORDER BY c.created_at DESC
         LIMIT " . $limite . "

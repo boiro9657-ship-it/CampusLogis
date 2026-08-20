@@ -111,15 +111,15 @@ function listLogements(): void
         $sql .= ' WHERE ' . implode(' AND ', $conditions);
     }
 
-    // Les logements encore disponibles passent toujours avant les
-    // déjà réservés, indépendamment de la date de publication. La
-    // mise en avant Pro/Premium se base sur le plan ACTUEL du
-    // propriétaire (pas un indicateur figé sur l'annonce) : un
-    // abonnement souscrit après coup profite immédiatement à toutes
-    // ses annonces existantes, et s'arrête dès que le plan change.
+    // Un logement réservé reste affiché à sa place naturelle (par
+    // date, comme les autres), pas relégué en fin de liste — juste
+    // marqué "Déjà réservé" côté client. La mise en avant Pro/Premium
+    // se base sur le plan ACTUEL du propriétaire (pas un indicateur
+    // figé sur l'annonce) : un abonnement souscrit après coup profite
+    // immédiatement à toutes ses annonces existantes, et s'arrête dès
+    // que le plan change.
     $sql .= "
-        ORDER BY (l.statut = 'disponible') DESC,
-            (CASE u.plan WHEN 'pro' THEN 2 WHEN 'premium' THEN 1 ELSE 0 END) DESC,
+        ORDER BY (CASE u.plan WHEN 'pro' THEN 2 WHEN 'premium' THEN 1 ELSE 0 END) DESC,
             l.created_at DESC
     ";
 

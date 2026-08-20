@@ -33,6 +33,7 @@
     chargerReservations();
     chargerMessages();
     chargerCommentaires();
+    chargerTemoignagesAdmin();
     chargerStatsVisites();
 
 })();
@@ -699,6 +700,124 @@ async function chargerCommentaires(){
         });
 
     });
+
+}
+
+/* ==========================
+    TÉMOIGNAGES PLATEFORME
+    Distincts des commentaires laissés sur une annonce précise —
+    "Grâce à TerangaHome, j'ai loué/trouvé..." — modérés ici avant
+    d'apparaître sur la page d'accueil.
+========================== */
+
+async function chargerTemoignagesAdmin(){
+
+    let temoignages = [];
+
+    try{
+
+        temoignages = await apiFetch("/admin/temoignages");
+
+    }catch(error){
+
+        showToast("Impossible de charger les témoignages.", "error");
+
+        return;
+    }
+
+    const libellesStatut = {
+        en_attente: "En attente",
+        approuve: "Approuvé",
+        rejete: "Rejeté"
+    };
+
+    const libellesRole = {
+        locataire: "Locataire",
+        proprietaire: "Propriétaire"
+    };
+
+    const table =
+    document.getElementById("tableTemoignages");
+
+    const lignesEntete =
+    table.querySelector("tr").outerHTML;
+
+    table.innerHTML =
+    lignesEntete +
+    temoignages.map(t => `
+        <tr>
+            <td>${t.auteur_nom}<br><span style="color:#94A3B8;font-size:12px;">${t.auteur_email}</span></td>
+            <td>${libellesRole[t.role_auteur] || t.role_auteur}</td>
+            <td class="wrap">${t.message}</td>
+            <td>
+                <span class="validation-badge validation-${t.statut}">
+                    ${libellesStatut[t.statut] || t.statut}
+                </span>
+            </td>
+            <td>${new Date(t.created_at).toLocaleDateString("fr-FR")}</td>
+            <td>
+                ${t.statut !== "approuve" ? `<button class="btn-approuver" data-id="${t.id}">Approuver</button>` : ""}
+                ${t.statut !== "rejete" ? `<button class="btn-rejeter" data-id="${t.id}">Rejeter</button>` : ""}
+                <button class="btn-supprimer-ligne" data-id="${t.id}">Supprimer</button>
+            </td>
+        </tr>
+    `).join("");
+
+    table.querySelectorAll(".btn-approuver").forEach(btn => {
+
+        btn.addEventListener("click", () => validerTemoignageAdmin(btn.dataset.id, "approuve"));
+
+    });
+
+    table.querySelectorAll(".btn-rejeter").forEach(btn => {
+
+        btn.addEventListener("click", () => validerTemoignageAdmin(btn.dataset.id, "rejete"));
+
+    });
+
+    table.querySelectorAll(".btn-supprimer-ligne").forEach(btn => {
+
+        btn.addEventListener("click", async () => {
+
+            if(!confirm("Supprimer ce témoignage ?")) return;
+
+            try{
+
+                await apiFetch("/admin/temoignages/" + btn.dataset.id, { method:"DELETE" });
+
+                chargerTemoignagesAdmin();
+
+            }catch(error){
+
+                showToast("Suppression impossible.", "error");
+
+            }
+
+        });
+
+    });
+
+}
+
+async function validerTemoignageAdmin(id, statut){
+
+    try{
+
+        await apiFetch("/admin/temoignages/" + id + "/valider", {
+
+            method: "PUT",
+
+            body: JSON.stringify({ statut })
+
+        });
+
+        chargerTemoignagesAdmin();
+
+    }catch(error){
+
+        showToast("Action impossible.", "error");
+
+    }
 
 }
 

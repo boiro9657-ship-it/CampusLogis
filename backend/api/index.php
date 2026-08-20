@@ -81,6 +81,11 @@ try {
             handlePaiementsRoute($rest, $method);
             break;
 
+        case 'temoignages':
+            require __DIR__ . '/routes/temoignages.php';
+            handleTemoignagesRoute($rest, $method);
+            break;
+
         default:
             jsonError('Route introuvable.', 404);
 

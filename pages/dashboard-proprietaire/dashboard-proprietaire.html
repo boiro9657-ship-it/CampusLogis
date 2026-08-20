@@ -136,6 +136,39 @@
         </div>
 
 
+        <!-- Témoignage plateforme (distinct des commentaires laissés
+             sur une annonce précise) : n'importe quel compte peut en
+             partager un, publié à l'accueil après validation admin. -->
+        <div class="temoignage-form-card" id="temoignageFormCard" style="display:none;">
+
+            <div class="temoignage-form-header">
+                <i class="ph ph-quotes"></i>
+                <div>
+                    <h3>Partagez votre expérience TerangaHome</h3>
+                    <p>Votre témoignage pourra être mis en avant sur la page d'accueil, une fois validé par notre équipe.</p>
+                </div>
+            </div>
+
+            <form id="formTemoignage">
+
+                <textarea id="temoignageMessage" maxlength="500" placeholder="Ex : Grâce à TerangaHome, j'ai trouvé un logement en quelques jours..."></textarea>
+
+                <button type="submit" class="btn-primary">Envoyer mon témoignage</button>
+
+            </form>
+
+        </div>
+
+        <div class="temoignage-statut-card" id="temoignageEnAttente" style="display:none;">
+            <i class="ph ph-hourglass"></i>
+            <p>Merci ! Votre témoignage a bien été reçu et sera visible sur l'accueil après validation par notre équipe.</p>
+        </div>
+
+        <div class="temoignage-statut-card temoignage-statut-publie" id="temoignagePublie" style="display:none;">
+            <i class="ph ph-check-circle"></i>
+            <p>Merci ! Votre témoignage est publié sur la page d'accueil de TerangaHome.</p>
+        </div>
+
         <div class="recent-section" id="recent-section">
 
             <h2 id="recentSectionTitle">Mes annonces récentes</h2>

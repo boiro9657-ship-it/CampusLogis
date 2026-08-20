@@ -429,7 +429,7 @@ async function chargerTemoignages(){
 
     try{
 
-        temoignages = await apiFetch("/logements/temoignages?limite=10");
+        temoignages = await apiFetch("/temoignages?limite=10");
 
     }catch(error){
 
@@ -506,6 +506,9 @@ function temoignageHTML(t){
     ? `<img src="${t.auteur_photo}" alt="${t.auteur_nom}">`
     : `<i class="ph ph-user"></i>`;
 
+    const roleLabel =
+    t.role_auteur === "proprietaire" ? "Propriétaire sur TerangaHome" : "Locataire sur TerangaHome";
+
     return `
     <div class="temoignage-slide">
 
@@ -517,7 +520,7 @@ function temoignageHTML(t){
 
             <p class="temoignage-auteur">
                 ${t.auteur_nom}
-                <span>à propos de « ${t.logement_titre} »</span>
+                <span>${roleLabel}</span>
             </p>
 
         </div>

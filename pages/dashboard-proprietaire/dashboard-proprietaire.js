@@ -44,6 +44,7 @@ const LIBELLES_DUREE_SEJOUR = {
     }
 
     initDashboard();
+    initTemoignage();
 
     // Arrivée depuis l'icône de messagerie (ou juste après une
     // réservation) : ouvre directement la discussion avec la
@@ -1123,5 +1124,104 @@ function formaterNumeroInternationalChat(telephone){
     }
 
     return "221" + chiffres;
+
+}
+
+/* ==========================
+    TÉMOIGNAGE PLATEFORME
+    Distinct des commentaires laissés sur une annonce précise —
+    "Grâce à TerangaHome, j'ai loué/trouvé..." — visible pour tout
+    compte connecté (locataire ou propriétaire).
+========================== */
+
+async function initTemoignage(){
+
+    const formCard =
+    document.getElementById("temoignageFormCard");
+
+    const enAttenteCard =
+    document.getElementById("temoignageEnAttente");
+
+    const publieCard =
+    document.getElementById("temoignagePublie");
+
+    if(!formCard) return;
+
+    let existant = null;
+
+    try{
+
+        existant = await apiFetch("/temoignages/mine");
+
+    }catch(error){
+
+        return;
+    }
+
+    if(existant && existant.statut === "en_attente"){
+
+        enAttenteCard.style.display = "";
+
+    }else if(existant && existant.statut === "approuve"){
+
+        publieCard.style.display = "";
+
+    }else{
+
+        // Pas encore de témoignage, ou précédent rejeté : on laisse
+        // la possibilité d'en soumettre un (nouveau).
+        formCard.style.display = "";
+
+    }
+
+    const form =
+    document.getElementById("formTemoignage");
+
+    if(!form) return;
+
+    form.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const message =
+        document.getElementById("temoignageMessage").value.trim();
+
+        if(message.length < 10){
+
+            showToast("Merci de partager votre expérience en quelques mots (10 caractères minimum).", "error");
+
+            return;
+        }
+
+        const submitBtn =
+        form.querySelector("button[type=submit]");
+
+        submitBtn.disabled = true;
+
+        try{
+
+            await apiFetch("/temoignages", {
+
+                method: "POST",
+
+                body: JSON.stringify({ message })
+
+            });
+
+            formCard.style.display = "none";
+
+            enAttenteCard.style.display = "";
+
+            showToast("Merci ! Votre témoignage sera visible après validation.");
+
+        }catch(error){
+
+            showToast(error.message, "error");
+
+            submitBtn.disabled = false;
+
+        }
+
+    });
 
 }

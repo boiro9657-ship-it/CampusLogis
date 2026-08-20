@@ -576,6 +576,27 @@ try {
     ");
     $etapes[] = 'Table "whatsapp_clics" prête.';
 
+    // Vrais témoignages sur TerangaHome en tant que plateforme (ex.
+    // "Grâce à TerangaHome, j'ai loué mon appartement") — à ne pas
+    // confondre avec les commentaires laissés sur une annonce précise
+    // (table "commentaires"). Soumis par un utilisateur connecté,
+    // affiché à l'accueil seulement une fois approuvé par un admin —
+    // jamais de témoignage inventé, mais une petite modération avant
+    // publication puisque rien ne rattache ce message à une annonce
+    // vérifiable.
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS temoignages_plateforme (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            message TEXT NOT NULL,
+            role_auteur ENUM('locataire','proprietaire') NOT NULL,
+            statut ENUM('en_attente','approuve','rejete') NOT NULL DEFAULT 'en_attente',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "temoignages_plateforme" prête.';
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS paiements (
             id INT AUTO_INCREMENT PRIMARY KEY,

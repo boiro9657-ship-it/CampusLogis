@@ -22,11 +22,6 @@ function handleLogementsRoute(array $segments, string $method): void
         return;
     }
 
-    if ($method === 'GET' && $first === 'temoignages') {
-        listTemoignages();
-        return;
-    }
-
     if ($method === 'GET' && $first === null) {
         listLogements();
         return;
@@ -130,36 +125,6 @@ function listLogements(): void
 
     $stmt = getPdo()->prepare($sql);
     $stmt->execute($params);
-
-    jsonResponse($stmt->fetchAll());
-}
-
-/**
- * Derniers vrais commentaires laissés sur des annonces, réutilisés
- * comme témoignages sur la page d'accueil — jamais d'avis inventé,
- * uniquement de vrais commentaires de vrais utilisateurs, avec leur
- * vraie photo de profil. Seuls les messages franchement trop courts
- * pour vouloir dire quoi que ce soit (ex. "ok", "👍") sont écartés ;
- * un mot comme "Super" reste un vrai avis, pas du bruit — pas
- * question d'en exiger un roman pour l'afficher.
- */
-function listTemoignages(): void
-{
-    $limite = isset($_GET['limite']) ? min(20, max(1, (int) $_GET['limite'])) : 10;
-
-    $stmt = getPdo()->prepare("
-        SELECT c.id, c.message, c.created_at,
-               u.nom_complet AS auteur_nom, u.photo_url AS auteur_photo,
-               l.titre AS logement_titre, l.id AS logement_id
-        FROM commentaires c
-        JOIN utilisateurs u ON u.id = c.user_id
-        JOIN logements l ON l.id = c.logement_id
-        WHERE CHAR_LENGTH(c.message) >= 5
-        AND l.statut_validation = 'approuve'
-        ORDER BY c.created_at DESC
-        LIMIT " . $limite . "
-    ");
-    $stmt->execute();
 
     jsonResponse($stmt->fetchAll());
 }

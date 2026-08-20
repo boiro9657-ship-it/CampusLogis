@@ -81,6 +81,21 @@ function handleAdminRoute(array $segments, string $method): void
         return;
     }
 
+    if ($resource === 'temoignages' && $method === 'GET' && $id === null) {
+        listTemoignagesAdmin();
+        return;
+    }
+
+    if ($resource === 'temoignages' && $method === 'PUT' && is_numeric($id) && ($segments[2] ?? null) === 'valider') {
+        validerTemoignageAdmin((int) $id);
+        return;
+    }
+
+    if ($resource === 'temoignages' && $method === 'DELETE' && is_numeric($id)) {
+        supprimerTemoignageAdmin((int) $id);
+        return;
+    }
+
     if ($resource === 'visites' && $method === 'GET' && $id === 'stats') {
         statsVisites();
         return;
@@ -238,6 +253,44 @@ function supprimerCommentaireAdmin(int $id): void
     getPdo()->prepare('DELETE FROM commentaires WHERE id = ?')->execute([$id]);
 
     jsonResponse(['message' => 'Commentaire supprimé.']);
+}
+
+/**
+ * Tous les témoignages plateforme (tous statuts confondus), pour la
+ * file de modération admin — voir temoignages.php pour la version
+ * publique (approuvés uniquement).
+ */
+function listTemoignagesAdmin(): void
+{
+    $stmt = getPdo()->query("
+        SELECT t.*, u.nom_complet AS auteur_nom, u.email AS auteur_email
+        FROM temoignages_plateforme t
+        JOIN utilisateurs u ON u.id = t.user_id
+        ORDER BY t.created_at DESC
+    ");
+
+    jsonResponse($stmt->fetchAll());
+}
+
+function validerTemoignageAdmin(int $id): void
+{
+    $body = getJsonBody();
+    $statut = $body['statut'] ?? null;
+
+    if (!in_array($statut, ['approuve', 'rejete'], true)) {
+        jsonError('Statut invalide.');
+    }
+
+    getPdo()->prepare('UPDATE temoignages_plateforme SET statut = ? WHERE id = ?')->execute([$statut, $id]);
+
+    jsonResponse(['message' => 'Témoignage mis à jour.']);
+}
+
+function supprimerTemoignageAdmin(int $id): void
+{
+    getPdo()->prepare('DELETE FROM temoignages_plateforme WHERE id = ?')->execute([$id]);
+
+    jsonResponse(['message' => 'Témoignage supprimé.']);
 }
 
 /**

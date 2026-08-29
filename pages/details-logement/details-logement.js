@@ -447,8 +447,13 @@ async function chargerLogementsSimilaires(logement){
  * et mailto:). Les coordonnées propres à l'annonce priment sur
  * celles du compte propriétaire ; sans numéro/email disponible,
  * affiche un message clair plutôt qu'un lien cassé.
+ *
+ * Contacter un propriétaire nécessite d'être connecté (évite les
+ * contacts anonymes non traçables) — un visiteur non connecté est
+ * redirigé vers la connexion au clic, avant même de savoir si des
+ * coordonnées existent.
  */
-function brancherContactProprietaire(logement){
+async function brancherContactProprietaire(logement){
 
     const btnCall =
     document.querySelector(".btn-call");
@@ -458,6 +463,43 @@ function brancherContactProprietaire(logement){
 
     const btnMessage =
     document.querySelector(".btn-message");
+
+    let estConnecte = true;
+
+    try{
+
+        await apiFetch("/auth/me");
+
+    }catch(error){
+
+        estConnecte = false;
+    }
+
+    if(!estConnecte){
+
+        [btnCall, btnWhatsapp, btnMessage].forEach((btn) => {
+
+            if(!btn) return;
+
+            btn.addEventListener("click", (e) => {
+
+                e.preventDefault();
+
+                showToast("Connectez-vous pour contacter le propriétaire.", "error");
+
+                setTimeout(() => {
+
+                    window.location.href =
+                    "../connexion/connexion.html?redirect=" + encodeURIComponent(window.location.href);
+
+                }, 1200);
+
+            });
+
+        });
+
+        return;
+    }
 
     const telephoneEffectif =
     logement.contact_telephone || logement.proprietaire_telephone;

@@ -91,8 +91,11 @@ if(loginForm){
 
             });
 
+            const redirect =
+            new URLSearchParams(window.location.search).get("redirect");
+
             window.location.href =
-            "../../index.html";
+            redirect || "../../index.html";
 
         }catch(error){
 

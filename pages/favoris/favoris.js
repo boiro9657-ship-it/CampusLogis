@@ -138,7 +138,7 @@ function carteFavoriHTML(logement){
 
             ${dureeBadge ? `<span class="badge-engagement"><i class="ph ${iconeDuree(logement.duree_location)}"></i> ${dureeBadge}</span>` : ""}
 
-            <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
+            <span class="badge-card">Disponible</span>
 
             ${estPro ? `<span class="badge-pro"><i class="ph ph-medal"></i> Pro</span>` : estPremium ? `<span class="badge-premium"><i class="ph ph-crown-simple"></i> Premium</span>` : ""}
 

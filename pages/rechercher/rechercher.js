@@ -307,7 +307,7 @@ function carteRechercheHTML(logement){
 
         </div>
 
-        <span class="badge-card ${estReserve ? "badge-card-reserve" : ""}">${estReserve ? "Déjà réservé" : "Disponible"}</span>
+        <span class="badge-card">Disponible</span>
 
         ${estPro ? `
         <span class="badge-pro">

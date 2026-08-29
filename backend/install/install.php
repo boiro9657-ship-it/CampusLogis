@@ -597,6 +597,38 @@ try {
     ");
     $etapes[] = 'Table "temoignages_plateforme" prête.';
 
+    // Réglages globaux du site (clé/valeur) — pour l'instant utilisé
+    // uniquement pour "faut-il masquer les statistiques publiques de
+    // l'accueil" (décidé par un admin, visible par tout le monde),
+    // mais pensé pour accueillir d'autres réglages plus tard sans
+    // migration supplémentaire.
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS parametres_site (
+            cle VARCHAR(60) PRIMARY KEY,
+            valeur VARCHAR(255) NOT NULL,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "parametres_site" prête.';
+
+    // Préférence personnelle (par compte, pas par navigateur) pour
+    // masquer les nombres sur SON PROPRE tableau de bord — distincte
+    // du réglage global ci-dessus qui contrôle l'accueil public.
+    $colonneStatsMasqueesExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'utilisateurs'
+        AND COLUMN_NAME = 'stats_masquees'
+    ")->fetchColumn();
+
+    if ($colonneStatsMasqueesExiste == 0) {
+        $pdo->exec("
+            ALTER TABLE utilisateurs
+            ADD COLUMN stats_masquees TINYINT(1) NOT NULL DEFAULT 0
+        ");
+        $etapes[] = 'Colonne "stats_masquees" ajoutée à "utilisateurs".';
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS paiements (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -632,6 +664,84 @@ try {
         ");
         $etapes[] = 'Colonne "origine" ajoutée à "paiements".';
     }
+
+    // Système de publicité/sponsoring : réutilise entièrement la
+    // table "paiements" et l'intégration PayDunya existantes (voir
+    // paiements.php) plutôt que d'inventer un second circuit de
+    // paiement. "plan" devient facultatif (uniquement pertinent pour
+    // un abonnement) ; "type" distingue un paiement d'abonnement
+    // Premium/Pro d'un paiement de campagne publicitaire, et
+    // "campagne_id" rattache ce second cas à la bonne campagne.
+    $colonneTypeExiste = $pdo->query("
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'paiements'
+        AND COLUMN_NAME = 'type'
+    ")->fetchColumn();
+
+    if ($colonneTypeExiste == 0) {
+        $pdo->exec("
+            ALTER TABLE paiements
+            ADD COLUMN type ENUM('abonnement','campagne') NOT NULL DEFAULT 'abonnement' AFTER user_id,
+            ADD COLUMN campagne_id INT NULL AFTER type,
+            MODIFY COLUMN plan ENUM('premium','pro') NULL
+        ");
+        $etapes[] = 'Colonnes "type" et "campagne_id" ajoutées à "paiements" (plan devenu facultatif).';
+    }
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS campagnes_publicitaires (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            logement_id INT NOT NULL,
+            offre ENUM('mise_en_avant','sponsorisee','pack_premium') NOT NULL,
+            objectif ENUM('vues','contacts','whatsapp','reservations') NOT NULL DEFAULT 'vues',
+            zone_ciblee VARCHAR(150) NULL,
+            duree_jours INT NOT NULL,
+            budget DECIMAL(10,2) NOT NULL,
+            statut ENUM('en_attente_paiement','active','en_pause','terminee','rejetee') NOT NULL DEFAULT 'en_attente_paiement',
+            date_debut TIMESTAMP NULL,
+            date_fin TIMESTAMP NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
+            FOREIGN KEY (logement_id) REFERENCES logements(id) ON DELETE CASCADE,
+            INDEX idx_statut_dates (statut, date_debut, date_fin)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "campagnes_publicitaires" prête.';
+
+    // Une impression = une carte sponsorisée affichée à un visiteur,
+    // sur un emplacement donné (accueil, recherche...) — même
+    // principe anonyme que "visites" (empreinte IP, pas d'auth
+    // requise), mais rattaché à une campagne précise pour calculer
+    // ses vraies statistiques de performance.
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS campagnes_impressions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            campagne_id INT NOT NULL,
+            emplacement VARCHAR(30) NOT NULL,
+            ip_hash VARCHAR(64) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (campagne_id) REFERENCES campagnes_publicitaires(id) ON DELETE CASCADE,
+            INDEX idx_campagne_id (campagne_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "campagnes_impressions" prête.';
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS campagnes_clics (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            campagne_id INT NOT NULL,
+            type ENUM('carte','whatsapp','details') NOT NULL DEFAULT 'carte',
+            ip_hash VARCHAR(64) NOT NULL,
+            user_id INT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (campagne_id) REFERENCES campagnes_publicitaires(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES utilisateurs(id) ON DELETE SET NULL,
+            INDEX idx_campagne_id (campagne_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    $etapes[] = 'Table "campagnes_clics" prête.';
 
     // Pas d'annonces de démonstration : seules de vraies annonces
     // contactables doivent apparaître sur le site. Une annonce sans

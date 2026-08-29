@@ -23,6 +23,7 @@ const PAIEMENTS_TARIFS_PLAN = [
 const PAIEMENTS_ORIGINES = [
     'tarifs'           => '/pages/tarifs/tarifs.html',
     'publier-logement' => '/pages/publier-logement/publier-logement.html',
+    'publicite'        => '/pages/publicite/publicite.html',
 ];
 
 function handlePaiementsRoute(array $segments, string $method): void
@@ -69,6 +70,13 @@ function creerPaiement(): void
     $userId = requireAuth();
 
     $body = getJsonBody();
+    $type = $body['type'] ?? 'abonnement';
+
+    if ($type === 'campagne') {
+        creerPaiementCampagne($userId, $body);
+        return;
+    }
+
     $plan = $body['plan'] ?? null;
 
     if (!isset(PAIEMENTS_TARIFS_PLAN[$plan])) {
@@ -103,10 +111,66 @@ function creerPaiement(): void
     }
 
     $stmt = getPdo()->prepare('
-        INSERT INTO paiements (user_id, plan, origine, montant, token, statut)
-        VALUES (?, ?, ?, ?, ?, "en_attente")
+        INSERT INTO paiements (user_id, type, plan, origine, montant, token, statut)
+        VALUES (?, "abonnement", ?, ?, ?, ?, "en_attente")
     ');
     $stmt->execute([$userId, $plan, $origine, $montant, $facture['token']]);
+
+    jsonResponse(['invoice_url' => $facture['invoice_url']]);
+}
+
+/**
+ * Même circuit PayDunya, pour une campagne publicitaire — le montant
+ * vient toujours de la campagne déjà créée en base (jamais du
+ * client), et la campagne doit appartenir à l'utilisateur connecté
+ * et être encore en attente de paiement.
+ */
+function creerPaiementCampagne(int $userId, array $body): void
+{
+    $campagneId = (int) ($body['campagne_id'] ?? 0);
+
+    $stmt = getPdo()->prepare('
+        SELECT c.*, l.titre AS logement_titre
+        FROM campagnes_publicitaires c
+        JOIN logements l ON l.id = c.logement_id
+        WHERE c.id = ? AND c.user_id = ?
+    ');
+    $stmt->execute([$campagneId, $userId]);
+    $campagne = $stmt->fetch();
+
+    if (!$campagne) {
+        jsonError('Campagne introuvable.', 404);
+    }
+
+    if ($campagne['statut'] !== 'en_attente_paiement') {
+        jsonError('Cette campagne a déjà été payée ou n\'est plus modifiable.');
+    }
+
+    $urls = urlsActionsPaiement();
+
+    try {
+
+        $facture = paydunyaCreerFacture(
+            (float) $campagne['budget'],
+            'TerangaHome - Campagne publicitaire (' . $campagne['logement_titre'] . ')',
+            ['user_id' => $userId, 'campagne_id' => $campagneId],
+            $urls['return_url'],
+            $urls['cancel_url'],
+            $urls['callback_url']
+        );
+
+    } catch (Throwable $e) {
+
+        error_log('PayDunya - échec création paiement campagne (user ' . $userId . ') : ' . $e->getMessage());
+        jsonError('Impossible de créer le paiement pour le moment. Réessayez dans un instant.', 502);
+
+    }
+
+    $stmt = getPdo()->prepare('
+        INSERT INTO paiements (user_id, type, campagne_id, origine, montant, token, statut)
+        VALUES (?, "campagne", ?, "publicite", ?, ?, "en_attente")
+    ');
+    $stmt->execute([$userId, $campagneId, $campagne['budget'], $facture['token']]);
 
     jsonResponse(['invoice_url' => $facture['invoice_url']]);
 }
@@ -140,6 +204,27 @@ function appliquerPaiementConfirme(array $paiement): void
     $pdo->prepare('UPDATE paiements SET statut = "complete" WHERE id = ?')
         ->execute([$paiement['id']]);
 
+    if ($paiement['type'] === 'campagne') {
+
+        // Idempotent comme le reste : si la campagne est déjà active
+        // (retour navigateur ET webhook arrivés l'un après l'autre),
+        // on ne redémarre pas son décompte de durée depuis le début.
+        $stmt = $pdo->prepare("SELECT duree_jours, statut FROM campagnes_publicitaires WHERE id = ?");
+        $stmt->execute([$paiement['campagne_id']]);
+        $campagne = $stmt->fetch();
+
+        if ($campagne && $campagne['statut'] === 'en_attente_paiement') {
+
+            $pdo->prepare("
+                UPDATE campagnes_publicitaires
+                SET statut = 'active', date_debut = NOW(), date_fin = DATE_ADD(NOW(), INTERVAL ? DAY)
+                WHERE id = ?
+            ")->execute([$campagne['duree_jours'], $paiement['campagne_id']]);
+        }
+
+        return;
+    }
+
     $pdo->prepare('UPDATE utilisateurs SET plan = ? WHERE id = ?')
         ->execute([$paiement['plan'], $paiement['user_id']]);
 }
@@ -172,7 +257,12 @@ function gererRetourPaiement(): void
     if ($verification['statut'] === 'complete') {
 
         appliquerPaiementConfirme($paiement);
-        header('Location: ' . $urlRetour . '?paiement=succes&plan=' . urlencode($paiement['plan']));
+
+        $parametre = $paiement['type'] === 'campagne'
+            ? 'campagne_id=' . urlencode($paiement['campagne_id'])
+            : 'plan=' . urlencode($paiement['plan']);
+
+        header('Location: ' . $urlRetour . '?paiement=succes&' . $parametre);
         exit;
 
     }

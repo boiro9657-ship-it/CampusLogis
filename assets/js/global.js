@@ -24,29 +24,42 @@ if(typeof apiFetch !== "undefined"){
 
 /* ==========================
     MASQUER/AFFICHER LES STATISTIQUES
-    Préférence partagée (localStorage) entre le tableau de bord admin
-    et le tableau de bord propriétaire — un bouton .btn-toggle-stats
-    sur l'une ou l'autre page bascule le même réglage, appliqué à
-    tout élément marqué .stat-value (nombre flouté en un clic,
-    ré-affiché en un autre, sans recharger la page).
+    Deux réglages distincts, tous deux stockés côté serveur (plus de
+    localStorage : ça ne suivait pas d'un appareil à l'autre) :
+    - Sur une page SANS bouton .btn-toggle-stats (ex. l'accueil) :
+      reflète uniquement le réglage PUBLIC global, décidé par un
+      admin, identique pour tout le monde (GET /parametres, lecture
+      seule ici).
+    - Sur une page AVEC .btn-toggle-stats (tableaux de bord) :
+      reflète la préférence PERSONNELLE du compte connecté
+      (utilisateur.stats_masquees). Pour un admin, cliquer met aussi
+      à jour le réglage public global en même temps (un admin qui
+      masque ses stats masque aussi celles de l'accueil) ; pour un
+      propriétaire/locataire, ça ne touche que son propre compte.
 ========================== */
 
-const CLE_STATS_MASQUEES = "terangahome_stats_masquees";
+(async () => {
 
-function statsSontMasquees(){
+    const boutons =
+    document.querySelectorAll(".btn-toggle-stats");
 
-    return localStorage.getItem(CLE_STATS_MASQUEES) === "1";
+    if(boutons.length === 0){
 
-}
+        await initMasqueStatsPage();
 
-function appliquerEtatMasqueStats(){
+    }else{
 
-    const masquees =
-    statsSontMasquees();
+        await initMasqueStatsTableauDeBord(boutons);
+
+    }
+
+})();
+
+function appliquerMasqueStats(masquees, boutons){
 
     document.body.classList.toggle("stats-masquees", masquees);
 
-    document.querySelectorAll(".btn-toggle-stats").forEach(btn => {
+    (boutons || []).forEach(btn => {
 
         btn.innerHTML = masquees
             ? '<i class="ph ph-eye"></i> Afficher les statistiques'
@@ -56,21 +69,75 @@ function appliquerEtatMasqueStats(){
 
 }
 
-function basculerMasqueStats(){
+async function initMasqueStatsPage(){
 
-    localStorage.setItem(CLE_STATS_MASQUEES, statsSontMasquees() ? "0" : "1");
+    let masquees = false;
 
-    appliquerEtatMasqueStats();
+    try{
+
+        const parametres =
+        await apiFetch("/parametres");
+
+        masquees = parametres.stats_publiques_masquees === "1";
+
+    }catch(error){}
+
+    appliquerMasqueStats(masquees);
 
 }
 
-appliquerEtatMasqueStats();
+async function initMasqueStatsTableauDeBord(boutons){
 
-document.querySelectorAll(".btn-toggle-stats").forEach(btn => {
+    let utilisateur;
 
-    btn.addEventListener("click", basculerMasqueStats);
+    try{
 
-});
+        utilisateur = await apiFetch("/auth/me");
+
+    }catch(error){
+
+        return;
+    }
+
+    const estAdmin =
+    utilisateur.role === "admin";
+
+    let masquees =
+    !!Number(utilisateur.stats_masquees);
+
+    appliquerMasqueStats(masquees, boutons);
+
+    boutons.forEach(btn => {
+
+        btn.addEventListener("click", async () => {
+
+            masquees = !masquees;
+
+            appliquerMasqueStats(masquees, boutons);
+
+            try{
+
+                await apiFetch("/auth/preferences", {
+                    method: "PUT",
+                    body: JSON.stringify({ stats_masquees: masquees })
+                });
+
+                if(estAdmin){
+
+                    await apiFetch("/admin/parametres/stats_publiques_masquees", {
+                        method: "PUT",
+                        body: JSON.stringify({ valeur: masquees ? "1" : "0" })
+                    });
+
+                }
+
+            }catch(error){}
+
+        });
+
+    });
+
+}
 
 /* ==========================
         OMBRE NAVBAR AU SCROLL

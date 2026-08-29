@@ -13,6 +13,7 @@ require_once __DIR__ . '/notifications.php';
 // dupliquer cette logique — voir creerLogementAdmin() plus bas.
 // require_once amène aussi includes/uploads.php avec lui.
 require_once __DIR__ . '/logements.php';
+require_once __DIR__ . '/campagnes.php';
 
 function handleAdminRoute(array $segments, string $method): void
 {
@@ -93,6 +94,26 @@ function handleAdminRoute(array $segments, string $method): void
 
     if ($resource === 'temoignages' && $method === 'DELETE' && is_numeric($id)) {
         supprimerTemoignageAdmin((int) $id);
+        return;
+    }
+
+    if ($resource === 'campagnes' && $method === 'GET' && $id === 'stats') {
+        statsCampagnesAdmin();
+        return;
+    }
+
+    if ($resource === 'campagnes' && $method === 'GET' && $id === null) {
+        listCampagnesAdmin();
+        return;
+    }
+
+    if ($resource === 'campagnes' && $method === 'PUT' && is_numeric($id) && ($segments[2] ?? null) === 'statut') {
+        changerStatutCampagneAdmin((int) $id);
+        return;
+    }
+
+    if ($resource === 'parametres' && $method === 'PUT' && $id !== null) {
+        changerParametreAdmin($id);
         return;
     }
 
@@ -291,6 +312,109 @@ function supprimerTemoignageAdmin(int $id): void
     getPdo()->prepare('DELETE FROM temoignages_plateforme WHERE id = ?')->execute([$id]);
 
     jsonResponse(['message' => 'Témoignage supprimé.']);
+}
+
+/**
+ * Toutes les campagnes publicitaires (tous statuts confondus), avec
+ * leurs vraies statistiques — pour la file de gestion admin.
+ */
+function listCampagnesAdmin(): void
+{
+    $stmt = getPdo()->query('
+        SELECT c.*, l.titre AS logement_titre, u.nom_complet AS annonceur_nom, u.email AS annonceur_email,
+            (SELECT COUNT(*) FROM campagnes_impressions i WHERE i.campagne_id = c.id) AS impressions,
+            (SELECT COUNT(*) FROM campagnes_clics cl WHERE cl.campagne_id = c.id) AS clics
+        FROM campagnes_publicitaires c
+        JOIN logements l ON l.id = c.logement_id
+        JOIN utilisateurs u ON u.id = c.user_id
+        ORDER BY c.created_at DESC
+    ');
+
+    jsonResponse($stmt->fetchAll());
+}
+
+/**
+ * Active/met en pause/rejette une campagne. Une campagne encore en
+ * attente de paiement ne peut être qu'annulée (rejetée) — jamais
+ * activée manuellement sans paiement réel, même par un admin.
+ */
+function changerStatutCampagneAdmin(int $id): void
+{
+    $body = getJsonBody();
+    $statut = $body['statut'] ?? null;
+
+    if (!in_array($statut, ['active', 'en_pause', 'rejetee'], true)) {
+        jsonError('Statut invalide.');
+    }
+
+    $stmt = getPdo()->prepare('SELECT statut FROM campagnes_publicitaires WHERE id = ?');
+    $stmt->execute([$id]);
+    $campagne = $stmt->fetch();
+
+    if (!$campagne) {
+        jsonError('Campagne introuvable.', 404);
+    }
+
+    if ($statut === 'active' && $campagne['statut'] === 'en_attente_paiement') {
+        jsonError('Cette campagne n\'a pas encore été payée — elle ne peut pas être activée manuellement.');
+    }
+
+    getPdo()->prepare('UPDATE campagnes_publicitaires SET statut = ? WHERE id = ?')->execute([$statut, $id]);
+
+    jsonResponse(['message' => 'Statut de la campagne mis à jour.']);
+}
+
+/**
+ * Revenu publicitaire réel (paiements de campagnes confirmés), plus
+ * les totaux d'impressions/clics toutes campagnes confondues.
+ */
+function statsCampagnesAdmin(): void
+{
+    $pdo = getPdo();
+
+    $revenu = $pdo->query("
+        SELECT COALESCE(SUM(montant), 0) FROM paiements
+        WHERE type = 'campagne' AND statut = 'complete'
+    ")->fetchColumn();
+
+    $campagnesActives = $pdo->query("
+        SELECT COUNT(*) FROM campagnes_publicitaires WHERE statut = 'active'
+    ")->fetchColumn();
+
+    $totalImpressions = $pdo->query('SELECT COUNT(*) FROM campagnes_impressions')->fetchColumn();
+    $totalClics = $pdo->query('SELECT COUNT(*) FROM campagnes_clics')->fetchColumn();
+
+    jsonResponse([
+        'revenu'             => (float) $revenu,
+        'campagnes_actives'  => (int) $campagnesActives,
+        'impressions'        => (int) $totalImpressions,
+        'clics'              => (int) $totalClics,
+    ]);
+}
+
+/**
+ * Modifie un réglage global du site (voir parametres.php pour la
+ * lecture publique) — ex. masquer/afficher les statistiques
+ * publiques de l'accueil pour tout le monde, pas seulement l'admin
+ * qui clique.
+ */
+function changerParametreAdmin(string $cle): void
+{
+    $clesAutorisees = ['stats_publiques_masquees'];
+
+    if (!in_array($cle, $clesAutorisees, true)) {
+        jsonError('Réglage inconnu.', 404);
+    }
+
+    $body = getJsonBody();
+    $valeur = (string) ($body['valeur'] ?? '0');
+
+    getPdo()->prepare('
+        INSERT INTO parametres_site (cle, valeur) VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE valeur = VALUES(valeur)
+    ')->execute([$cle, $valeur]);
+
+    jsonResponse(['message' => 'Réglage mis à jour.']);
 }
 
 /**

@@ -86,6 +86,16 @@ try {
             handleTemoignagesRoute($rest, $method);
             break;
 
+        case 'campagnes':
+            require __DIR__ . '/routes/campagnes.php';
+            handleCampagnesRoute($rest, $method);
+            break;
+
+        case 'parametres':
+            require __DIR__ . '/routes/parametres.php';
+            handleParametresRoute($rest, $method);
+            break;
+
         default:
             jsonError('Route introuvable.', 404);
 

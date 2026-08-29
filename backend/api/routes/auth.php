@@ -66,6 +66,11 @@ function handleAuthRoute(array $segments, string $method): void
         return;
     }
 
+    if ($action === 'preferences' && $method === 'PUT') {
+        modifierPreferences();
+        return;
+    }
+
     if ($action === 'presence' && $method === 'POST') {
         enregistrerActivite();
         return;
@@ -253,7 +258,7 @@ function currentUser(): void
     }
 
     $stmt = getPdo()->prepare('
-        SELECT id, nom_complet, email, telephone, photo_url, role, notifications_actives, plan
+        SELECT id, nom_complet, email, telephone, photo_url, role, notifications_actives, plan, stats_masquees
         FROM utilisateurs WHERE id = ?
     ');
     $stmt->execute([$_SESSION['user_id']]);
@@ -355,6 +360,31 @@ function modifierPreferenceNotifications(): void
         ->execute([$actives, $userId]);
 
     jsonResponse(['message' => 'Préférence de notifications mise à jour.']);
+}
+
+/**
+ * Préférence personnelle "statistiques masquées sur mon tableau de
+ * bord" — liée au compte, pas au navigateur, donc elle suit
+ * l'utilisateur d'un appareil à l'autre. Pour un admin, ce même
+ * bouton contrôle en plus le réglage public de l'accueil (voir
+ * changerParametreAdmin() dans admin.php) via un appel séparé côté
+ * client — cette route-ci ne touche jamais qu'au compte connecté.
+ */
+function modifierPreferences(): void
+{
+    $userId = requireAuth();
+
+    $body = getJsonBody();
+
+    if (array_key_exists('stats_masquees', $body)) {
+
+        $masquees = !empty($body['stats_masquees']) ? 1 : 0;
+
+        getPdo()->prepare('UPDATE utilisateurs SET stats_masquees = ? WHERE id = ?')
+            ->execute([$masquees, $userId]);
+    }
+
+    jsonResponse(['message' => 'Préférences mises à jour.']);
 }
 
 /**

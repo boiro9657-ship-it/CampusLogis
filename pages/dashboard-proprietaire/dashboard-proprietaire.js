@@ -15,7 +15,7 @@ let utilisateurConnecte = null;
 // les statistiques de consultation sont offertes à tous les comptes,
 // pas seulement Premium/Pro — voir publier-logement.js pour le même
 // interrupteur appliqué aux vidéos et à la publicité vocale.
-const FONCTIONNALITES_LIBRES_LANCEMENT = true;
+const FONCTIONNALITES_LIBRES_LANCEMENT = false;
 
 const LIBELLES_DUREE_SEJOUR = {
     "24h": "24 heures",

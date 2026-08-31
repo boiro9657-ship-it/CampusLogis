@@ -21,7 +21,7 @@ const MAX_VIDEOS_PAR_PLAN = {
 // gratuitement (vidéos, publicité vocale...), quel que soit le plan
 // réellement enregistré. Repasser à false une fois les paiements
 // activés pour revenir aux limites normales par plan.
-const FONCTIONNALITES_LIBRES_LANCEMENT = true;
+const FONCTIONNALITES_LIBRES_LANCEMENT = false;
 
 // Présence de "?id=" = mode édition d'une annonce existante plutôt
 // que création : détermine tout du long ce fichier (pré-remplissage,

@@ -58,12 +58,9 @@
             <a href="./publier-logement.html" class="active"><i class="ph ph-plus-circle"></i> Publier un logement</a>
         </li>
 
-        <!-- Masqué : campagnes publicitaires payantes désactivées tant que le compte PayDunya n'est pas validé en mode live (voir backend/config/paydunya.php).
         <li>
             <a href="../publicite/publicite.html"><i class="ph ph-megaphone"></i> Publicité</a>
         </li>
-
-        -->
 
     </ul>
 
@@ -81,14 +78,10 @@
 
     <h1>Publier un logement</h1>
 
-    <p>Publiez gratuitement en quelques minutes, avec toutes les fonctionnalités.</p>
+    <p>Choisissez la formule qui vous convient, ou publiez gratuitement en quelques minutes.</p>
 
 </div>
 
-<!-- Bandeau de promotion Premium masqué : paiement PayDunya pas
-     encore validé (compte en attente d'approbation). Retirer ce
-     commentaire pour le réactiver. -->
-<!--
 <div class="plan-teaser" id="planTeaser">
 
     <button type="button" class="plan-teaser-close" id="planTeaserClose" aria-label="Fermer">
@@ -103,16 +96,7 @@
     </div>
 
 </div>
--->
 
-<!-- Écran de choix de plan masqué : le temps que les paiements
-     PayDunya soient validés, la publication est entièrement libre
-     et gratuite pour tous (voir FONCTIONNALITES_LIBRES_LANCEMENT
-     dans publier-logement.js) — afficher une carte "Gratuit" à côté
-     de rien donnait l'impression de frais cachés. Retirer ce
-     commentaire (et remettre "display:none" sur #publishForm)
-     pour réactiver le choix de plan. -->
-<!--
 <section id="planChoice" class="plan-choice-section">
 
     <div class="container">
@@ -216,9 +200,8 @@
     </div>
 
 </section>
--->
 
-<form class="publish-card" id="publishForm">
+<form class="publish-card" id="publishForm" style="display:none;">
 
     <div class="publish-progress" id="publishProgress">
 
@@ -730,7 +713,7 @@
                 <ul>
                     <li><a href="./publier-logement.html">Publier une annonce</a></li>
                     <li><a href="../tarifs/tarifs.html">Tarifs</a></li>
-                    <!-- Masqué : campagnes publicitaires payantes désactivées tant que le compte PayDunya n'est pas validé en mode live (voir backend/config/paydunya.php). <li><a href="../publicite/publicite.html">Publicité</a></li> -->
+                    <li><a href="../publicite/publicite.html">Publicité</a></li>
                     <li><a href="../rechercher/rechercher.html">Réserver</a></li>
                     <li><a href="../favoris/favoris.html">Favoris</a></li>
                     <li><a href="../contacte/contacte.html">Support</a></li>

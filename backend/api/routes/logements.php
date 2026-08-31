@@ -239,7 +239,7 @@ const LIMITE_ANNONCES_GRATUIT_PAR_JOUR = 2;
 // Repasser à false une fois les paiements activés pour revenir aux
 // limites normales par plan — voir aussi publier-logement.js
 // (FONCTIONNALITES_LIBRES_LANCEMENT) côté client.
-const FONCTIONNALITES_LIBRES_LANCEMENT = true;
+const FONCTIONNALITES_LIBRES_LANCEMENT = false;
 
 /**
  * Bloque la publication si le compte est au plan Gratuit et a déjà
